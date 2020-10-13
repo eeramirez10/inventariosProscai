@@ -1,0 +1,11 @@
+create table FINV(
+	ID int(10) not null auto_increment primary key,
+    ISEQ int(10),
+    ICOD VARCHAR(200),
+    IEAN VARCHAR(200),
+    I2DESCR VARCHAR(200),
+    IALTA DATE,
+    ALMCANT DECIMAL(18,3),
+    IALTAREAL DATE,
+    ALMCANTREAL DECIMAL(18,3)
+) 
