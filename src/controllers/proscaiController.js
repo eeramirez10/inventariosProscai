@@ -6,13 +6,17 @@ const moment = require('moment');
 
 
 
+
+
 controller.inventarios = async () => {
 
     const inventarios = await query(`
-        SELECT FINV.ISEQ,ICOD,IEAN,I2DESCR,IALTA,ALMCANT FROM FINV
+        SELECT FINV.ISEQ,ICOD,IEAN,I2DESCR,IALTA,SUM(ALMCANT) as ALMCANT FROM FINV
         LEFT JOIN FALM ON FALM.ISEQ=FINV.ISEQ
         LEFT JOIN FINV2 ON FINV2.I2KEY=FINV.ISEQ
         WHERE mid(ICOD,1,2)='01'
+        GROUP BY ICOD
+        ORDER BY ISEQ
         
     `);
 
@@ -37,13 +41,16 @@ controller.buscaRegistrosNuevos = async () => {
 
     const query = util.promisify(connection.query).bind(connection);
 
-  
+
 
     const registrosNuevos = await query(`
-    SELECT FINV.ISEQ,ICOD,IEAN,I2DESCR,DATE_FORMAT(IALTA,"%Y-%m-%d" ) AS IALTA,ALMCANT FROM FINV
+    SELECT FINV.ISEQ,ICOD,IEAN,I2DESCR,DATE_FORMAT(IALTA,"%Y-%m-%d" ) AS IALTA, SUM(ALMCANT) as ALMCANT FROM FINV
     LEFT JOIN FALM ON FALM.ISEQ=FINV.ISEQ
     LEFT JOIN FINV2 ON FINV2.I2KEY=FINV.ISEQ
-    WHERE mid(ICOD,1,2)='01' and  DAY(IALTA) = ${currentDay} AND  MONTH(IALTA)=${currentMonth}  AND YEAR(IALTA)= ${currentYear}`);
+    WHERE mid(ICOD,1,2)='01' and  DAY(IALTA) = ${currentDay} AND  MONTH(IALTA)=${currentMonth}  AND YEAR(IALTA)= ${currentYear}
+    GROUP BY ICOD
+    ORDER BY ISEQ
+    `);
 
     connection.end();
 

@@ -14,13 +14,22 @@ let ultimoDiaMes = moment().endOf('month').format('D');
 
 
 //controllers
-const { buscaRegistrosNuevos } = require('./controllers/proscaiController');
-const { creaColumnaAFinDeMes,insertaActualiza } = require('./controllers/tuvansaController');
+const { buscaRegistrosNuevos,inventarios } = require('./controllers/proscaiController');
+const { creaColumnaAFinDeMes,insertaActualiza, insertaABdTuvansa } = require('./controllers/tuvansaController');
 
 //
+/* 
+inventarios()
+    .then(resp => {
+        insertaABdTuvansa(resp)
+            .then(resp => console.log(resp))
+            .catch(err => console.log(err))
+    })
+    .then(resp => console.log(resp))
+    .catch(err => console.log(err)) */
 
 
-    cron.schedule(`*/10 * * * *`,()=>{
+  cron.schedule(`*/20 * * * *`,()=>{
 
         buscaRegistrosNuevos()
         .then(resp => {

@@ -32,7 +32,11 @@ controller.insertaABdTuvansa = async (inventarios) => {
             console.log(result);
         })
     }
-    //return busca.legth > 0 ? busca : 'No hay datos';
+
+    return {
+        ok: true,
+        message: 'insertados correctamente'
+    }
 }
 
 //Inserta o actualiza los datos desde proscai a la BD Tuvansa
