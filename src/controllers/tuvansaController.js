@@ -9,7 +9,9 @@ const { Console } = require('console');
 let sIndexColumn = '*';
 let sTable = 'FINV';
 var request = {};
-var aColumns = ['ISEQ', 'ICOD', 'IEAN', 'I2DESCR', ' DATE_FORMAT(IALTA,"%Y-%m-%d")', 'ALMCANT', 'ALMASIGNADO', '(ALMCANT - ALMASIGNADO)', 'ALMCANTREAL', 'U.nombre'];
+var aColumns = [
+    'ISEQ', 'ICOD', 'IEAN', 'I2DESCR', ' DATE_FORMAT(IALTA,"%Y-%m-%d")', 'ALMCANT', 'ALMASIGNADO', '(ALMCANT - ALMASIGNADO)', 'ALMCANTREAL',
+    'IF(idUsuario=1,"Erick",IF(idUsuario=2,"German",IF(idUsuario=3,"Gilberto",IF(idUsuario=4,"Alejandro",IF(idUsuario=5,"Hector",idUsuario)))))'];
 
 const connection = mysql.createConnection({
     host: 'tuvansa-server.dyndns.org',
@@ -341,7 +343,7 @@ function server(res) {
     //var sQuery = "SELECT SQL_CALC_FOUND_ROWS " +aColumns.join(',')+ " FROM " +sTable+" "+sWhere+" "+sOrder+" "+sLimit +" limit 10";
 
     
-    var sQuery = `SELECT SQL_CALC_FOUND_ROWS  ${aColumns.join(',')} FROM   ${sTable} LEFT JOIN usuario AS U ON finv.IdUsuario = U.id ${sWhere} ${sOrder} ${sLimit}  `;
+    var sQuery = `SELECT SQL_CALC_FOUND_ROWS  ${aColumns.join(',')} FROM   ${sTable}  ${sWhere} ${sOrder} ${sLimit}  `;
 
     var rResult = {};
     var rResultFilterTotal = {};
