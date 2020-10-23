@@ -9,7 +9,7 @@ const { Console } = require('console');
 let sIndexColumn = '*';
 let sTable = 'FINV';
 var request = {};
-var aColumns = ['ISEQ', 'ICOD', 'IEAN', 'I2DESCR', ' DATE_FORMAT(IALTA,"%Y-%m-%d")', 'ALMCANT', 'ALMCANTREAL'];
+var aColumns = ['ISEQ', 'ICOD', 'IEAN', 'I2DESCR', ' DATE_FORMAT(IALTA,"%Y-%m-%d")', 'ALMCANT', 'ALMASIGNADO', '(ALMCANT - ALMASIGNADO)', 'ALMCANTREAL', 'U.nombre'];
 
 const connection = mysql.createConnection({
     host: 'tuvansa-server.dyndns.org',
@@ -24,8 +24,11 @@ const query = util.promisify(connection.query).bind(connection);
 controller.insertaABdTuvansa = async (inventarios) => {
 
     for (inventario of inventarios) {
-        if (inventario.ALMCANT === null) {
+        if (inventario.ALMCANT === null ) {
             inventario.ALMCANT = 0;
+        }
+        if(inventario.ALMASIGNADO === null){
+            inventario.ALMASIGNADO = 0;
         }
         connection.query(` INSERT INTO FINV SET ? `, inventario, (err, result) => {
             if (err) throw err;
@@ -119,12 +122,51 @@ controller.insertaActualiza = async (inventarios) => {
 
 }
 
+controller.actualizaAlmcantAlmasignado = async (inventarioProscai) =>{
+
+    const inventarios = inventarioProscai;
+    let almcantCambios = []
+    let almasignadoCambios = [];
+    for (let inventario of inventarios){
+
+        const buscaAlmcant = await query('Select ISEQ, ALMCANT FROM FINV WHERE ISEQ = ? AND ALMCANT != ?', [inventario.ISEQ,inventario.ALMCANT ])
+
+        if (buscaAlmcant.length > 0){
+            await query('UPDATE FINV SET ALMCANT = ? WHERE ISEQ = ?', [inventario.ALMCANT, inventario.ISEQ])
+            almcantCambios.push(inventario);
+        }
+
+        const buscaAlmsignado = await query('Select ISEQ, ALMCANT FROM FINV WHERE ISEQ = ? AND ALMASIGNADO != ?', [inventario.ISEQ,inventario.ALMASIGNADO ])
+
+        if(buscaAlmsignado.length > 0){
+            await query ('UPDATE FINV SET ALMASIGNADO = ? WHERE ISEQ = ?', [inventario.ALMASIGNADO, inventario.ISEQ]) 
+            almasignadoCambios.push(inventario)
+        }
+        
+      
+    }
+
+    if(almcantCambios.length == 0 && almasignadoCambios.length == 0){
+        return {
+            ok: true,
+            message: 'No hay cambios'
+        }
+    }
+
+    return {
+        ok:true,
+        message:'Registros actualizados',
+        almcantCambios,
+        almasignadoCambios
+    }
+}
+
 
 controller.cargaDataTable = (req, res) => {
     console.log('GET request to /server');
     request = req.query;
 
-
+    //console.log(req.user)
     server(res);
 }
 
@@ -135,33 +177,23 @@ controller.inserta = (req, res) => {
         return
     }
 
-    let datos = {};
-    const { value, iseq } = req.body;
+    const datos = {...req.body, ...req.user}
+
     const fechaActual = moment().format('YYYY-MM-DD');
 
 
-
-    datos.IALTAREAL = fechaActual;
-    datos.ALMCANTREAL = value;
-    datos.ISEQ = iseq;
-
-    
-
     (async () => {
 
-        let actualiza = await query(`UPDATE FINV SET IALTAREAL= ?, ALMCANTREAL = ? WHERE ISEQ = ? `, [datos.IALTAREAL, datos.ALMCANTREAL, datos.ISEQ]);
+       
+        if (await query(`UPDATE FINV SET idUsuario= ?, IALTAREAL = ?, ALMCANTREAL = ? WHERE ISEQ = ? `, [datos.idUsuario,fechaActual, datos.value, datos.iseq])) {
 
-
-        if (!actualiza) {
-
-            return
+            return {
+                ok: true,
+                message: 'Registros actualizados'
+            }
         }
 
-        return {
-            ok: true,
-            message: 'Registros actualizados',
-            data: datos
-        }
+        return
 
     })()
         .then(resp => console.log(resp))
@@ -302,7 +334,9 @@ function server(res) {
 
     //Queries
     //var sQuery = "SELECT SQL_CALC_FOUND_ROWS " +aColumns.join(',')+ " FROM " +sTable+" "+sWhere+" "+sOrder+" "+sLimit +" limit 10";
-    var sQuery = `SELECT SQL_CALC_FOUND_ROWS  ${aColumns.join(',')} FROM   ${sTable} ${sWhere} ${sOrder} ${sLimit}  `;
+
+    
+    var sQuery = `SELECT SQL_CALC_FOUND_ROWS  ${aColumns.join(',')} FROM   ${sTable} LEFT JOIN usuario AS U ON finv.IdUsuario = U.id ${sWhere} ${sOrder} ${sLimit}  `;
 
     var rResult = {};
     var rResultFilterTotal = {};

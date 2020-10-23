@@ -1,10 +1,17 @@
 const express = require('express');
-const app = express();
+
 const moment = require('moment');
 const path = require('path');
 const morgan = require('morgan');
 const cors = require('cors');
 const cron = require('node-cron');
+const passport = require('passport');
+const cookieParser = require('cookie-parser');
+const flash = require('express-flash');
+const session = require('express-session');
+
+
+const app = express();
 
 
 const mes = String(moment().format('M'))
@@ -15,31 +22,38 @@ let ultimoDiaMes = moment().endOf('month').format('D');
 
 //controllers
 const { buscaRegistrosNuevos,inventarios } = require('./controllers/proscaiController');
-const { creaColumnaAFinDeMes,insertaActualiza, insertaABdTuvansa } = require('./controllers/tuvansaController');
+const { creaColumnaAFinDeMes,insertaActualiza, insertaABdTuvansa, actualizaAlmcantAlmasignado } = require('./controllers/tuvansaController');
 
 //
-/* 
-inventarios()
+
+
+cron.schedule('*/10 * * * *', ()=>{
+    console.log('Buscando cambios en inventario y asignados', moment().format());
+    inventarios()
     .then(resp => {
-        insertaABdTuvansa(resp)
-            .then(resp => console.log(resp))
-            .catch(err => console.log(err))
+
+        actualizaAlmcantAlmasignado(resp)
+        .then(resp => console.log(resp))
+        .catch(err => console.log(err))
+
     })
-    .then(resp => console.log(resp))
-    .catch(err => console.log(err)) */
+    .catch(err => console.log(err))
+})
 
 
-  cron.schedule(`*/20 * * * *`,()=>{
 
+cron.schedule(`*/1 * * * *`,()=>{
+    console.log('Buscando registros nuevos', moment().format())
         buscaRegistrosNuevos()
         .then(resp => {
             insertaActualiza(resp)
                 .then(resp => console.log(resp))
                 .catch(err => console.log(err)) 
         })
-        .catch(err => console.log(err))
+        .catch(err => console.log(err)) 
 
-    })
+ }) 
+
 
 
 
@@ -74,6 +88,18 @@ app.set('view engine', 'ejs');
 //app.use(morgan('dev'));
 app.use(express.urlencoded({ extended: false }))
 app.use(cors());
+app.use(flash());
+app.use(express.static(path.join(__dirname,'public')));
+app.use(cookieParser('secreto'));
+app.use(session({
+    secret:'secreto',
+    resave: true,
+    saveUninitialized: true
+}));
+app.use(passport.initialize());
+app.use(passport.session());
+
+
 
 
 

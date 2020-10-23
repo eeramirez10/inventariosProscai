@@ -10,8 +10,17 @@ const moment = require('moment');
 
 controller.inventarios = async () => {
 
+    const connection = mysql.createConnection({
+        host: 'tuvansa.dyndns.org',
+        user: 'consultas',
+        password: 'consultas',
+        database: 'tuvansa'
+    });
+
+    const query = util.promisify(connection.query).bind(connection);
+
     const inventarios = await query(`
-        SELECT FINV.ISEQ,ICOD,IEAN,I2DESCR,IALTA,SUM(ALMCANT) as ALMCANT FROM FINV
+        SELECT FINV.ISEQ,ICOD,IEAN,I2DESCR,IALTA,SUM(ALMCANT) as ALMCANT, SUM(ALMASIGNADO) AS ALMASIGNADO  FROM FINV
         LEFT JOIN FALM ON FALM.ISEQ=FINV.ISEQ
         LEFT JOIN FINV2 ON FINV2.I2KEY=FINV.ISEQ
         WHERE mid(ICOD,1,2)='01'
@@ -44,9 +53,10 @@ controller.buscaRegistrosNuevos = async () => {
 
 
     const registrosNuevos = await query(`
-    SELECT FINV.ISEQ,ICOD,IEAN,I2DESCR,DATE_FORMAT(IALTA,"%Y-%m-%d" ) AS IALTA, SUM(ALMCANT) as ALMCANT FROM FINV
+    SELECT FINV.ISEQ,ICOD,IEAN,I2DESCR,DATE_FORMAT(IALTA,"%Y-%m-%d" ) AS IALTA, SUM(ALMCANT) as ALMCANT, SUM(ALMASIGNADO) AS ALMASIGNADO FROM FINV
     LEFT JOIN FALM ON FALM.ISEQ=FINV.ISEQ
     LEFT JOIN FINV2 ON FINV2.I2KEY=FINV.ISEQ
+    LEFT JOIN FFAM AS FAM2 ON FAM2.FAMTNUM = FINV.IFAM2
     WHERE mid(ICOD,1,2)='01' and  DAY(IALTA) = ${currentDay} AND  MONTH(IALTA)=${currentMonth}  AND YEAR(IALTA)= ${currentYear}
     GROUP BY ICOD
     ORDER BY ISEQ
