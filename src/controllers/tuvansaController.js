@@ -173,6 +173,8 @@ controller.cargaDataTable = (req, res) => {
 controller.inserta = (req, res) => {
 
     
+    console.log(req.body)
+    
     if (isNaN(req.body.value) || req.body.value ==='') {
         return
     }
@@ -180,6 +182,8 @@ controller.inserta = (req, res) => {
     const datos = {...req.body, ...req.user}
 
     const fechaActual = moment().format('YYYY-MM-DD');
+
+   
 
 
     (async () => {

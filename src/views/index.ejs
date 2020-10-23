@@ -85,13 +85,13 @@
 
             const rol = document.querySelector('.rol').textContent;
 
-            let target = rol !== 'administrador'? [0,4,9] : ' ';
+            let target = rol !== 'administrador'? [4,9] : ' ';
 
             let oTable = $('#example').DataTable({
                 "bProcessing": true,
                 "bServerSide": true,
 
-                "sAjaxSource": "https://test-1314.herokuapp.com/server",
+                "sAjaxSource": "http://localhost:3000/server",
 
                 "aoColumns": [
                     { "mData": 0 },
@@ -118,7 +118,7 @@
                         return
                     }
 
-                    $('.inventarios').editable('https://test-1314.herokuapp.com/data', {
+                    $('.inventarios').editable('http://localhost:3000/data', {
 
 
                         "submitdata": function (value, settings) {
