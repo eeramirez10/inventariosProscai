@@ -173,21 +173,22 @@ controller.cargaDataTable = (req, res) => {
 controller.inserta = (req, res) => {
 
     
-    console.log(req.body)
+    
     
     if (isNaN(req.body.value) || req.body.value ==='') {
         return
     }
 
-    const datos = {...req.body, ...req.user}
-
+    let datos = {...req.body, ...req.user}
+    console.log(datos)
     const fechaActual = moment().format('YYYY-MM-DD');
 
-   
+    
+    
 
 
     (async () => {
-
+        
        
         if (await query(`UPDATE FINV SET idUsuario= ?, IALTAREAL = ?, ALMCANTREAL = ? WHERE ISEQ = ? `, [datos.idUsuario,fechaActual, datos.value, datos.iseq])) {
 
