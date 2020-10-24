@@ -10,8 +10,8 @@ let sIndexColumn = '*';
 let sTable = 'FINV';
 var request = {};
 var aColumns = [
-    'ISEQ', 'ICOD', 'IEAN', 'I2DESCR', ' DATE_FORMAT(IALTA,"%Y-%m-%d")', 'ALMCANT', 'ALMASIGNADO', '(ALMCANT - ALMASIGNADO) AS DISPONIBLE', 'ALMCANTREAL',
-    'IF(idUsuario=1,"Erick",IF(idUsuario=2,"German",IF(idUsuario=3,"Gilberto",IF(idUsuario=4,"Alejandro",IF(idUsuario=5,"Hector",idUsuario)))))'];
+    'ISEQ', 'ICOD', 'IEAN', 'I2DESCR', ' DATE_FORMAT(IALTA,"%Y-%m-%d")', 'ALMCANT', 'ALMASIGNADO', '(ALMCANT - ALMASIGNADO) ', 'ALMCANTREAL',
+    'idUsuario'];
 
 const connection = mysql.createConnection({
     host: 'tuvansa-server.dyndns.org',
