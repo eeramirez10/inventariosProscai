@@ -11,7 +11,7 @@ let sTable = 'FINV';
 var request = {};
 var aColumns = [
     'ISEQ', 'ICOD', 'IEAN', 'I2DESCR', ' DATE_FORMAT(IALTA,"%Y-%m-%d")', 'ALMCANT', 'ALMASIGNADO', '(ALMCANT - ALMASIGNADO) ', 'ALMCANTREAL',
-    'idUsuario'];
+    ' u.nombre'];
 
 const connection = mysql.createConnection({
     host: 'tuvansa-server.dyndns.org',
@@ -343,7 +343,7 @@ function server(res) {
     //var sQuery = "SELECT SQL_CALC_FOUND_ROWS " +aColumns.join(',')+ " FROM " +sTable+" "+sWhere+" "+sOrder+" "+sLimit +" limit 10";
 
     
-    var sQuery = `SELECT SQL_CALC_FOUND_ROWS  ${aColumns.join(',')} FROM ${sTable} ${sWhere} ${sOrder} ${sLimit} `;
+    var sQuery = `SELECT SQL_CALC_FOUND_ROWS  ${aColumns.join(',')} FROM ${sTable} left join usuario as u on finv.IdUsuario = u.id  ${sWhere} ${sOrder} ${sLimit} `;
 
     var rResult = {};
     var rResultFilterTotal = {};
