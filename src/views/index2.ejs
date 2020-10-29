@@ -1,35 +1,155 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Table</title>
-</head>
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.22/css/jquery.dataTables.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.6.5/css/buttons.dataTables.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/select/1.3.1/css/select.dataTables.min.css">
+<html>
 
+<head>
+    <title>Tuvansa</title>
+    <!-- 
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.22/css/dataTables.bootstrap4.min.css">
+    <script src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.22/js/dataTables.bootstrap4.min.js"></script>
+    <script src="https://markcell.github.io/jquery-tabledit/assets/js/tabledit.min.js"></script> -->
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />
+
+    <script src="https://cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.12/js/dataTables.bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.12/css/dataTables.bootstrap.min.css" />
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <script src="https://markcell.github.io/jquery-tabledit/assets/js/tabledit.min.js"></script>
+
+    
+
+</head>
 
 <body>
-    <h1>Titulo</h1>
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                    data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">Brand</a>
+            </div>
 
-    <table id="example" class="display" cellspacing="0" width="100%">
-        <thead>
-            <tr>
-                <th></th>
-                <th>First name</th>
-                <th>Last name</th>
-                <th>Position</th>
-                <th>Office</th>
-                <th width="18%">Start date</th>
-                <th>Salary</th>
-            </tr>
-        </thead>
-    </table>
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 
-    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
-    <script src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/1.6.5/js/dataTables.buttons.min.js"></script>
-    <script src="https://cdn.datatables.net/select/1.3.1/js/dataTables.select.min.js"></script>
+
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a><%= user.nombre %></a></li>
+                    <li><a id="rol"><%= user.rol %></a></li>
+                    <li><a class="nav-link " href="/logout">Cerrar Sesion</a></li>
+
+                </ul>
+            </div><!-- /.navbar-collapse -->
+        </div><!-- /.container-fluid -->
+    </nav>
+
+    <div class="container-fluid">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 align="center">Inventarios</h4>
+            </div>
+            <div class="panel-body">
+                <div class="table-responsive">
+                    <table id="sample_data" class="table table-bordered table-striped"
+                        style="width:100%; font-size:11px; ">
+                        <thead>
+                            <tr>
+                                <th>ISEC</th>
+                                <th>Codigo</th>
+                                <th>Ean</th>
+                                <th>Descripcion</th>
+                                <th>fecha/pros</th>
+                                <th>inv proscai </th>
+                                <th>Asignado</th>
+                                <th>Disponible</th>
+                                <th>Inv/Real</th>
+                                <th>Usuario</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br />
+    <br />
 </body>
+
 </html>
+
+<script type="text/javascript" language="javascript">
+    $(document).ready(function () {
+
+        let rol = document.querySelector('#rol').textContent;
+
+        let targets = rol !== 'administrador' ? [4, 9] : [];
+
+        let columnaEditable = rol === 'administrador' ? 8 : 7;
+
+        console.log(rol)
+
+        var dataTable = $('#sample_data').DataTable({
+            "processing": true,
+            "serverSide": true,
+            "order": [],
+            "ajax": {
+                url: "http://localhost:3000/server",
+                type: "GET"
+            },
+            "columnDefs": [
+                {
+                    "targets": targets,
+                    "visible": false
+                }
+            ],
+            "buttons": [
+                'print'
+            ]
+        });
+
+        if (rol === 'Vendedor') {
+            return;
+        }
+
+        $('#sample_data').on('draw.dt', function () {
+            $('#sample_data').Tabledit({
+                url: 'http://localhost:3000/data',
+                deleteButton: false,
+                /* editButton:false, */
+                dataType: 'json',
+                columns: {
+                    identifier: [0, 'ISEQ'],
+                    editable: [[columnaEditable, 'ALMCANTREAL']/* , [2, 'last_name'], [3, 'gender', '{"1":"Male","2":"Female"}'] */]
+                },
+                restoreButton: false,
+                onSuccess: function (data, textStatus, jqXHR) {
+                    console.log(data);
+                    $('#sample_data').DataTable().ajax.reload();
+                    if (data.action == 'delete') {
+                        $('#' + data.id).remove();
+                        $('#sample_data').DataTable().ajax.reload();
+                    }
+                },
+                onFail: function (jqXHR, textStatus, errorThrown) {
+                    console.log('onFail(jqXHR, textStatus, errorThrown)');
+                    console.log(jqXHR);
+                    console.log(textStatus);
+                    console.log(errorThrown);
+                },
+            });
+        });
+
+    }); 
+</script>

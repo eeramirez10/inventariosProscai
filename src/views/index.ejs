@@ -14,6 +14,8 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.22/css/dataTables.bootstrap4.min.css">
 
 
+
+
 </head>
 
 <body>
@@ -72,27 +74,40 @@
     </div>
 
 
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"
+
+
+      <script src="https://code.jquery.com/jquery-3.5.1.min.js"
         integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
 
 
     <script src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.10.22/js/dataTables.bootstrap4.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jeditable.js/1.7.3/jeditable.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.22/js/dataTables.bootstrap4.min.js"></script>
+
 
     <script>
         $(document).ready(function () {
 
             const rol = document.querySelector('.rol').textContent;
 
-            let target = rol !== 'administrador'? [4] : ' ';
+            let target = rol !== 'administrador' ? [4] : ' ';
 
-            let oTable = $('#example').dataTable({
+            let search = document.querySelector('#example_filter');
+
+            let value = '';
+
+            /*             $('#example').on('search.dt', function () {
+                            value = $('.dataTables_filter input').val();
+            
+                            console.log(value); // <-- the value
+                        }); */
+
+            var oTable = $('#example').DataTable({
                 "bProcessing": true,
                 "bServerSide": true,
 
                 //https://test-1314.herokuapp.com/
-                "sAjaxSource": "https://test-1314.herokuapp.com/server",
+                "sAjaxSource": "http://localhost:3000/server",
 
                 "aoColumns": [
                     { "mData": 0 },
@@ -104,12 +119,14 @@
                     { "mData": 6 },
                     { "mData": 7 },
 
-                    { "sTitle": "Inventario Real", "mData": 8,  "className": "inventarios" },
+                    { "sTitle": "Inventario Real", "mData": 8, "className": "inventarios" },
                     { "mData": 9 },
 
                 ],
-                "aoColumnDefs":[
-                    { "bVisible": false, "aTargets":target  }
+                "aoColumnDefs": [
+                    { "bVisible": false, "aTargets": target }
+
+
                 ],
                 "fnDrawCallback": function () {
 
@@ -118,30 +135,37 @@
                     if (rol === 'Vendedor') {
                         return
                     }
+
+
+
                     //http://localhost:3000/
-                    $('.inventarios').editable('https://test-1314.herokuapp.com/data', {
+                    $('.inventarios').editable('http://localhost:3000/data', {
+                        tooltip: "Ingresa",
+                        event: "click",
+                        //style: "inherit",
+                        type: "text",
 
-
-                        "submitdata": function (value, settings) {
-
+                        "submitdata": function (value, settings, result) {
                             //refresca el campo con el nuevo valor
+                            //location.reload();
+                            //oTable.cell(this).data(value).draw(); 
+/*                             console.log(oTable.cell(this).data(5).draw());
+                            console.log(oTable.cell(this.parentElement.children[9]).data(88888).draw());
+                            console.log(this)
+                            var aPos = oTable.fnGetPosition(this);
+                            console.log(aPos);
+                            oTable.fnUpdate(value, aPos[0], aPos[1]); */
 
+                            oTable.draw()
 
-                            location.reload();
+                            //oTable.search('01103037').draw();
 
                             return {
-                                "iseq":this.parentElement.querySelector('.sorting_1').textContent
-                                
+                                "iseq": this.parentElement.querySelector('.sorting_1').textContent,
+
+
                             }
-
-
-                        },
-
-
-                        event: "click",
-                        style: "inherit",
-
-
+                        }
 
 
                     })
@@ -151,10 +175,26 @@
 
                 }
 
+
+
+
+
             })
 
 
 
+            /*            oTable.on('submitdata', function () {
+                           console.log('table has been re-drawn')
+                       });
+           
+           
+                              $('.dataTables_filter input').unbind().keyup(function () {
+                                       var value = $(this).val();
+                                       console.log(value); 
+                                       if (value.length > 3) {
+                                           oTable.search(value).draw();
+                                       }
+                                   });  */
 
 
 

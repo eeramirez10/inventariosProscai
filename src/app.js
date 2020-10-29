@@ -27,7 +27,7 @@ const { creaColumnaAFinDeMes,insertaActualiza, insertaABdTuvansa, actualizaAlmca
 //
 
 
-cron.schedule('*/10 * * * *', ()=>{
+cron.schedule('*/20 * * * *', ()=>{
     console.log('Buscando cambios en inventario y asignados', moment().format());
     inventarios()
     .then(resp => {
@@ -38,17 +38,26 @@ cron.schedule('*/10 * * * *', ()=>{
 
     })
     .catch(err => console.log(err))
+},{
+    schedule:true,
+    timezone:"America/Mexico_City"
 })
 
 
 
-cron.schedule(`*/1 * * * *`,()=>{
+
+
+
+
+cron.schedule(`*/50 * * * *`,()=>{
     console.log('Buscando registros nuevos', moment().format())
         buscaRegistrosNuevos()
         .then(resp => {
+
+            console.log(resp)
             insertaActualiza(resp)
                 .then(resp => console.log(resp))
-                .catch(err => console.log(err)) 
+                .catch(err => console.log(err))  
         })
         .catch(err => console.log(err)) 
 
@@ -70,6 +79,9 @@ cron.schedule(`*/1 * * * *`,()=>{
         })
         .catch( err => console.log(err))
 
+    },{
+        schedule:true,
+        timezone:"America/Mexico_City"
     })
 
 

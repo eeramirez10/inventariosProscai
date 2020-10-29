@@ -23,7 +23,7 @@ controller.inventarios = async () => {
         SELECT FINV.ISEQ,ICOD,IEAN,I2DESCR,IALTA,SUM(ALMCANT) as ALMCANT, SUM(ALMASIGNADO) AS ALMASIGNADO  FROM FINV
         LEFT JOIN FALM ON FALM.ISEQ=FINV.ISEQ
         LEFT JOIN FINV2 ON FINV2.I2KEY=FINV.ISEQ
-        WHERE mid(ICOD,1,2)='01'
+        WHERE mid(ICOD,1,2)='01' AND ALMNUM = '01'
         GROUP BY ICOD
         ORDER BY ISEQ
         
@@ -57,7 +57,7 @@ controller.buscaRegistrosNuevos = async () => {
     LEFT JOIN FALM ON FALM.ISEQ=FINV.ISEQ
     LEFT JOIN FINV2 ON FINV2.I2KEY=FINV.ISEQ
     LEFT JOIN FFAM AS FAM2 ON FAM2.FAMTNUM = FINV.IFAM2
-    WHERE mid(ICOD,1,2)='01' and  DAY(IALTA) = ${currentDay} AND  MONTH(IALTA)=${currentMonth}  AND YEAR(IALTA)= ${currentYear}
+    WHERE mid(ICOD,1,2)='01' AND ALMNUM = '01' and  DAY(IALTA) = ${currentDay} AND  MONTH(IALTA)=${currentMonth}  AND YEAR(IALTA)= ${currentYear}
     GROUP BY ICOD
     ORDER BY ISEQ
     `);

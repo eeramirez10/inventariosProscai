@@ -27,7 +27,7 @@ router.get('/inventarios',(req, res, next)=>{
 
     
     const user = req.user;
-    res.render('index', { user })
+    res.render('index2', { user })
 })
 
 
