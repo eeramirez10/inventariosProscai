@@ -34,7 +34,7 @@ controller.insertaABdTuvansa = async (inventarios) => {
         }
         connection.query(` INSERT INTO FINV SET ? `, inventario, (err, result) => {
             if (err) throw err;
-            console.log(result);
+            //console.log(result);
         })
     }
 

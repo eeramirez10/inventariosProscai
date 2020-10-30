@@ -125,10 +125,12 @@
 
         $('#sample_data').on('draw.dt', function () {
             $('#sample_data').Tabledit({
+                //"http://localhost:3000/
                 url:'https://test-1314.herokuapp.com/data',
                 deleteButton: false,
                 /* editButton:false, */
                 dataType: 'json',
+                //data: { usuario : 'Erick'},
                 columns: {
                     identifier: [0, 'ISEQ'],
                     editable: [[columnaEditable, 'ALMCANTREAL']/* , [2, 'last_name'], [3, 'gender', '{"1":"Male","2":"Female"}'] */]

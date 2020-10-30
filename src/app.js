@@ -9,6 +9,7 @@ const passport = require('passport');
 const cookieParser = require('cookie-parser');
 const flash = require('express-flash');
 const session = require('express-session');
+const MemoryStore = require('memorystore')(session);
 
 
 const app = express();
@@ -104,6 +105,10 @@ app.use(flash());
 app.use(express.static(path.join(__dirname,'public')));
 app.use(cookieParser('secreto'));
 app.use(session({
+    cookie: { maxAge:86400000},
+    store: new MemoryStore({
+        checkPeriod: 86400000
+    }),
     secret:'secreto',
     resave: true,
     saveUninitialized: true
