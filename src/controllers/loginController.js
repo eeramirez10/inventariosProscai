@@ -12,35 +12,46 @@ const connection = mysql.createConnection({
     database: 'tuvansa'
 });
 
+
+
 const query = util.promisify(connection.query).bind(connection);
 
-passport.use(new passportLocal(async (username, password, done) => {
-
-    const buscaUsuario = await query(`
-        SELECT u.id,u.nombre, u.user, a.area, r.rol,s.sucursal from usuario as u
-        inner join area as a on u.idArea = a.idArea
-        inner join rol as r on u.idRol = r.idRol
-        inner join sucursal as s on u.idSucursal = s.idSucursal
-        where user = ? && password = ?`,
-        [username, password]
-    );
+passport.use(new passportLocal((username, password, done) => {
 
 
 
-    if (buscaUsuario.length > 0) {
-        return done(null,
-            {
-                idUsuario: buscaUsuario[0].id,
-                nombre: buscaUsuario[0].nombre,
-                user: buscaUsuario[0].user,
-                area: buscaUsuario[0].area,
-                rol: buscaUsuario[0].rol,
-                sucursal: buscaUsuario[0].sucursal
-            }
-        )
-    }
+    const queryUsuarios = `SELECT u.id,u.nombre, u.user, a.area, r.rol,s.sucursal from usuario as u
+    inner join area as a on u.idArea = a.idArea
+    inner join rol as r on u.idRol = r.idRol
+    inner join sucursal as s on u.idSucursal = s.idSucursal
+    where user = ? && password = ?`
 
-    done(null, false, { message: 'Usuario o password incorrecto' });
+    connection.query(queryUsuarios,[username, password],(err, results)=>{
+
+        if (err) throw err;
+
+        console.log(results)
+
+
+        if (results.length > 0 ){
+            return done(null,
+                {
+                    idUsuario: results[0].id,
+                    nombre: results[0].nombre,
+                    user: results[0].user,
+                    area: results[0].area,
+                    rol: results[0].rol,
+                    sucursal: results[0].sucursal
+                }
+            )
+        }
+
+       return done(null, false, { message: 'Usuario o password incorrecto' });
+    })
+
+    
+
+    
 }))
 
 passport.serializeUser((user, done) => {

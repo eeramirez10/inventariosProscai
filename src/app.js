@@ -23,36 +23,43 @@ let ultimoDiaMes = moment().endOf('month').format('D');
 
 
 //controllers
-const { buscaRegistrosNuevos,inventarios } = require('./controllers/proscaiController');
-const { creaColumnaAFinDeMes,insertaActualiza, insertaABdTuvansa, actualizaAlmcantAlmasignado } = require('./controllers/tuvansaController');
+const { buscaRegistrosNuevos,inventarios, traeAlmcantAlmasigandoAlmacenesMexicoMonterreyVeracruz } = require('./controllers/proscaiController');
+const { creaColumnaAFinDeMes,insertaActualiza, insertaABdTuvansa, actualizaAlmcantAlmasignado, actualizaAlmacenesMexicoMonterreyVeracruz } = require('./controllers/tuvansaController');
 
 //
 
+// Se usa una sola vez para insertar la bd de proscai a bd Tuvansa
+/* inventarios()
+    .then( (inventario) => {
+
+        
+
+        insertaABdTuvansa(inventario)
+        .then( resp => console.log(resp))
+        .catch( err => console.log(err))
+    })
+    .catch ( err => console.log(err)) */
 
 cron.schedule('*/20 * * * *', ()=>{
-    console.log('Buscando cambios en inventario y asignados', moment().format());
-    inventarios()
-    .then(resp => {
 
-        actualizaAlmcantAlmasignado(resp)
-        .then(resp => console.log(resp))
-        .catch(err => console.log(err))
+    console.log('Buscando cambios en Almacenes', moment().format());
+    traeAlmcantAlmasigandoAlmacenesMexicoMonterreyVeracruz()
+    .then(res =>{
 
+        actualizaAlmacenesMexicoMonterreyVeracruz (res)
+            .then( resp => console.log(resp))
+            .catch(err => console.log(err))
     })
-    .catch(err => console.log(err))
+    .catch( err => console.log(err))
+
 },{
     schedule:true,
     timezone:"America/Mexico_City"
 })
 
 
-
-
-
-
-
-cron.schedule(`*/50 * * * *`,()=>{
-    console.log('Buscando registros nuevos', moment().format())
+cron.schedule(`*/10 * * * *`,()=>{
+     console.log('Buscando registros nuevos', moment().format())
         buscaRegistrosNuevos()
         .then(resp => {
 
@@ -63,8 +70,7 @@ cron.schedule(`*/50 * * * *`,()=>{
         })
         .catch(err => console.log(err)) 
 
- }) 
-
+ })
 
 
 

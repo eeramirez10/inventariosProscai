@@ -21,7 +21,7 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
     <script src="https://markcell.github.io/jquery-tabledit/assets/js/tabledit.min.js"></script>
 
-    
+
 
 </head>
 
@@ -37,7 +37,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="#">Brand</a>
+                <a class="navbar-brand" href="#">Tuvansa</a>
             </div>
 
             <!-- Collect the nav links, forms, and other content for toggling -->
@@ -61,7 +61,7 @@
             </div>
             <div class="panel-body">
                 <div class="table-responsive">
-                    <table id="sample_data" class="table table-bordered table-striped"
+                    <table id="sample_data" class="table table-bordered table-striped table-hover"
                         style="width:100%; font-size:11px; ">
                         <thead>
                             <tr>
@@ -70,11 +70,14 @@
                                 <th>Ean</th>
                                 <th>Descripcion</th>
                                 <th>fecha/pros</th>
-                                <th>inv proscai </th>
+                                <th>Alm/Mex </th>
+                                <th>Alm/MTY</th>
+                                <th>Alm/Ver </th>
                                 <th>Asignado</th>
                                 <th>Disponible</th>
                                 <th>Inv/Real</th>
                                 <th>Usuario</th>
+                                <th>Comentarios</th>
                             </tr>
                         </thead>
                         <tbody></tbody>
@@ -94,9 +97,14 @@
 
         let rol = document.querySelector('#rol').textContent;
 
-        let targets = rol !== 'administrador' ? [4, 9] : [];
+        let targets = rol !== 'administrador' && rol !== 'Almacenista' ? [11, 12] : [];
 
         let columnaEditable = rol === 'administrador' ? 8 : 7;
+
+        //http://localhost:3000
+        //https://test-1314.herokuapp.com
+
+        const url = 'https://test-1314.herokuapp.com';
 
         console.log(rol)
 
@@ -105,7 +113,7 @@
             "serverSide": true,
             "order": [],
             "ajax": {
-                url: "https://test-1314.herokuapp.com/server",
+                url: `${url}/server`,
                 type: "GET"
             },
             "columnDefs": [
@@ -125,16 +133,15 @@
 
         $('#sample_data').on('draw.dt', function () {
             $('#sample_data').Tabledit({
-                //"http://localhost:3000/
-                //https://test-1314.herokuapp.com/data
-                url:'https://test-1314.herokuapp.com/data',
+
+                url: `${url}/data`,
                 deleteButton: false,
                 /* editButton:false, */
                 dataType: 'json',
                 //data: { usuario : 'Erick'},
                 columns: {
                     identifier: [0, 'ISEQ'],
-                    editable: [[columnaEditable, 'ALMCANTREAL']/* , [2, 'last_name'], [3, 'gender', '{"1":"Male","2":"Female"}'] */]
+                    editable: [[10, 'ALMCANTREAL'], [12, "COMENTARIOS"] /* , [2, 'last_name'], [3, 'gender', '{"1":"Male","2":"Female"}'] */]
                 },
                 restoreButton: false,
                 onSuccess: function (data, textStatus, jqXHR) {

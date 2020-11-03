@@ -1,5 +1,11 @@
 
-
+td.details-control {
+  background: url('../img/details_open.png') no-repeat center center;
+  cursor: pointer;
+}
+tr.shown td.details-control {
+  background: url('../img/resources/details_close.png') no-repeat center center;
+}
 
 
 /*//////////////////////////////////////////////////////////////////

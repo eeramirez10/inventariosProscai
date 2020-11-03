@@ -10,8 +10,8 @@ let sIndexColumn = '*';
 let sTable = 'FINV';
 var request = {};
 var aColumns = [
-    'ISEQ', 'ICOD', 'IEAN', 'I2DESCR', ' DATE_FORMAT(IALTA,"%Y-%m-%d")', 'ALMCANT', 'ALMASIGNADO', '(ALMCANT - ALMASIGNADO) ', 'ALMCANTREAL',
-    'USUARIO'];
+    'ISEQ', 'ICOD', 'IEAN', 'I2DESCR', ' DATE_FORMAT(IALTA,"%Y-%m-%d")', 'ALMCANT','ALMCANTMTY','ALMCANTVER', 'ALMASIGNADO', '(ALMCANT - ALMASIGNADO) ', 'ALMCANTREAL',
+    'USUARIO','COMENTARIOS'];
 
 const connection = mysql.createConnection({
     host: 'tuvansa-server.dyndns.org',
@@ -32,10 +32,7 @@ controller.insertaABdTuvansa = async (inventarios) => {
         if (inventario.ALMASIGNADO === null) {
             inventario.ALMASIGNADO = 0;
         }
-        connection.query(` INSERT INTO FINV SET ? `, inventario, (err, result) => {
-            if (err) throw err;
-            //console.log(result);
-        })
+        await query(` INSERT INTO FINV SET ? `, inventario);
     }
 
     return {
@@ -144,6 +141,43 @@ controller.actualizaAlmcantAlmasignado = async (inventarioProscai) => {
 }
 
 
+controller.actualizaAlmacenesMexicoMonterreyVeracruz = async (inventarios) =>{
+
+    const mexico = inventarios.almacenMexico
+    const monterrey = inventarios.almacenMonterrey
+    const veracruz = inventarios.almacenVeracruz
+    
+    if ( mexico.length > 0){
+        console.log('Buscando cambios en almacen Mexico')
+        for (let inventario of mexico){
+            await query (`UPDATE FINV SET ALMCANT = ?, ALMASIGNADO = ? WHERE ISEQ = ?`, [inventario.ALMCANT, inventario.ALMASIGNADO, inventario.ISEQ]);
+        }
+    }
+
+    if(monterrey.length > 0){
+        console.log('Buscando cambios en almacen Mexico/Monterrey')
+        for (let inventario of monterrey ){
+            await query (`UPDATE FINV SET ALMCANTMTY = ? WHERE ISEQ = ?`, [inventario.ALMCANT, inventario.ISEQ]);
+        }
+    }
+
+    if(veracruz.length > 0){
+        console.log('Buscando cambios en almacen Mexico/Veracruz')
+        for (let inventario of veracruz ){
+            await query (`UPDATE FINV SET ALMCANTVER = ? WHERE ISEQ = ?`, [inventario.ALMCANT, inventario.ISEQ]);
+        }    
+    }
+
+
+
+    return {
+        ok: true,
+        message:'Almacenes actualizados'
+    }
+
+}
+
+
 controller.cargaDataTable = (req, res) => {
     console.log('GET request to /server');
     request = req.query;
@@ -179,7 +213,7 @@ controller.inserta = (req, res) => {
     (async () => {
 
 
-        if (await query(`UPDATE FINV SET USUARIO= ?, IALTAREAL = ?, ALMCANTREAL = ? WHERE ISEQ = ? `, [datos.nombre, fechaActual, datos.ALMCANTREAL, datos.ISEQ])) {
+        if (await query(`UPDATE FINV SET USUARIO= ?, IALTAREAL = ?, ALMCANTREAL = ?, COMENTARIOS = ? WHERE ISEQ = ? `, [datos.nombre, fechaActual, datos.ALMCANTREAL,datos.COMENTARIOS, datos.ISEQ])) {
 
             await query(`insert into usuariofinv set idFinv = (select id from finv where iseq = ${datos.ISEQ}), idUsuario = ${datos.idUsuario}`);
 
