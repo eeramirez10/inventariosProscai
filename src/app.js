@@ -119,8 +119,6 @@ app.use(session({
     secret:'secreto',
     resave: true,
     saveUninitialized: true,
-    passport: { user: { name:'Erick'}}
-    //cookie: { secure: true}
 }));
 app.use(passport.initialize());
 app.use(passport.session());

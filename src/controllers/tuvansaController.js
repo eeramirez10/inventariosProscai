@@ -186,13 +186,7 @@ controller.cargaDataTable = (req, res) => {
 
 controller.inserta = (req, res) => {
 
-    console.log("Request", req)
-    console.log("response", res)
-    console.log("User",req.user)
-    console.log("Body", req.body)
-
-
-    /* let datos = { ...req.body, ...req.user };
+    let datos = { ...req.body, ...req.user };
 
 
     if (datos.action !== 'edit') {
@@ -230,7 +224,7 @@ controller.inserta = (req, res) => {
 
     })()
         .then(resp => console.log(resp))
-        .catch(err => console.log(err)); */
+        .catch(err => console.log(err));
 
 
 
