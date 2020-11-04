@@ -118,7 +118,8 @@ app.use(session({
     }),
     secret:'secreto',
     resave: true,
-    saveUninitialized: true
+    saveUninitialized: true,
+    cookie: { secure: true}
 }));
 app.use(passport.initialize());
 app.use(passport.session());
