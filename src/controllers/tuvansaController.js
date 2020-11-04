@@ -188,6 +188,12 @@ controller.inserta = (req, res) => {
 
     let datos = { ...req.body, ...req.user };
 
+    if(req.user === undefined){
+
+        res.status(500).json({ message:'No hay usuario'})
+        return
+    }
+
 
     if (datos.action !== 'edit') {
         return;
@@ -195,8 +201,11 @@ controller.inserta = (req, res) => {
 
 
     if (isNaN(datos.ALMCANTREAL) || datos.ALMCANTREAL === '') {
+        res.status(500).json({ message:'Solo datos numericos'})
         return;
     }
+
+    
 
     console.log(datos)
 
@@ -223,8 +232,14 @@ controller.inserta = (req, res) => {
         return
 
     })()
-        .then(resp => console.log(resp))
-        .catch(err => console.log(err));
+        .then(resp =>{
+            console.log(resp)
+
+            res.status(200).json({ ok:true})
+        } )
+        .catch(err => {
+            res.status(500).json({ message:err})
+        });
 
 
 
