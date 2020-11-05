@@ -31,6 +31,22 @@ controller.inventarios = async () => {
 }
 
 
+controller.unidad = async ()=>{
+
+    const ium = await query(`
+    
+    SELECT FINV.ISEQ,IUM FROM FINV
+    LEFT JOIN FALM ON FALM.ISEQ=FINV.ISEQ
+    LEFT JOIN FINV2 ON FINV2.I2KEY=FINV.ISEQ
+    WHERE mid(ICOD,1,2)='01' AND ALMNUM = '01'
+    GROUP BY ICOD
+    ORDER BY ISEQ;
+    `)
+
+    return ium;
+}
+
+
 controller.traeAlmcantAlmasigandoAlmacenesMexicoMonterreyVeracruz = async () => {
 
     const almacenMexico = await query(`
@@ -78,7 +94,7 @@ controller.buscaRegistrosNuevos = async () => {
 
 
     const registrosNuevos = await query(`
-    SELECT FINV.ISEQ,ICOD,IEAN,I2DESCR,DATE_FORMAT(IALTA,"%Y-%m-%d" ) AS IALTA, SUM(ALMCANT) as ALMCANT, SUM(ALMASIGNADO) AS ALMASIGNADO FROM FINV
+    SELECT FINV.ISEQ,ICOD,IEAN,I2DESCR,DATE_FORMAT(IALTA,"%Y-%m-%d" ) AS IALTA, SUM(ALMCANT) as ALMCANT, IUM, SUM(ALMASIGNADO) AS ALMASIGNADO FROM FINV
     LEFT JOIN FALM ON FALM.ISEQ=FINV.ISEQ
     LEFT JOIN FINV2 ON FINV2.I2KEY=FINV.ISEQ
     LEFT JOIN FFAM AS FAM2 ON FAM2.FAMTNUM = FINV.IFAM2

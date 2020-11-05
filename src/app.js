@@ -23,8 +23,8 @@ let ultimoDiaMes = moment().endOf('month').format('D');
 
 
 //controllers
-const { buscaRegistrosNuevos,inventarios, traeAlmcantAlmasigandoAlmacenesMexicoMonterreyVeracruz } = require('./controllers/proscaiController');
-const { creaColumnaAFinDeMes,insertaActualiza, insertaABdTuvansa, actualizaAlmcantAlmasignado, actualizaAlmacenesMexicoMonterreyVeracruz } = require('./controllers/tuvansaController');
+const { buscaRegistrosNuevos,inventarios, traeAlmcantAlmasigandoAlmacenesMexicoMonterreyVeracruz, unidad } = require('./controllers/proscaiController');
+const { creaColumnaAFinDeMes,insertaActualiza, insertaABdTuvansa, actualizaAlmcantAlmasignado, actualizaAlmacenesMexicoMonterreyVeracruz, insertaIum } = require('./controllers/tuvansaController');
 
 //
 
@@ -39,6 +39,9 @@ const { creaColumnaAFinDeMes,insertaActualiza, insertaABdTuvansa, actualizaAlmca
         .catch( err => console.log(err))
     })
     .catch ( err => console.log(err)) */
+
+
+
 
 cron.schedule('*/20 * * * *', ()=>{
 

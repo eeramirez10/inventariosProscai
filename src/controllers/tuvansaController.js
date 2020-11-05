@@ -10,7 +10,7 @@ let sIndexColumn = '*';
 let sTable = 'FINV';
 var request = {};
 var aColumns = [
-    'ISEQ', 'ICOD', 'IEAN', 'I2DESCR', ' DATE_FORMAT(IALTA,"%Y-%m-%d")', 'ALMCANT','ALMCANTMTY','ALMCANTVER', 'ALMASIGNADO', '(ALMCANT - ALMASIGNADO) ', 'ALMCANTREAL',
+    'ISEQ', 'ICOD', 'IEAN', 'I2DESCR', ' DATE_FORMAT(IALTA,"%Y-%m-%d")', 'ALMCANT','IUM','ALMCANTMTY','ALMCANTVER', 'ALMASIGNADO', '(ALMCANT - ALMASIGNADO) ', 'ALMCANTREAL',
     'USUARIO','COMENTARIOS'];
 
 const connection = mysql.createConnection({
@@ -118,6 +118,28 @@ controller.insertaActualiza = async (inventarios) => {
         ok: false,
         message: 'No hay nada que hacer',
     }
+
+}
+
+controller.insertaIum = async (ium)=>{
+
+    for (let unidad of ium ){
+
+        console.log(unidad)
+
+        if ( await query (`UPDATE FINV SET IUM = ? WHERE ISEQ = ?`, [ unidad.IUM, unidad.ISEQ])){
+
+            console.log('ok')
+        }
+    }
+
+
+    return {
+        ok:true,
+        message:'Unidad de medida insertado correctamente'
+    }
+
+
 
 }
 
