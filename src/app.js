@@ -63,7 +63,7 @@ cron.schedule('*/20 * * * *', async ()=>{
 })
 
 
-cron.schedule(`*/1 * * * *`, async ()=>{
+cron.schedule(`*/14 * * * *`, async ()=>{
      console.log('Buscando registros nuevos', momentTZMexico)
 
      let registrosNuevos = await buscaRegistrosNuevos()
