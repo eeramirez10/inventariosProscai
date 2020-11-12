@@ -1,6 +1,6 @@
 const express = require('express');
 
-const moment = require('moment');
+const moment = require('moment-timezone');
 const path = require('path');
 const morgan = require('morgan');
 const cors = require('cors');
@@ -11,14 +11,18 @@ const flash = require('express-flash');
 const session = require('express-session');
 const MemoryStore = require('memorystore')(session);
 
+const momentTZMexico = moment().tz('America/Mexico_City').format();
+
 
 
 const app = express();
 
 
-const mes = String(moment().format('M'))
+const mes = String(moment().tz('America/Mexico_City').format('M'))
 
-let ultimoDiaMes = moment().endOf('month').format('D');
+let ultimoDiaMes = moment().tz('America/Mexico_City').endOf('month').format('D');
+
+
 
 
 
@@ -45,7 +49,7 @@ const { creaColumnaAFinDeMes,insertaActualiza, insertaABdTuvansa, actualizaAlmca
 
 cron.schedule('*/20 * * * *', async ()=>{
 
-    console.log('Buscando cambios en Almacenes', moment().format());
+    console.log('Buscando cambios en Almacenes', momentTZMexico);
 
     let almacenes = await traeAlmcantAlmasigandoAlmacenesMexicoMonterreyVeracruz()
 
@@ -59,8 +63,8 @@ cron.schedule('*/20 * * * *', async ()=>{
 })
 
 
-cron.schedule(`*/10 * * * *`, async ()=>{
-     console.log('Buscando registros nuevos', moment().format())
+cron.schedule(`*/1 * * * *`, async ()=>{
+     console.log('Buscando registros nuevos', momentTZMexico)
 
      let registrosNuevos = await buscaRegistrosNuevos()
 
@@ -68,7 +72,10 @@ cron.schedule(`*/10 * * * *`, async ()=>{
         .then( resp => console.log(resp))
         .catch( err => console.log(err))
 
- })
+ },{
+    schedule:true,
+    timezone:"America/Mexico_City"
+})
 
 
 

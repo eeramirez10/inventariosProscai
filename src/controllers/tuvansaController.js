@@ -2,7 +2,7 @@ const controller = {};
 
 const mysql = require('mysql');
 const util = require('util');
-const moment = require('moment');
+const moment = require('moment-timezone');
 const requestDB = require('request');
 const { Console } = require('console');
 
@@ -158,7 +158,7 @@ controller.actualizaAlmcantAlmasignado = async (inventarioProscai) => {
 
     return {
         ok: true,
-        message: `Actualizado cambios en inventario y asignados ${moment().format()} `,
+        message: `Actualizado cambios en inventario y asignados ${moment().tz('America/Mexico_City').format()} `,
     }
 }
 
@@ -271,12 +271,12 @@ controller.inserta = (req, res) => {
 
 controller.creaColumnaAFinDeMes = async () => {
 
-    const mes = String(moment().format('M'))
-    const anio = String(moment().format('Y'))
+    const mes = String(moment().tz('America/Mexico_City').format('M'))
+    const anio = String(moment().tz('America/Mexico_City').format('Y'))
     //let ultimoDiaMes = moment().endOf('month').format('D');
     let elementosActualizados = 0;
 
-    console.log(moment().format('D h:mm a'))
+    console.log(moment().tz('America/Mexico_City').format('D h:mm a'))
     //console.log(`la siquiente actualizacion sera el dia  ${ultimoDiaMes} de ${mes} de ${anio} a las 10:00 pm`)
 
 

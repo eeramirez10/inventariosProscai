@@ -2,7 +2,9 @@ const controller = {}
 
 const mysql = require('mysql');
 const util = require('util');
-const moment = require('moment');
+const moment = require('moment-timezone');
+
+const momentTZMexico = moment().tz('America/Mexico_City');
 
 const connection = mysql.createConnection({
     host: 'tuvansa.dyndns.org',
@@ -88,9 +90,9 @@ controller.traeAlmcantAlmasigandoAlmacenesMexicoMonterreyVeracruz = async () => 
 
 controller.buscaRegistrosNuevos = async () => {
 
-    const currentDay = moment().format('D')
-    const currentMonth = moment().format('M')
-    const currentYear = moment().format('Y')
+    const currentDay = moment().tz('America/Mexico_City').format('D')
+    const currentMonth = moment().tz('America/Mexico_City').format('M')
+    const currentYear = moment().tz('America/Mexico_City').format('Y')
 
 
     const registrosNuevos = await query(`
