@@ -50,10 +50,10 @@ controller.unidad = async ()=>{
 controller.traeAlmcantAlmasigandoAlmacenesMexicoMonterreyVeracruz = async () => {
 
     const almacenMexico = await query(`
-    SELECT FINV.ISEQ,SUM(ALMCANT) as ALMCANT, SUM(ALMASIGNADO) AS ALMASIGNADO  FROM FINV
+    SELECT FINV.ISEQ,SUM(ALMCANT) as ALMCANT,IUM, SUM(ALMASIGNADO) AS ALMASIGNADO  FROM FINV
     LEFT JOIN FALM ON FALM.ISEQ=FINV.ISEQ
     LEFT JOIN FINV2 ON FINV2.I2KEY=FINV.ISEQ
-    WHERE mid(ICOD,1,2)='01' AND ALMNUM = '01' and ALMCANT <> 0
+    WHERE mid(ICOD,1,2)='01' AND ALMNUM = '01' 
     GROUP BY ICOD
     ORDER BY ISEQ;
     

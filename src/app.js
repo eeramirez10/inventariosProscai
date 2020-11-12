@@ -43,17 +43,15 @@ const { creaColumnaAFinDeMes,insertaActualiza, insertaABdTuvansa, actualizaAlmca
 
 
 
-cron.schedule('*/20 * * * *', ()=>{
+cron.schedule('*/20 * * * *', async ()=>{
 
     console.log('Buscando cambios en Almacenes', moment().format());
-    traeAlmcantAlmasigandoAlmacenesMexicoMonterreyVeracruz()
-    .then(res =>{
 
-        actualizaAlmacenesMexicoMonterreyVeracruz (res)
-            .then( resp => console.log(resp))
-            .catch(err => console.log(err))
-    })
-    .catch( err => console.log(err))
+    let almacenes = await traeAlmcantAlmasigandoAlmacenesMexicoMonterreyVeracruz()
+
+    actualizaAlmacenesMexicoMonterreyVeracruz(almacenes)
+        .then( resp => console.log(resp))
+        .catch( err => console.log(err))
 
 },{
     schedule:true,
@@ -61,17 +59,14 @@ cron.schedule('*/20 * * * *', ()=>{
 })
 
 
-cron.schedule(`*/10 * * * *`,()=>{
+cron.schedule(`*/10 * * * *`, async ()=>{
      console.log('Buscando registros nuevos', moment().format())
-        buscaRegistrosNuevos()
-        .then(resp => {
 
-            console.log(resp)
-            insertaActualiza(resp)
-                .then(resp => console.log(resp))
-                .catch(err => console.log(err))  
-        })
-        .catch(err => console.log(err)) 
+     let registrosNuevos = await buscaRegistrosNuevos()
+
+     insertaActualiza(registrosNuevos)
+        .then( resp => console.log(resp))
+        .catch( err => console.log(err))
 
  })
 

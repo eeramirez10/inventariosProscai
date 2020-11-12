@@ -172,7 +172,7 @@ controller.actualizaAlmacenesMexicoMonterreyVeracruz = async (inventarios) =>{
     if ( mexico.length > 0){
         console.log('Buscando cambios en almacen Mexico')
         for (let inventario of mexico){
-            await query (`UPDATE FINV SET ALMCANT = ?, ALMASIGNADO = ? WHERE ISEQ = ?`, [inventario.ALMCANT, inventario.ALMASIGNADO, inventario.ISEQ]);
+            await query (`UPDATE FINV SET ALMCANT = ?, ALMASIGNADO = ?, IUM = ? WHERE ISEQ = ?`, [inventario.ALMCANT, inventario.ALMASIGNADO,inventario.IUM, inventario.ISEQ]);
         }
     }
 
