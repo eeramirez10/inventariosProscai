@@ -126,7 +126,7 @@
             "serverSide": true,
             "order": [],
             "ajax": {
-                url: `${url}/server`,
+                url: `/server`,
                 type: "GET"
             },
             "columnDefs": [
@@ -146,14 +146,14 @@
               ],
         });
 
-        if (rol === 'Vendedor') {
+        if (rol === 'administrador ') {
             return;
         }
 
         $('#sample_data').on('draw.dt', function () {
             $('#sample_data').Tabledit({
 
-                url: `${url}/data`,
+                url: `/data`,
                 deleteButton: false,
                 /* editButton:false, */
                 dataType: 'json',

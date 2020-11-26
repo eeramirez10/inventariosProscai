@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <!-- Favicon icon -->
+    <link rel="icon" type="image/png" sizes="16x16" href="images/favicon.png">
+    <title>Admin Pro Admin Template - The Ultimate Bootstrap 4 Admin Template</title>
+
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.22/css/jquery.dataTables.min.css">
+    <!-- Bootstrap Core CSS -->
+    <link href="plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="css/style.css" rel="stylesheet">
+    <!-- page css -->
+    <link href="css/pages/file-upload.css" rel="stylesheet">
+    <!-- You can change the theme colors from here -->
+    <link href="css/colors/default-dark.css" id="theme" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css"
+        integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA=="
+        crossorigin="anonymous" />
+
+
+    <style>
+        .folder {
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body class="fix-header card-no-border fix-sidebar">
+    <!-- ============================================================== -->
+    <!-- Preloader - style you can find in spinners.css -->
+    <!-- ============================================================== -->
+    <%- include ('../partials/preloader.ejs'); -%>
+    <!-- ============================================================== -->
+    <!-- Main wrapper - style you can find in pages.scss -->
+    <!-- ============================================================== -->
+    <div id="main-wrapper">
+        <!-- ============================================================== -->
+        <!-- Topbar header - style you can find in pages.scss -->
+        <!-- ============================================================== -->
+        <%- include ('../partials/header.ejs'); -%>
+        <!-- ============================================================== -->
+        <!-- End Topbar header -->
+        <!-- ============================================================== -->
+        <!-- ============================================================== -->
+        <!-- Left Sidebar - style you can find in sidebar.scss  -->
+        <!-- ============================================================== -->
+        <%- include ('../partials/left-sidebar.ejs')  -%>
+        <!-- ============================================================== -->
+        <!-- End Left Sidebar - style you can find in sidebar.scss  -->
+        <!-- ============================================================== -->
+        <!-- ============================================================== -->
+        <!-- Page wrapper  -->
+        <!-- ============================================================== -->
+        <div class="page-wrapper">
+
+            <!-- ============================================================== -->
+            <!-- Container fluid  -->
+            <!-- ============================================================== -->
+            <div class="container-fluid">
+                <!-- ============================================================== -->
+                <!-- Bread crumb and right sidebar toggle -->
+                <!-- ============================================================== -->
+                <%- include ('../partials/breadcrumb.ejs') -%>
+                <!-- ============================================================== -->
+                <!-- End Bread crumb and right sidebar toggle -->
+                <!-- ============================================================== -->
+
+                <!-- ============================================================== -->
+                <!-- Start Page Content -->
+                <!-- ============================================================== -->
+                <div class="row" id="div-input">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <h3 class="card-title" id="titulo-carpeta"> Sube tus Archivos de Cierre</h3>
+
+                                <div class="form-group">
+                                    <label>File upload</label>
+                                    <div class="fileinput fileinput-new input-group" data-provides="fileinput">
+                                        <div class="form-control" data-trigger="fileinput">
+                                            <i class="glyphicon glyphicon-file fileinput-exists"></i>
+                                            <span class="fileinput-filename"></span>
+                                        </div>
+                                        <form id="myForm" name="myForm" method="POST" enctype="multipart/form-data">
+                                            <span class="input-group-addon btn btn-default btn-file">
+                                                <span class="fileinput-new">Selecciona tus archivos</span>
+
+                                                <input type="file" name="archivos" id="file" multiple>
+                                            </span>
+                                            <button
+                                                class="btn waves-effect waves-light btn-outline-danger fileinput-exists"
+                                                data-dismiss="fileinput">Remover</button>
+                                            <button
+                                                class=" btn waves-effect waves-light btn-outline-primary fileinput-exists"
+                                                type="button" id="upload-button">Subir</button>
+                                        </form>
+
+
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <h4 class="card-title">Tabla</h4>
+
+                                <div class="table-responsive">
+                                    <table id="table" class="table hover">
+                                        <thead>
+                                            <tr>
+
+                                                <th>Carpeta</th>
+                                                <th>typo</th>
+                                                <th>Tamaño</th>
+                                                <th>Fecha</th>
+                                                <th></th>
+
+                                            </tr>
+                                        </thead>
+
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- ============================================================== -->
+                    <!-- End PAge Content -->
+                    <!-- ============================================================== -->
+
+                </div>
+                <!-- ============================================================== -->
+                <!-- End Container fluid  -->
+                <!-- ============================================================== -->
+                <!-- ============================================================== -->
+                <!-- footer -->
+                <!-- ============================================================== -->
+                <footer class="footer">
+                    © 2017 Admin Pro by wrappixel.com
+                </footer>
+                <!-- ============================================================== -->
+                <!-- End footer -->
+                <!-- ============================================================== -->
+            </div>
+            <!-- ============================================================== -->
+            <!-- End Page wrapper  -->
+            <!-- ============================================================== -->
+        </div>
+        <!-- ============================================================== -->
+        <!-- End Wrapper -->
+        <!-- ============================================================== -->
+        <!-- ============================================================== -->
+        <!-- All Jquery -->
+        <!-- ============================================================== -->
+        <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+        <!-- Bootstrap tether Core JavaScript -->
+        <script src="plugins/bootstrap/js/popper.min.js"></script>
+        <script src="plugins/bootstrap/js/bootstrap.min.js"></script>
+        <!-- slimscrollbar scrollbar JavaScript -->
+        <script src="js/perfect-scrollbar.jquery.min.js"></script>
+        <!--Wave Effects -->
+        <script src="js/waves.js"></script>
+        <!--Menu sidebar -->
+        <script src="js/sidebarmenu.js"></script>
+
+        <!--Custom JavaScript -->
+        <script src="js/custom.min.js"></script>
+        <!-- ============================================================== -->
+        <!-- This page plugins -->
+        <!-- ============================================================== -->
+        <!-- form  -->
+        <script src="js/jasny-bootstrap.js"></script>
+
+        <!--  Sweet Alert  -->
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+
+        <script src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
+
+        <script>
+
+            let url = ``
+            $(document).ready(function () {
+
+                //console.log($('#titulo-carpeta').text(`Sube tus archivos de cierre en - ${url}`)); 
+
+                $('#div-input').hide()
+
+                printTable()
+
+                $('#table ').on('click', 'td.folder', async function () {
+
+
+                    $('#div-input').show()
+
+                    let carpeta = `/${$(this)[0].textContent}`;
+                    let type = $(this)[0].parentElement.children[1].textContent;
+
+                    if (type !== 'd') {
+                        return
+                    }
+                    url += carpeta;
+
+                    console.log(url)
+
+                    $('#titulo-carpeta').text(`Sube tus archivos de cierre en - ${url}`)
+
+                    const data = await getfiles(url);
+
+                    // console.log(data)
+
+                    getDataTable(data)
+
+                })
+
+                async function getfiles(path) {
+
+
+                    try {
+
+                        return await $.ajax({
+                            url: '/getFiles',
+                            data: { path },
+                            type: 'POST',
+                        })
+
+
+                    } catch (err) {
+                        console.log(err)
+                    }
+
+                }
+
+                function getDataTable(data) {
+
+                    let table = $('#table').DataTable({
+                        "bDestroy": true,
+                        "autoWidth": false,
+                        "data": data.data,
+                        "columns": [
+                            { "data": "name" },
+                            { "data": "type" },
+                            { "data": "size" },
+                            { "data": "date" },
+
+                        ],
+                        "createdRow": function (row, data, dataIndex) {
+
+
+                            if (data.type === "d") {
+                                $(row)[0].children[0].className = 'folder'
+                                $(row)[0].children[1].className = 'fas fa-folder'
+
+                            } else {
+                                $(row)[0].children[1].className = 'far fa-file-archive'
+
+                            }
+                        },
+
+                        "paging": false,
+                        "dom": '<"toolbar">frtip'
+                    });
+
+                    $("div.toolbar").html('<button class="btn btn-primary" id="atras"><i class="fas fa-long-arrow-alt-left"></i></button>');
+                }
+
+                $("div.card-body").on('click', 'div.toolbar button.btn', async function () {
+
+                    console.log('atras', url)
+                    let index = url.lastIndexOf('/');
+                    let anterior = url.substr(0, index);
+
+                    console.log('anterior', anterior)
+                    url = anterior
+                    if (url === '') {
+                        $('#div-input').hide()
+                    }
+                    $('#titulo-carpeta').text(`Sube tus archivos de cierre en - ${url}`)
+                    const data = await getfiles(url);
+                    getDataTable(data)
+
+                })
+
+
+                async function printTable() {
+                    const data = await getfiles('');
+                    getDataTable(data);
+
+                }
+
+                $('#upload-button').on('click', function () {
+                    let formData = new FormData($('#myForm')[0])
+
+                    console.log(url)
+
+                    Swal.fire({
+                        title: 'subiendo',
+                        icon: 'info',
+                    })
+                    Swal.showLoading()
+
+                    $.ajax({
+                        url: `/upload${url}`,
+                        type: 'POST',
+                        data: formData,
+                        cache: false,
+                        contentType: false,
+                        processData: false,
+                        success: async function (resp) {
+
+                            console.log(resp)
+
+                            Swal.fire({
+                                position: 'top-end',
+                                icon: 'success',
+                                title: `Subido correctamente `,
+                                showConfirmButton: true
+                            })
+
+                            const data = await getfiles(url);
+
+                            getDataTable(data)
+                        },
+                        error: function (err) {
+                            if (err) {
+                                console.log(err.responseJSON)
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: `${err.responseJSON.mesagge}`,
+                                })
+                            }
+                        }
+
+                    })
+                })
+
+
+            })
+
+        </script>
+</body>
+
+</html>

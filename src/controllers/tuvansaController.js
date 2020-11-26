@@ -65,9 +65,13 @@ controller.insertaActualiza = async (inventarios) => {
 
         const buscaIseq = await query(`Select * FROM FINV WHERE ISEQ = ?  `, [inventario.ISEQ]);
 
-        //console.log('buscaIseq', buscaIseq)
+        if(buscaIseq.length === 0){
+            let inserta = await query(`INSERT INTO FINV SET ?`, inventario);
+            insertados.push(inventario);
+        }
+        
 
-        if (buscaIseq.length > 0) {
+/*         if (buscaIseq.length > 0) {
 
 
             //console.log(`el iseq ${buscaIseq[0].ISEQ} se encuentra en la bd tuvansa `)
@@ -92,7 +96,7 @@ controller.insertaActualiza = async (inventarios) => {
             insertados.push(inventario);
             // console.log(`el iseq ${inventario.ISEQ} es nuevo  `)
 
-        }
+        } */
 
 
     }

@@ -1,0 +1,160 @@
+<%- include ('../partials/head.ejs'); -%>
+
+<%- include ('../partials/preloader.ejs'); -%>
+<!-- ============================================================== -->
+<!-- Main wrapper - style you can find in pages.scss -->
+<!-- ============================================================== -->
+<!--  <div id="main-wrapper"> -->
+<%- include ('../partials/header.ejs'); -%>
+<!-- ============================================================== -->
+<!-- End Topbar header -->
+<!-- ============================================================== -->
+<!-- ============================================================== -->
+<!-- Left Sidebar - style you can find in sidebar.scss  -->
+<!-- ============================================================== -->
+<%- include ('../partials/left-sidebar.ejs')  -%>
+<!-- ============================================================== -->
+<!-- End Left Sidebar - style you can find in sidebar.scss  -->
+<!-- ============================================================== -->
+<!-- ============================================================== -->
+<!-- Page wrapper  -->
+<!-- ============================================================== -->
+<div class="page-wrapper">
+    <!-- ============================================================== -->
+    <!-- Container fluid  -->
+    <!-- ============================================================== -->
+    <div class="container-fluid ">
+        <!-- r-aside -->
+        <!-- ============================================================== -->
+        <!-- Bread crumb and right sidebar toggle -->
+        <!-- ============================================================== -->
+        <%- include ('../partials/breadcrumb.ejs') -%>
+        <!-- ============================================================== -->
+        <!-- End Bread crumb and right sidebar toggle -->
+        <!-- ============================================================== -->
+        <!-- ============================================================== -->
+        <!-- Sales overview chart -->
+        <!-- ============================================================== -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table id="sample_data" class="table table-bordered table-striped table-hover"
+                                style="width:100%; font-size:11px; ">
+                                <thead>
+                                    <tr>
+                                        <th>ISEC</th>
+                                        <th>Codigo</th>
+                                        <th>Ean</th>
+                                        <th>Descripcion</th>
+                                        <th>fecha/pros</th>
+                                        <th>inv</th>
+                                        <th>Unidad</th>
+                                        <th>Res/MTY</th>
+                                        <th>Res/Ver </th>
+                                        <th>Asignado</th>
+                                        <th>Disponible</th>
+                                        <th>Inv/Real</th>
+                                        <th>Usuario</th>
+                                        <th>Comentarios</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <!-- ============================================================== -->
+    <!-- End Container fluid  -->
+    <!-- ============================================================== -->
+    <%- include ('../partials/footer.ejs') -%>
+
+    <script type="text/javascript" language="javascript">
+        $(document).ready(function () {
+
+            let rol =  document.querySelector('#rol').textContent.trim();
+
+            
+
+
+
+            let targets = rol !== 'administrador' && rol !== 'Almacenista' ? [12] : [];
+
+            let columnaEditable = rol === 'administrador ' ? 8 : 7;
+
+
+
+            const url = 'https://test-1314.herokuapp.com';
+
+            //console.log(rol)
+
+            var dataTable = $('#sample_data').DataTable({
+                "processing": true,
+                "serverSide": true,
+                "order": [],
+                "ajax": {
+                    url: `/server`,
+                    type: "GET"
+                },
+                "columnDefs": [
+                    {
+                        "targets": targets ,
+                        "visible": false
+                    }
+                ],
+                "dom": 'Bfrtip',
+                "buttons": [
+                    'excel'
+                ],
+                "dom": 'Blfrtip',
+                "lengthMenu": [
+                    [10, 25, 50, 100, 500, 1000],
+                    ['10', '25', '50', '100','500','1000']
+                ],
+            });
+
+           
+
+            if (rol !== 'administrador' && rol !== 'Almacenista') {
+                return;
+                
+            }
+
+            $('#sample_data').on('draw.dt', function () {
+                $('#sample_data').Tabledit({
+
+                    url: `/data`,
+                    deleteButton: false,
+                    /* editButton:false, */
+                    dataType: 'json',
+                    //data: { usuario : 'Erick'},
+                    columns: {
+                        identifier: [0, 'ISEQ'],
+                        editable: [[11, 'ALMCANTREAL'], [13, "COMENTARIOS"] /* , [2, 'last_name'], [3, 'gender', '{"1":"Male","2":"Female"}'] */]
+                    },
+                    restoreButton: false,
+                    onSuccess: function (data, textStatus, jqXHR) {
+                        console.log(data);
+                        $('#sample_data').DataTable().ajax.reload();
+                        if (data.action == 'delete') {
+                            $('#' + data.id).remove();
+                            $('#sample_data').DataTable().ajax.reload();
+                        }
+                    },
+                    onFail: function (jqXHR, textStatus, errorThrown) {
+
+                        console.log('onFail(jqXHR, textStatus, errorThrown)');
+                        console.log(jqXHR);
+                        console.log(textStatus);
+                        console.log(errorThrown);
+                    },
+                });
+            });
+
+        }); 
+    </script>

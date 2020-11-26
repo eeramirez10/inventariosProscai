@@ -1,0 +1,75 @@
+<%- include ('partials/head.ejs'); -%>
+
+<%- include ('partials/preloader.ejs'); -%>
+    <!-- ============================================================== -->
+    <!-- Main wrapper - style you can find in pages.scss -->
+    <!-- ============================================================== -->
+   <!--  <div id="main-wrapper"> -->
+        <%- include ('partials/header.ejs'); -%>
+        <!-- ============================================================== -->
+        <!-- End Topbar header -->
+        <!-- ============================================================== -->
+        <!-- ============================================================== -->
+        <!-- Left Sidebar - style you can find in sidebar.scss  -->
+        <!-- ============================================================== -->
+        <%- include ('partials/left-sidebar.ejs')  -%>
+        <!-- ============================================================== -->
+        <!-- End Left Sidebar - style you can find in sidebar.scss  -->
+        <!-- ============================================================== -->
+        <!-- ============================================================== -->
+        <!-- Page wrapper  -->
+        <!-- ============================================================== -->
+        <div class="page-wrapper">
+            <!-- ============================================================== -->
+            <!-- Container fluid  -->
+            <!-- ============================================================== -->
+            <div class="container-fluid "><!-- r-aside -->
+                <!-- ============================================================== -->
+                <!-- Bread crumb and right sidebar toggle -->
+                <!-- ============================================================== -->
+                <%- include ('partials/breadcrumb.ejs') -%>
+                <!-- ============================================================== -->
+                <!-- End Bread crumb and right sidebar toggle -->
+                <!-- ============================================================== -->
+                <!-- ============================================================== -->
+                <!-- Sales overview chart -->
+                <!-- ============================================================== -->
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table id="sample_data" class="table table-bordered table-striped table-hover"
+                                        style="width:100%; font-size:11px; ">
+                                        <thead>
+                                            <tr>
+                                                <th>ISEC</th>
+                                                <th>Codigo</th>
+                                                <th>Ean</th>
+                                                <th>Descripcion</th>
+                                                <th>fecha/pros</th>
+                                                <th>inv</th>
+                                                <th>Unidad</th>
+                                                <th>Res/MTY</th>
+                                                <th >Res/Ver </th>
+                                                <th>Asignado</th>
+                                                <th>Disponible</th>
+                                                <th>Inv/Real</th>
+                                                <th>Usuario</th>
+                                                <th>Comentarios</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+            <!-- ============================================================== -->
+            <!-- End Container fluid  -->
+            <!-- ============================================================== -->
+<%- include ('partials/footer.ejs') -%>
+

@@ -63,7 +63,7 @@ cron.schedule('*/20 * * * *', async ()=>{
 })
 
 
-cron.schedule(`*/14 * * * *`, async ()=>{
+cron.schedule(`*/5 * * * *`, async ()=>{
      console.log('Buscando registros nuevos', momentTZMexico)
 
      let registrosNuevos = await buscaRegistrosNuevos()
@@ -117,7 +117,7 @@ app.use(flash());
 app.use(express.static(path.join(__dirname,'public')));
 app.use(cookieParser('secreto'));
 app.use(session({
-    cookie: { maxAge:86400000},
+    cookie: { maxAge: 168 * 60 * 60 * 1000},
     store: new MemoryStore({
         checkPeriod: 86400000
     }),
