@@ -75,7 +75,7 @@ controller.getFiles = (req, res) => {
     let sucursal = req.user.sucursal;
 
     c.connect({
-        host: '192.168.1.205',
+        host: 'tuvansa-server.dyndns.org',
         secure: false,
         user: 'Administrador',
         password: 'Ag7348pp**'
