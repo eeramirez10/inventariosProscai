@@ -17,6 +17,8 @@ const upload = multer({
         basepath: '/uploads',
         destination: (req, file, options, cb) => {
             const sucursal = req.user.sucursal;
+            let usuario = req.user;
+            
             let folders = req.params;
             let foldersItera = ``
             for (let folder in folders) {
@@ -25,8 +27,10 @@ const upload = multer({
                     foldersItera += `/${folders[folder]}`
                 }
             }
+
+            let ruta = usuario.user === "jortiz" ? `${options.basepath}${foldersItera}` : `${options.basepath}/${sucursal}${foldersItera}`;
             // aqui pone la ruta con el nombre del archivo en el callback
-            cb(null, path.join(`${options.basepath}/${sucursal}${foldersItera}`, file.originalname))
+            cb(null, path.join(ruta, file.originalname))
 
         },
         ftp: {
@@ -73,6 +77,8 @@ controller.getFiles = (req, res) => {
 
     
     let sucursal = req.user.sucursal;
+    let usuario = req.user;
+ 
 
     c.connect({
         host: 'tuvansa-server.dyndns.org',
@@ -81,8 +87,10 @@ controller.getFiles = (req, res) => {
         password: 'Ag7348pp**'
     })
 
+    let path = usuario.user === "jortiz" ?  `/uploads${ruta}`: `/uploads/${sucursal}${ruta}`;
+
     c.on('ready', function () {
-        c.list(`/uploads/${sucursal}${ruta}`, function (err, list) {
+        c.list(path, function (err, list) {
 
             if (err) throw err;
 
