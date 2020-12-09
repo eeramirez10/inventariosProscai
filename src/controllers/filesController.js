@@ -28,7 +28,7 @@ const upload = multer({
                 }
             }
 
-            let ruta = usuario.user === "jortiz" ? `${options.basepath}${foldersItera}` : `${options.basepath}/${sucursal}${foldersItera}`;
+            let ruta = usuario.rol === "administrador" || usuario.rol === "upload" ? `${options.basepath}${foldersItera}` : `${options.basepath}/${sucursal}${foldersItera}`;
             // aqui pone la ruta con el nombre del archivo en el callback
             cb(null, path.join(ruta, file.originalname))
 
@@ -87,7 +87,7 @@ controller.getFiles = (req, res) => {
         password: 'Ag7348pp**'
     })
 
-    let path = usuario.user === "jortiz" ?  `/uploads${ruta}`: `/uploads/${sucursal}${ruta}`;
+    let path = usuario.rol === "administrador" || usuario.rol === "upload" ?  `/uploads${ruta}`: `/uploads/${sucursal}${ruta}`;
 
     c.on('ready', function () {
         c.list(path, function (err, list) {
