@@ -253,8 +253,7 @@
 
                 function getDataTable(data) {
 
-                    Swal.hideLoading();
-                    Swal.close()
+
 
                     let table = $('#table').DataTable({
                         "bDestroy": true,
@@ -285,6 +284,9 @@
                     });
 
                     $("div.toolbar").html('<button class="btn btn-primary" id="atras"><i class="fas fa-long-arrow-alt-left"></i></button>');
+
+                    Swal.hideLoading();
+                    Swal.close()
                 }
 
                 $("div.card-body").on('click', 'div.toolbar button.btn', async function () {
