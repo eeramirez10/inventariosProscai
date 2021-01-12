@@ -1,55 +1,57 @@
 <%- include ('../partials/head.ejs'); -%>
 
-<%- include ('../partials/preloader.ejs'); -%>
-<!-- ============================================================== -->
-<!-- Main wrapper - style you can find in pages.scss -->
-<!-- ============================================================== -->
-<!--  <div id="main-wrapper"> -->
-<%- include ('../partials/header.ejs'); -%>
-<!-- ============================================================== -->
-<!-- End Topbar header -->
-<!-- ============================================================== -->
-<!-- ============================================================== -->
-<!-- Left Sidebar - style you can find in sidebar.scss  -->
-<!-- ============================================================== -->
-<%- include ('../partials/left-sidebar.ejs')  -%>
-<!-- ============================================================== -->
-<!-- End Left Sidebar - style you can find in sidebar.scss  -->
-<!-- ============================================================== -->
-<!-- ============================================================== -->
-<!-- Page wrapper  -->
-<!-- ============================================================== -->
-<div class="page-wrapper">
-    <!-- ============================================================== -->
-    <!-- Container fluid  -->
-    <!-- ============================================================== -->
-    <div class="container-fluid ">
-        <!-- r-aside -->
+    <%- include ('../partials/preloader.ejs'); -%>
         <!-- ============================================================== -->
-        <!-- Bread crumb and right sidebar toggle -->
+        <!-- Main wrapper - style you can find in pages.scss -->
         <!-- ============================================================== -->
-        <%- include ('../partials/breadcrumb.ejs') -%>
-        <!-- ============================================================== -->
-        <!-- End Bread crumb and right sidebar toggle -->
-        <!-- ============================================================== -->
-        <!-- ============================================================== -->
-        <!-- Sales overview chart -->
-        <!-- ============================================================== -->
-        <div class="row">
- 
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-body">
-                        <iframe width="100%" height="750" src="https://app.powerbi.com/reportEmbed?reportId=a77289d1-2f8a-4b56-b8a8-44fae012cfc1&autoAuth=true&ctid=db92e7fd-ee89-491d-bf3f-af75f073e0cf&config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly93YWJpLXNvdXRoLWNlbnRyYWwtdXMtcmVkaXJlY3QuYW5hbHlzaXMud2luZG93cy5uZXQvIn0%3D" frameborder="0" allowFullScreen="true"></iframe>
+        <!--  <div id="main-wrapper"> -->
+        <%- include ('../partials/header.ejs'); -%>
+            <!-- ============================================================== -->
+            <!-- End Topbar header -->
+            <!-- ============================================================== -->
+            <!-- ============================================================== -->
+            <!-- Left Sidebar - style you can find in sidebar.scss  -->
+            <!-- ============================================================== -->
+            <%- include ('../partials/left-sidebar.ejs') -%>
+                <!-- ============================================================== -->
+                <!-- End Left Sidebar - style you can find in sidebar.scss  -->
+                <!-- ============================================================== -->
+                <!-- ============================================================== -->
+                <!-- Page wrapper  -->
+                <!-- ============================================================== -->
+                <div class="page-wrapper">
+                    <!-- ============================================================== -->
+                    <!-- Container fluid  -->
+                    <!-- ============================================================== -->
+                    <div class="container-fluid ">
+                        <!-- r-aside -->
+                        <!-- ============================================================== -->
+                        <!-- Bread crumb and right sidebar toggle -->
+                        <!-- ============================================================== -->
+                        <%- include ('../partials/breadcrumb.ejs') -%>
+                            <!-- ============================================================== -->
+                            <!-- End Bread crumb and right sidebar toggle -->
+                            <!-- ============================================================== -->
+                            <!-- ============================================================== -->
+                            <!-- Sales overview chart -->
+                            <!-- ============================================================== -->
+                            <div class="row">
+
+                                <div class="col-12">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <iframe width="100%" height="750"
+                                                src="https://app.powerbi.com/reportEmbed?reportId=9fcd39db-0846-4653-9743-be4d317c73af&autoAuth=true&ctid=f58d3ba0-a156-4803-acdf-652c0c1cf2e1&config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly93YWJpLXBhYXMtMS1zY3VzLXJlZGlyZWN0LmFuYWx5c2lzLndpbmRvd3MubmV0LyJ9"
+                                                frameborder="0" allowFullScreen="true"></iframe>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+
                     </div>
-                </div>
-            </div>
-        </div>
-
-
-
-    </div>
-    <!-- ============================================================== -->
-    <!-- End Container fluid  -->
-    <!-- ============================================================== -->
-    <%- include ('../partials/footer.ejs') -%>
+                    <!-- ============================================================== -->
+                    <!-- End Container fluid  -->
+                    <!-- ============================================================== -->
+                    <%- include ('../partials/footer.ejs') -%>
