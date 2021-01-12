@@ -19,6 +19,16 @@ const isAuthenticated = (req, res, next)=>{
 
 }
 
+router.get('/estadisticas',isAuthenticated, (req, res)=>{
+
+    const data = {
+        user: req.user,
+        title: 'Estadisticas'
+    }
+
+    res.render('pages/estadisticas', {data});
+})
+
 
 router.get('/inventarios',isAuthenticated,(req, res) => {
 

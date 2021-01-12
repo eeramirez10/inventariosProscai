@@ -26,6 +26,8 @@ passport.use(new passportLocal((username, password, done) => {
     inner join sucursal as s on u.idSucursal = s.idSucursal
     where user = ? && password = ?`
 
+    
+
     connection.query(queryUsuarios,[username, password],(err, results)=>{
 
         if (err) throw err;
@@ -42,11 +44,15 @@ passport.use(new passportLocal((username, password, done) => {
                     upload: results[0].upload,
                     sucursal: results[0].sucursal
                 }
-            )
+            );
+
+            
         }
 
        return done(null, false, { message: 'Usuario o password incorrecto' });
     })
+
+    
 
 }))
 

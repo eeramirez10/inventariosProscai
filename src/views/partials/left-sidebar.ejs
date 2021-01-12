@@ -35,7 +35,9 @@
                         <%  if(data.user.upload === 1 || data.user.rol === 'administrador'){  %>
                         <li><a href="/cierre">Subir Archivos de Cierre</a></li>
                         <%  } %>
-
+                        <% if(data.user.rol === 'administrador'){  %>
+                        <li><a href="/estadisticas">Estadisticas</a></li>
+                        <%  } %>
                         <!--                         <li><a href="app-ticket.html">Support Ticket</a></li>
                         <li><a href="app-contact.html">Contact / Employee</a></li>
                         <li><a href="app-contact2.html">Contact Grid</a></li>

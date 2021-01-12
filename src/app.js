@@ -117,7 +117,7 @@ app.use(flash());
 app.use(express.static(path.join(__dirname,'public')));
 app.use(cookieParser('secreto'));
 app.use(session({
-    cookie: { maxAge: 168 * 60 * 60 * 1000},
+    cookie: { maxAge: null },
     store: new MemoryStore({
         checkPeriod: 86400000
     }),
