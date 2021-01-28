@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <!-- Favicon icon -->
+    <link rel="icon" type="image/png" sizes="16x16" href="images/favicon.png">
+    <title>Admin Pro Admin Template - The Ultimate Bootstrap 4 Admin Template</title>
+    <!-- Bootstrap Core CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+    <!-- Custom CSS -->
+    <link href="css/style.css" rel="stylesheet">
+    <!-- You can change the theme colors from here -->
+    <link href="css/colors/default-dark.css" id="theme" rel="stylesheet">
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+    <style>
+        .iframe-container {
+            padding-bottom: 60%;
+            padding-top: 30px;
+            height: 0;
+            overflow: hidden;
+        }
+
+        .iframe-container iframe,
+        .iframe-container object,
+        .iframe-container embed {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .modal.in .modal-dialog {
+            transform: none;
+            /*translate(0px, 0px);*/
+        }
+
+        .form-control {
+            width: 50%;
+            min-height: 0px;
+        }
+
+        td.details-control {
+            background: url('images/details_open.png') no-repeat center center;
+            cursor: pointer;
+        }
+
+        tr.details td.details-control {
+            background: url('images/details_close.png') no-repeat center center;
+        }
+
+        button.close {
+            padding: 0;
+            background: 0 0;
+            border: 0;
+            -webkit-appearance: none;
+        }
+
+        .close {
+            float: right;
+            font-size: 1.5rem;
+            font-weight: 700;
+            line-height: 1;
+            color: #000;
+            text-shadow: 0 1px 0 #fff;
+            opacity: .5;
+
+        }
+    </style>
+
+</head>
+
+<%- include ('../partials/preloader.ejs'); -%>
+    <!-- ============================================================== -->
+    <!-- Main wrapper - style you can find in pages.scss -->
+    <!-- ============================================================== -->
+    <!--  <div id="main-wrapper"> -->
+    <%- include ('../partials/header.ejs'); -%>
+        <!-- ============================================================== -->
+        <!-- End Topbar header -->
+        <!-- ============================================================== -->
+        <!-- ============================================================== -->
+        <!-- Left Sidebar - style you can find in sidebar.scss  -->
+        <!-- ============================================================== -->
+        <%- include ('../partials/left-sidebar.ejs') -%>
+            <!-- ============================================================== -->
+            <!-- End Left Sidebar - style you can find in sidebar.scss  -->
+            <!-- ============================================================== -->
+            <!-- ============================================================== -->
+            <!-- Page wrapper  -->
+            <!-- ============================================================== -->
+            <div class="page-wrapper">
+                <!-- ============================================================== -->
+                <!-- Container fluid  -->
+                <!-- ============================================================== -->
+
+
+
+                <div class="container-fluid ">
+                    <!-- r-aside -->
+                    <!-- ============================================================== -->
+                    <!-- Bread crumb and right sidebar toggle -->
+                    <!-- ============================================================== -->
+                    <%- include ('../partials/breadcrumb.ejs') -%>
+                        <!-- ============================================================== -->
+                        <!-- End Bread crumb and right sidebar toggle -->
+                        <!-- ============================================================== -->
+                        <!-- ============================================================== -->
+                        <!-- Sales overview chart -->
+                        <!-- ============================================================== -->
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="card">
+                                    <div class="card-body">
+
+                                        <div class="table-responsive">
+                                            <table id="sample_data" class="table table-bordered "
+                                                style="width:100%; font-size:11px; ">
+                                                <thead>
+                                                    <tr>
+                                                        <th></th>
+                                                        <th>ID</th>
+                                                        <th>Codigo</th>
+                                                        <th>EAN</th>
+                                                        <th>Descripcion</th>
+                                                        <th>Colada</th>
+                                                        <th>Archivo</th>
+                                                        <th>Entrada</th>
+                                                        <th>Orden</th>
+                                                        <th>Proveedor</th>
+                                                        <th>Fecha</th>
+
+                                                    </tr>
+                                                </thead>
+                                                <tbody></tbody>
+                                            </table>
+                                        </div>
+
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!--                         <div class="row">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-body"> -->
+                        <%- include ('../components/modalProveedores.ejs') -%>
+                            <!--                                     </div>
+                                </div>
+                            </div>
+                        </div> -->
+
+
+
+                </div>
+                <!-- ============================================================== -->
+                <!-- End Container fluid  -->
+                <!-- ============================================================== -->
+                <%- include ('../partials/footer.ejs') -%>
+            </div>
+
+            <script>
+
+                let tituloOrden = document.querySelector('#windowOrdenes .modal-title');
+
+                let tituloProductos = document.querySelector('#windowProductos .modal-title');
+
+
+
+                let codigo;
+                let proveedor;
+                let entrada;
+                let ordenCompra;
+
+                let productos;
+
+                /*                 $('#windowProveedor').modal({
+                                    backdrop: false
+                                });
+                
+                                $('#windowOrdenes').modal({
+                                    backdrop: false
+                                });
+                
+                                $('#windowProductos').modal({
+                                    backdrop: false
+                                }); */
+
+                tablaCertificadosTuvansa()
+
+
+                function format(d) {
+
+                    console.log(d)
+                    // `d` is the original data object for the row
+
+                    var template;
+
+                    /*                     for (let p of productos) {
+                    
+                    
+                    
+                    
+                                            template += `
+                                                
+                                                    <tr>
+                                                        <td>${p.codigo} </td>
+                                                        <td>${p.descripcion} </td>
+                                                        <td> ${p.cantidad}</td>
+                                                        <td> ${p.unidad}</td>
+                                                    </tr>
+                                            `
+                                        } */
+
+                    let template2 = `
+                        <table  cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">
+                            <tr>
+                                <td>Proveedor:</td>
+                                <td>${d[8]} </td>
+                            </tr>
+                            <tr>
+                                <td>Entrada:</td>
+                            
+                                <td> ${d[6]} </td>
+                            </tr>
+                            <tr>
+                                <td>Orden:</td>
+                                <td> ${d[7]} </td>
+                            </tr>
+                            <tr>
+                                <td>Fecha:</td>
+                                <td> ${d[9]} </td>
+                            </tr>
+
+                        </table>
+                        `
+
+                    return template2;
+
+                    return `
+                        <table  class="extra table table-sm table-hover">
+
+                            <thead>
+                                <tr>
+                                    <th>Codigo</th>
+                                    <th>Descripcion</th>
+                                    <th>cantidad</th>
+                                    <th>unidad</th>
+
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                ${template}
+                            </tbody>
+
+                        </table>
+                        `
+                }
+
+                verPdf();
+
+                function verPdf() {
+                    $(document).on('click', '.view-pdf', function () {
+                        var pdf_link = $(this).attr('href');
+                        console.log(pdf_link)
+
+                        var iframe = `<object type="application/pdf" data="uploads/${pdf_link}" width="100%" height="600">No Support</object>`
+                        $.createModal({
+                            title: '',
+                            message: iframe,
+                            closeButton: true,
+                            scrollable: false
+                        });
+                        return false;
+                    })
+
+
+                }
+                function tablaCertificadosTuvansa() {
+
+                    var dataTable = $('#sample_data').DataTable({
+                        "bDestroy": true,
+                        "processing": true,
+                        "serverSide": true,
+                        "order": [],
+                        "ajax": {
+                            url: `/certificadosTable`,
+                            type: "GET"
+                        },
+                        "columns": [
+                            {
+                                "class": "details-control",
+                                "orderable": false,
+                                "data": null,
+                                "defaultContent": ""
+                            },
+                            { "data": [0] },
+                            { "data": [1] },
+                            { "data": [2] },
+                            { "data": [3] },
+                            { "data": [4] },
+                            {
+                                "data": [5],
+                                render: function (data, type, row) {
+
+                                    return `<btn class="btn btn-outline-secondary btn-xs view-pdf" href='${data} ' ><i class ="fa fa-file-pdf-o"></i></> </btn>`
+                                }
+                            },
+                            { "data": [6] },
+
+                            { "data": [7] },
+                            { "data": [8] },
+                            { "data": [9] },
+
+
+                        ],
+                        "dom": 'Bfrtip',
+                        "buttons": [
+                            {
+                                text: 'Alta',
+                                action: function (e, dt, node, config) {
+                                    /* 
+                                    
+                                                                        node[0].setAttribute('data-target', "#windowProveedor")
+                                                                        node[0].setAttribute('data-toggle', "modal") */
+
+                                    printTable()
+                                },
+                                attr: {
+                                    "data-target": '#windowProveedor',
+                                    "data-toggle": "modal"
+                                }
+
+                            }
+                        ],
+                        "columnDefs": [
+                            {
+                                "targets": [7, 8, 9, 10],
+                                "visible": false
+                            }
+                        ],
+                        /*
+                       "dom": 'Bfrtip',
+                       "buttons": [
+                           'excel'
+                       ],
+                       "dom": 'Blfrtip',
+                       "lengthMenu": [
+                           [10, 25, 50, 100, 500, 1000],
+                           ['10', '25', '50', '100','500','1000']
+                       ],*/
+                    });
+
+
+                    // Add event listener for opening and closing details
+                    $('#sample_data tbody').on('click', 'td.details-control', async function () {
+
+
+                        var tr = $(this).closest('tr');
+                        var row = dataTable.row(tr);
+                        //let entrada = row.data()[2]
+
+
+
+                        //let extra = await getData('extra', entrada);
+
+
+                        if (row.child.isShown()) {
+                            // This row is already open - close it
+                            row.child.hide();
+                            tr.removeClass('shown');
+                        }
+                        else {
+                            // Open this row
+                            row.child(format(row.data())).show();
+                            tr.addClass('shown');
+
+                            //$('.extra').DataTable()
+                        }
+                    });
+
+                }
+
+
+                async function printTable() {
+
+                    cargaSpinner();
+
+                    let data = await getData('proveedores', '');
+
+                    getTable(data);
+
+                }
+
+                function getTable(data) {
+
+
+                    let proveedores = $("#TablaProveedores").DataTable({
+                        "bDestroy": true,
+                        "data": data.data,
+                        "columns": data.columns,
+                    })
+
+                    if (data.data.length > 0) {
+                        cierraSpinner()
+                    }
+
+
+
+                    $('#TablaProveedores tbody').on('click', 'tr', async function () {
+
+
+                        cargaSpinner();
+
+                        codigo = proveedores.row(this).data()[0];
+                        proveedor = proveedores.row(this).data()[1];
+
+                        let data = await getData('ordenes', codigo);
+
+                        $('#windowProveedor').modal('hide')
+                        $('#windowOrdenes').modal('show')
+
+
+                        tituloOrden.textContent = `${codigo} -  ${proveedor} `;
+
+
+                        let ordenes = $("#TablaOrdenes").DataTable({
+                            "destroy": true,
+                            "data": data.data,
+                            "columns": data.columns,
+                        })
+
+                        cierraSpinner()
+
+                        $('#TablaOrdenes tbody').on('click', 'tr', async function () {
+                            codigo = ordenes.row(this).data()[1];
+                            entrada = ordenes.row(this).data()[1];
+                            ordenCompra = ordenes.row(this).data()[4];
+
+                            tituloProductos.innerHTML = ` 
+                                Proveedor: <strong>${proveedor} </strong>  
+                                Entrada:  <strong>${entrada}   </strong>  
+                                OrdenCompra: <strong>${ordenCompra}</strong> `
+                                ;
+
+                            cargaSpinner();
+
+                            let datas = await getData('productos', codigo)
+
+                            let data = datas.data;
+
+
+                            cierraSpinner()
+
+
+                            $('#windowProductos').modal('show')
+                            $('#windowOrdenes').modal('hide')
+                            $('#windowProvedores').modal('hide')
+
+                            productos = $("#TablaProductos").DataTable({
+                                "bDestroy": true,
+                                "data": data,
+                                "columns": [
+                                    { "data": "PRVCOD" },
+                                    { "data": "PRVNOM" },
+                                    { "data": "PRVRFC" },
+                                    { "data": "DNUM" },
+                                    { "data": "DFECHA" },
+                                    { "data": "DREFERELLOS" },
+                                    { "data": "DREFER" },
+                                    { "data": "ICOD" },
+                                    { "data": "IEAN" },
+                                    { "data": "I2DESCR" },
+                                    { "data": "AICANTF" },
+                                    { "data": "IUM" },
+                                    { "data": "DMULTICIA" },
+
+                                    {
+                                        "defaultContent": `
+
+                                        <form class="coladas-archivo" name="coladas-archivo" method="POST" enctype="multipart/form-data" >
+                                            <div class="form-horizontal form-material ">
+                                                <div class="form-group row">
+                                                    
+                                                    <div class="col-sm-12">
+                                                        <a href="javascript:void(0);" for="inputEmail3" class="add_button mx-3"><img src="images/add-icon.png"/></a>
+                                                        <input type="text" class="form-control form-control-line " name="coladas[]" placeholder="colada" required>
+                                                    </div>
+                                                    
+                                                </div>
+
+                                            </div>
+                                            <div class="col-sm-12 mb-2">
+                                                <input type="file" class="certificado form-control-line "  name="certificado" placeholder="Certificado">
+                                            </div>
+                                            <div class="d-grid gap-2">
+                                                <button style="display:none"  class='button-enviar btn btn-primary btn-sm'>enviar</button>
+                                            </div>
+                                        </form>
+
+
+
+                                        ` },
+
+
+
+                                ],
+                                "columnDefs": [
+                                    { "visible": false, "targets": [0, 1, 2, 3, 4, 5, 6, 11] }
+                                ]
+                            })
+
+                        })
+
+                    })
+                }
+
+
+                async function getData(param, codigo) {
+
+                    return await $.ajax({
+                        url: `/certificadosData/${param}`,
+                        data: { codigo },
+                        type: 'POST',
+                    })
+                }
+
+                function cargaSpinner() {
+                    Swal.fire({
+                        showConfirmButton: false,
+                        allowOutsideClick: false
+                    })
+                    Swal.showLoading({
+                        allowOutsideClick: false
+                    })
+                }
+
+                function cierraSpinner() {
+                    Swal.close()
+                }
+
+
+                $('#TablaProductos tbody').on('click', '.add_button', function (e) {
+                    var fieldHTML = `
+                        <div class="form-group row">
+                            <div class="col-sm-12">
+                                <a href="javascript:void(0);" for="inputEmail3" class=" remove_button mx-3"><img src="images/remove-icon.png"/></a>
+                                <input type="text" class="form-control form-control-line " name="coladas[]" placeholder="colada">
+                            </div>
+                        </div>
+                    `;
+
+                    $(this).parent('div').parent('div').parent('div').append(fieldHTML)
+
+                })
+
+                $('#TablaProductos tbody').on('click', '.remove_button', function () {
+                    $(this).parent('div').parent('div').remove();
+                });
+
+
+                $('#TablaProductos tbody').on('change', '.certificado', function () {
+
+                    let botonEnviar = $(this)[0].parentElement.parentElement.children[2].children[0];
+
+
+                    if ($(this)[0].value === '') {
+                        botonEnviar.style.display = 'none'
+                    } else {
+                        botonEnviar.style.display = 'block'
+                    }
+
+
+                })
+
+
+
+
+
+
+                $('#TablaProductos tbody').on('click', '.button-enviar', function (e) {
+                    e.preventDefault()
+                    let tablaProductosRow = productos.row($(this).parents('tr')).data();
+                    let tr = $(this)[0].parentElement.parentElement.parentElement.parentElement;
+                    let formColadasCertificado = $(this).parent('div').parent('form')[0];
+                    let formData = new FormData(formColadasCertificado);
+
+                    let string = JSON.stringify(tablaProductosRow)
+
+                    //console.log(tablaProductosRow)
+
+                    formData.append('data', string)
+
+
+
+                    // Ver los valores de un form data
+                    /*                    for(let data of formData.entries()){
+                                          console.log(data)
+                                      }  */
+
+                    //cargaSpinner();
+
+                    $.ajax({
+                        url: '/certificadosUpload',
+                        type: 'POST',
+                        data: formData,
+                        cache: false,
+                        contentType: false,
+                        processData: false,
+                        success: function (resp) {
+
+                            console.log(resp)
+
+                            Swal.fire({
+                                position: 'top-end',
+                                icon: 'success',
+                                title: `${resp.message} `,
+                                showConfirmButton: false,
+                                timer: 1500
+                            })
+
+
+
+                            tr.remove()
+
+                            //cierraSpinner()
+
+                            tablaCertificadosTuvansa()
+
+                        },
+                        error: function (err) {
+
+                            console.log(err.responseJSON)
+
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: `${err.responseJSON.message} `
+                            })
+
+                        }
+                    })
+
+                })
+
+
+
+            </script>

@@ -1,23 +1,34 @@
-const router = require('express').Router();
+const express = require('express')
+
+
+const router = express.Router();
+
+
 
 //Controllers
 const tuvansaController = require('../controllers/tuvansaController');
-const loginController = require('../controllers/loginController');
-const filesController = require('../controllers/filesController');
+
+const { certificadosQuery, getTables, uploadData, upload, pdf } = require('../controllers/certificadosController')
+
+//Middlewares
+const {  isAuthenticated } = require('../middlewares/loginMiddleware');
 
 
-router.get('/',loginController.login);
 router.get('/server', tuvansaController.cargaDataTable );
 router.post('/data', tuvansaController.inserta);
 
-router.post('/login', loginController.loginPost);
+//Certificados
+router.get('/certificadosTable',certificadosQuery);
 
-const isAuthenticated = (req, res, next)=>{
-   
-    if (req.isAuthenticated()) return next();
-    res.redirect('/');
+router.post('/certificadosData/:table',getTables );
 
-}
+router.post('/certificadosUpload', uploadData);
+
+router.get('/pdf',pdf)
+
+
+
+//Power Bi
 
 router.get('/estadisticas',isAuthenticated, (req, res)=>{
 
@@ -41,12 +52,6 @@ router.get('/inventarios',isAuthenticated,(req, res) => {
 })
 
 
-router.get('/logout', (req, res)=>{
-    req.logout();
-    res.redirect('/')
-})
-
-
 
 router.get('/cierre',isAuthenticated,(req, res)=>{
 
@@ -59,10 +64,16 @@ router.get('/cierre',isAuthenticated,(req, res)=>{
     })
 })
 
+router.get('/certificados',isAuthenticated, (req, res)=>{
+    const data = {
+        user: req.user,
+        title: 'Cierre'
+    }
+    res.render('pages/certificados',{data})
+})
 
-//Upload files routes
-router.post('/getFiles', filesController.getFiles);
-router.post('/upload/:folder1?/:folder2?/:folder3?/:folder4?/:folder5?', filesController.uploadFiles)
+
+
 
 
 

@@ -3,8 +3,6 @@ const controller = {};
 const mysql = require('mysql');
 const util = require('util');
 const moment = require('moment-timezone');
-const requestDB = require('request');
-const { Console } = require('console');
 
 let sIndexColumn = '*';
 let sTable = 'FINV';
