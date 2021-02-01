@@ -2,21 +2,13 @@ const controller = {};
 
 const passport = require('passport');
 const passportLocal = require('passport-local').Strategy;
-const mysql = require('mysql');
-const util = require('util');
 
-const connection = mysql.createConnection({
-    host: 'tuvansa-server.dyndns.org',
-    user: 'erick',
-    password: 'Ag7348pp**',
-    database: 'tuvansa'
-});
+const query = require('../connection/tuvansaConnection');
 
 
 
-const query = util.promisify(connection.query).bind(connection);
 
-passport.use(new passportLocal((username, password, done) => {
+passport.use(new passportLocal( async  (username, password, done) =>  {
 
 
 
@@ -26,12 +18,34 @@ passport.use(new passportLocal((username, password, done) => {
     inner join sucursal as s on u.idSucursal = s.idSucursal
     where user = ? && password = ?`
 
-    
+    let usuarios = await query(queryUsuarios,[username, password])
+        .catch( err => err);
 
-    connection.query(queryUsuarios,[username, password],(err, results)=>{
+        console.log(usuarios)
+
+    if (usuarios.length > 0){
+
+        return done(null,
+            {
+                idUsuario: usuarios[0].id,      
+                nombre: usuarios[0].nombre,
+                apellido: usuarios[0].apellido,
+                user: usuarios[0].user,
+                area: usuarios[0].area,
+                rol: usuarios[0].rol,
+                upload: usuarios[0].upload,
+                sucursal: usuarios[0].sucursal
+            }
+        );
+
+    }
+
+    return done(null, false, { message: 'Usuario o password incorrecto' });
+
+/*     connection.query(queryUsuarios,[username, password],(err, results)=>{
 
         if (err) throw err;
-       /*  console.log(results) */
+       console.log(results) 
         if (results.length > 0 ){
             return done(null,
                 {
@@ -50,7 +64,7 @@ passport.use(new passportLocal((username, password, done) => {
         }
 
        return done(null, false, { message: 'Usuario o password incorrecto' });
-    })
+    }) */
 
     
 

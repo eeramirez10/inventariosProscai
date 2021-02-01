@@ -517,7 +517,7 @@ async function asyncTables(tabla, body, res) {
     })
 }
 
-function server(res) {
+async function server(res) {
     //Paging
     var sLimit = "";
     if (request['length'] && request['length'] != -1) {
@@ -584,9 +584,13 @@ function server(res) {
     var rResultTotal = {};
     var aResultTotal = {};
 
-    (async () => {
 
-        let results = await query(sQuery);
+
+        let results = await query(sQuery)
+            .catch( err =>{
+                console.log(err)
+            })
+            
         if (!results) {
             return;
         }
@@ -641,7 +645,7 @@ function server(res) {
 
 
 
-    })();
+   
 
 }
 
