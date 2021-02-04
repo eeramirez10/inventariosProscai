@@ -8,6 +8,8 @@ const query = require('../connection/tuvansaConnection');
 
 
 
+
+
 passport.use(new passportLocal( async  (username, password, done) =>  {
 
 
@@ -16,12 +18,12 @@ passport.use(new passportLocal( async  (username, password, done) =>  {
     inner join area as a on u.idArea = a.idArea
     inner join rol as r on u.idRol = r.idRol
     inner join sucursal as s on u.idSucursal = s.idSucursal
-    where user = ? && password = ?`
+    where user = ? && password = ?`;
 
     let usuarios = await query(queryUsuarios,[username, password])
         .catch( err => err);
 
-        console.log(usuarios)
+        //console.log(usuarios)
 
     if (usuarios.length > 0){
 

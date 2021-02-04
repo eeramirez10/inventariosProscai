@@ -1,19 +1,9 @@
 const controller = {}
 
-const mysql = require('mysql');
-const util = require('util');
 const moment = require('moment-timezone');
-
 const momentTZMexico = moment().tz('America/Mexico_City');
 
-const connection = mysql.createConnection({
-    host: 'tuvansa.dyndns.org',
-    user: 'consultas',
-    password: 'consultas',
-    database: 'tuvansa'
-});
-
-const query = util.promisify(connection.query).bind(connection);
+const query = require('../connection/proscaiConnection');
 
 controller.inventarios = async () => {
 

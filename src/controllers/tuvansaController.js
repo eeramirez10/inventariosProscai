@@ -1,8 +1,11 @@
 const controller = {};
 
-const mysql = require('mysql');
-const util = require('util');
 const moment = require('moment-timezone');
+
+const query = require('../connection/tuvansaConnection');
+
+
+
 
 let sIndexColumn = '*';
 let sTable = 'FINV';
@@ -11,7 +14,6 @@ var aColumns = [
     'ISEQ', 'ICOD', 'IEAN', 'I2DESCR', ' DATE_FORMAT(IALTA,"%Y-%m-%d")', 'ALMCANT','IUM','ALMCANTMTY','ALMCANTVER', 'ALMASIGNADO', '(ALMCANT - ALMASIGNADO) ', 'ALMCANTREAL',
     'USUARIO','COMENTARIOS'];
 
-const query = require('../connection/tuvansaConnection');
 
 // Se corre una sola vez por que inserta la base de datos en proscai a la base de tuvansa en el server 192.168.1.205
 controller.insertaABdTuvansa = async (inventarios) => {

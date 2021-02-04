@@ -1,5 +1,6 @@
 const controller = {}
 
+
 const mysql = require('mysql');
 const util = require('util');
 const multer = require('multer');
@@ -7,20 +8,33 @@ const FTPStorage = require('multer-ftp');
 const path = require('path');
 const Client = require('ftp');
 
-let storage = multer.diskStorage({
+const queryProscai = require('../connection/proscaiConnection');
+
+let connectionCertificados = mysql.createConnection({
+    host: 'tuvansa-server.dyndns.org',
+    user: 'erick',
+    password: 'Ag7348pp**',
+    database:'tuvansa_certificados'
+})
+
+
+
+const query = util.promisify(connectionCertificados.query).bind(connectionCertificados);
+
+/* let storage = multer.diskStorage({
     destination: path.join(__dirname, '../public/uploads'),
     filename: (req, file, cb) => {
         
         cb(null, file.originalname)
     }
 
-})
+}) */
 
 /* controller.upload = multer({
     storage: storage
 }) */
 
-const upload = multer({
+/* const upload = multer({
     fileFilter: function (req, file, cb) {
         if (file.mimetype !== 'application/pdf') {
             return cb(new Error('Archivo no permitido'))
@@ -29,10 +43,10 @@ const upload = multer({
     },
     storage: storage
 
-}).single('certificado');
+}).single('certificado'); */
 
 
-/* const upload = multer({
+const upload = multer({
     fileFilter: function (req, file, cb) {
         if (file.mimetype !== 'application/pdf') {
             return cb(new Error('Archivo no permitido'))
@@ -61,23 +75,10 @@ const upload = multer({
 
 
 
-}).single('certificado') */
+}).single('certificado')
 
 
 
-const connection = mysql.createConnection({
-    host: 'tuvansa-server.dyndns.org',
-    user: 'erick',
-    password: 'Ag7348pp**',
-    database: 'tuvansa_certificados'
-});
-
-const connectionProscai = mysql.createConnection({
-    host: 'tuvansa.dyndns.org',
-    user: 'consultas',
-    password: 'consultas',
-    database: 'tuvansa'
-});
 
 let sIndexColumn = '*';
 let sTable = 'producto_coladas';
@@ -98,8 +99,8 @@ var aColumns = [
 
 
 
-const query = util.promisify(connection.query).bind(connection);
-const queryProscai = util.promisify(connectionProscai.query).bind(connectionProscai);
+
+
 
 
 controller.pdf = (req, res) =>{
@@ -487,7 +488,7 @@ async function asyncTables(tabla, body, res) {
 
         //console.log(productosDBTuvansa)
 
-/*         if (productosDBTuvansa.length > 0) {
+        if (productosDBTuvansa.length > 0) {
 
             for (let productoDB of productosDBTuvansa) {
 
@@ -501,7 +502,7 @@ async function asyncTables(tabla, body, res) {
                     }
                 }
             }
-        } */
+        }
 
 
 
