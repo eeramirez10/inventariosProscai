@@ -7,6 +7,7 @@ const multer = require('multer');
 const FTPStorage = require('multer-ftp');
 const path = require('path');
 const Client = require('ftp');
+const fs = require('fs');
 
 const queryProscai = require('../connection/proscaiConnection');
 
@@ -105,6 +106,9 @@ var aColumns = [
 
 controller.pdf = (req, res) =>{
 
+    let pdf = req.params.id;
+    
+
     let c = new Client();
 
     c.connect({
@@ -116,13 +120,34 @@ controller.pdf = (req, res) =>{
 
     c.on('ready', function(){
 
-        c.list('/certificados',(err,list) =>{
-            console.log(list)
+        if(fs.existsSync(path.join(__dirname,`../public/uploads/${pdf}`))){
+
+            return res.json({
+                ok: true,
+                message:'Ya esta cargado'
+            })
+        }
+
+        c.get(`/certificados/${pdf}`,function(err,stream){
+            if (err) throw err;
+            stream.once('close', function() { c.end(); });
+            stream.pipe(fs.createWriteStream(path.join(__dirname,`../public/uploads/${pdf}`)));
+            stream.on('end', function(){
+                res.json({
+                    ok: true,
+                    message:'No estaba cargado'
+                })
+            })
+
         })
 
     })
 
-    res.send('ok')
+
+
+
+ 
+
 }
 
 controller.certificadosQuery = async (req, res) => {

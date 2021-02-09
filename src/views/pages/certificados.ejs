@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
     <meta name="author" content="">
-    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+
     <!-- Favicon icon -->
     <link rel="icon" type="image/png" sizes="16x16" href="images/favicon.png">
     <title>Admin Pro Admin Template - The Ultimate Bootstrap 4 Admin Template</title>
@@ -56,7 +56,7 @@
 
         td.details-control {
             background: url('images/details_open.png') no-repeat center center;
-            
+
             cursor: pointer;
         }
 
@@ -134,8 +134,8 @@
                                                 style="width:100%; font-size:11px; ">
                                                 <thead>
                                                     <tr>
-                                                       
-                                                        <th >UID</th>
+
+                                                        <th>UID</th>
                                                         <th>Codigo</th>
                                                         <th>EAN</th>
                                                         <th>Descripcion</th>
@@ -279,11 +279,22 @@
                 verPdf();
 
                 function verPdf() {
-                    $(document).on('click', '.view-pdf', function () {
+                    $(document).on('click', '.view-pdf', async function () {
+
                         var pdf_link = $(this).attr('href');
 
-                        let uri = `http://tuvansa-server.dyndns.org/pdf/${pdf_link} `
-                        console.log(pdf_link)
+                        cargaSpinner()
+
+                        let resp = await $.ajax({
+                            url: `/pdf/${pdf_link}`,
+                            type: 'GET'
+                        })
+
+                        if ( resp.ok){
+                            cierraSpinner()
+                        }
+                        let uri = `uploads/${pdf_link}`
+                       
 
                         var iframe = `<object type="application/pdf" data="${uri}" width="100%" height="600">No Support</object>`
                         $.createModal({
@@ -293,6 +304,7 @@
                             scrollable: false
                         });
                         return false;
+
                     })
 
 
@@ -310,7 +322,7 @@
                         },
                         "columns": [
 
-                            { "data": [0], "class": "details-control"},
+                            { "data": [0], "class": "details-control" },
                             { "data": [1] },
                             { "data": [2] },
                             { "data": [3] },
@@ -319,7 +331,7 @@
                                 "data": [5],
                                 render: function (data, type, row) {
 
-                                    return `<btn class="btn btn-outline-secondary btn-xs view-pdf" href='${data} ' ><i class ="fa fa-file-pdf-o"></i></> </btn>`
+                                    return `<btn class="btn btn-outline-secondary btn-xs view-pdf" href='${data}' ><i class ="fa fa-file-pdf-o"></i></> </btn>`
                                 }
                             },
                             { "data": [6] },
@@ -355,7 +367,7 @@
                                 "visible": false
                             }
                         ],
-                        "order": [[0,"asc"]]
+                        "order": [[0, "asc"]]
                         /*
                        "dom": 'Bfrtip',
                        "buttons": [

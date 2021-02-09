@@ -24,7 +24,7 @@ router.post('/certificadosData/:table',getTables );
 
 router.post('/certificadosUpload', uploadData);
 
-router.get('/pdf',pdf)
+router.get('/pdf/:id',pdf)
 
 
 
