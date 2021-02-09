@@ -129,7 +129,12 @@ controller.pdf = (req, res) =>{
         }
 
         c.get(`/certificados/${pdf}`,function(err,stream){
-            if (err) throw err;
+            if (err){
+                return res.status(500).json({
+                    ok:false,
+                    err
+                })
+            }
             stream.once('close', function() { c.end(); });
             stream.pipe(fs.createWriteStream(path.join(__dirname,`../public/uploads/${pdf}`)));
             stream.on('end', function(){
