@@ -1,8 +1,5 @@
 const controller = {}
 
-
-const mysql = require('mysql');
-const util = require('util');
 const multer = require('multer');
 const FTPStorage = require('multer-ftp');
 const path = require('path');
@@ -11,16 +8,7 @@ const fs = require('fs');
 
 const queryProscai = require('../connection/proscaiConnection');
 
-let connectionCertificados = mysql.createConnection({
-    host: 'tuvansa-server.dyndns.org',
-    user: 'erick',
-    password: 'Ag7348pp**',
-    database:'tuvansa_certificados'
-})
-
-
-
-const query = util.promisify(connectionCertificados.query).bind(connectionCertificados);
+const query = require('../connection/tuvansaConnection');
 
 /* let storage = multer.diskStorage({
     destination: path.join(__dirname, '../public/uploads'),
@@ -85,16 +73,17 @@ let sIndexColumn = '*';
 let sTable = 'producto_coladas';
 var request = {};
 var aColumns = [
-    "idProductoColadas as ID",
+    "pc.idProductoColadas as ID",
+    'DATE_FORMAT(pc.fecha,"%Y-%m-%d") as Alta',
     "prod.codigo as Codigo",
     "prod.iean as EAN",
     "prod.descripcion as Descripcion",
     "col.colada as Colada",
+    'DATE_FORMAT(doc.fecha,"%Y-%m-%d") as Fecha',
     "cer.descripcion as Certificado",
     "doc.entrada as Entrada",
     "doc.orden as Orden",
     "prov.nombre as Proveedor",
-    'DATE_FORMAT(doc.fecha,"%Y-%m-%d") as Fecha',
 ];
 
 
@@ -107,10 +96,7 @@ var aColumns = [
 controller.pdf = (req, res) =>{
 
     let pdf = req.params.id;
-    
-
     let c = new Client();
-
     c.connect({
         host: 'tuvansa-server.dyndns.org',
         secure: false,
@@ -213,14 +199,6 @@ controller.uploadData =  (req, res) => {
  
     })
 
-
-
-
-
-
-    
-
-
 }
 
 
@@ -316,14 +294,14 @@ async function asincrinos(certificado, coladas, data, res) {
 
     let productosOrdenesDB = await query(`
         SELECT p.codigo, p.descripcion, p.cantidad, p.unidad, doc.orden, doc.entrada
-        FROM productos_ordenes as po
+        FROM productos_documentos as po
         inner join producto as p on p.idProducto =  po.idProducto
         inner join documentos as doc on doc.idDocumento = po.idDocumento
         WHERE p.codigo = ? AND doc.idDocumento = ?
     `, [productosDB[0].codigo, documentosDB[0].idDocumento]);
 
     if (productosOrdenesDB.length === 0) {
-        await query('INSERT INTO productos_ordenes set idProducto = ?, idDocumento = ?', [productosDB[0].idProducto, documentosDB[0].idDocumento]);
+        await query('INSERT INTO productos_documentos set idProducto = ?, idDocumento = ?', [productosDB[0].idProducto, documentosDB[0].idDocumento]);
     }
 
     
@@ -410,7 +388,7 @@ async function asyncTables(tabla, body, res) {
 
         let productosDBTuvansa = await query(`
         
-        select doc.entrada, doc.orden, prod.codigo, prod.descripcion, prod.cantidad, prod.unidad from productos_ordenes as po
+        select doc.entrada, doc.orden, prod.codigo, prod.descripcion, prod.cantidad, prod.unidad from productos_documentos as po
         inner join documentos as doc on doc.idDocumento = po.idDocumento
         inner join producto as prod on prod.idProducto = po.idProducto
         where doc.entrada = '${entrada}'
@@ -509,7 +487,7 @@ async function asyncTables(tabla, body, res) {
 
         let productosDBTuvansa = await query(`
                 
-                     select doc.entrada, doc.orden, prod.codigo, prod.descripcion, prod.cantidad, prod.unidad from productos_ordenes as po
+                     select doc.entrada, doc.orden, prod.codigo, prod.descripcion, prod.cantidad, prod.unidad from productos_documentos as po
                       inner join documentos as doc on doc.idDocumento = po.idDocumento
                       inner join producto as prod on prod.idProducto = po.idProducto
                       where doc.entrada = '${recepcion}'
@@ -590,7 +568,7 @@ async function server(res) {
         inner join producto as prod on prod.idProducto = pc.idProducto
         inner join coladas as col on col.idColada = pc.idColada
         inner join certificados as cer on cer.idCertificado = col.idCertificado
-        inner join productos_ordenes as po on po.idProducto = prod.idProducto
+        inner join productos_documentos as po on po.idProducto = prod.idProducto
         inner join documentos as doc on doc.idDocumento = po.idDocumento
         inner join proveedores as prov on prov.idProveedor = doc.idProveedor
         
