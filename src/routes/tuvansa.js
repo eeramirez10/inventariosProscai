@@ -1,14 +1,8 @@
 const express = require('express')
-
-
 const router = express.Router();
-
-
 
 //Controllers
 const tuvansaController = require('../controllers/tuvansaController');
-
-const { certificadosQuery, getTables, uploadData, upload, pdf } = require('../controllers/certificadosController')
 
 //Middlewares
 const {  isAuthenticated } = require('../middlewares/loginMiddleware');
@@ -16,15 +10,6 @@ const {  isAuthenticated } = require('../middlewares/loginMiddleware');
 
 router.get('/server', tuvansaController.cargaDataTable );
 router.post('/data', tuvansaController.inserta);
-
-//Certificados
-router.get('/certificadosTable',certificadosQuery);
-
-router.post('/certificadosData/:table',getTables );
-
-router.post('/certificadosUpload', uploadData);
-
-router.get('/pdf/:id',pdf)
 
 
 
@@ -42,8 +27,6 @@ router.get('/estadisticas',isAuthenticated, (req, res)=>{
 
 
 router.get('/inventarios',isAuthenticated,(req, res) => {
-
-    
     const data = {
         user: req.user,
         title: 'Inventarios'
@@ -53,24 +36,8 @@ router.get('/inventarios',isAuthenticated,(req, res) => {
 
 
 
-router.get('/cierre',isAuthenticated,(req, res)=>{
 
-    const data = {
-        user: req.user,
-        title: 'Cierre'
-    }
-    res.render('pages/cierre',{
-        data
-    })
-})
 
-router.get('/certificados',isAuthenticated, (req, res)=>{
-    const data = {
-        user: req.user,
-        title: 'Cierre'
-    }
-    res.render('pages/certificados',{data})
-})
 
 
 

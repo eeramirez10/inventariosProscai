@@ -14,9 +14,6 @@ const app = express();
 // Procesos de inserccion 
 require('./procesos/procesos.js');
 
-
-
-
 //Settings
 
 app.set('port', process.env.PORT || 3000);

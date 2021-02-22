@@ -3,7 +3,9 @@ const app = express.Router();
 
 app.use(require('./tuvansa'));
 app.use(require('./login'));
-app.use(require('./files'));
+app.use(require('./cierre'));
+app.use(require('./usuarios'));
+app.use(require('./certificados'));
 
 
 module.exports = app;

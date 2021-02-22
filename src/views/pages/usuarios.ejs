@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Favicon icon -->
+    <link rel="icon" type="image/png" sizes="16x16" href="images/favicon.png">
+    <title>Tuvansa</title>
+    <!-- Bootstrap Core CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+    <!-- Custom CSS -->
+    <link href="css/style.css" rel="stylesheet">
+    <!-- You can change the theme colors from here -->
+    <link href="css/colors/default-dark.css" id="theme" rel="stylesheet">
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+    <style>
+        .iframe-container {
+            padding-bottom: 60%;
+            padding-top: 30px;
+            height: 0;
+            overflow: hidden;
+        }
+
+        .iframe-container iframe,
+        .iframe-container object,
+        .iframe-container embed {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .modal.in .modal-dialog {
+            transform: none;
+            /*translate(0px, 0px);*/
+        }
+
+        .form-control {
+            width: 50%;
+            min-height: 0px;
+        }
+
+        td.details-control {
+            background: url('images/details_open.png') no-repeat center center;
+
+            cursor: pointer;
+        }
+
+        tr.details td.details-control {
+            background: url('images/details_close.png') no-repeat center center;
+        }
+
+        button.close {
+            padding: 0;
+            background: 0 0;
+            border: 0;
+            -webkit-appearance: none;
+        }
+
+        .close {
+            float: right;
+            font-size: 1.5rem;
+            font-weight: 700;
+            line-height: 1;
+            color: #000;
+            text-shadow: 0 1px 0 #fff;
+            opacity: .5;
+
+        }
+    </style>
+
+</head>
+
+    <%- include ('../partials/preloader.ejs'); -%>
+        <!-- ============================================================== -->
+        <!-- Main wrapper - style you can find in pages.scss -->
+        <!-- ============================================================== -->
+        <!--  <div id="main-wrapper"> -->
+        <%- include ('../partials/header.ejs'); -%>
+            <!-- ============================================================== -->
+            <!-- End Topbar header -->
+            <!-- ============================================================== -->
+            <!-- ============================================================== -->
+            <!-- Left Sidebar - style you can find in sidebar.scss  -->
+            <!-- ============================================================== -->
+            <%- include ('../partials/left-sidebar.ejs') -%>
+                <!-- ============================================================== -->
+                <!-- End Left Sidebar - style you can find in sidebar.scss  -->
+                <!-- ============================================================== -->
+                <!-- ============================================================== -->
+                <!-- Page wrapper  -->
+                <!-- ============================================================== -->
+                <div class="page-wrapper">
+                    <!-- ============================================================== -->
+                    <!-- Container fluid  -->
+                    <!-- ============================================================== -->
+                    <div class="container-fluid ">
+                        <!-- r-aside -->
+                        <!-- ============================================================== -->
+                        <!-- Bread crumb and right sidebar toggle -->
+                        <!-- ============================================================== -->
+                        <%- include ('../partials/breadcrumb.ejs') -%>
+                            <!-- ============================================================== -->
+                            <!-- End Bread crumb and right sidebar toggle -->
+                            <!-- ============================================================== -->
+                            <!-- ============================================================== -->
+                            <!-- Sales overview chart -->
+                            <!-- ============================================================== -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <div class="table-responsive">
+                                                <table id="usuarios" class="table table-sm table-hover"
+                                                    style="width:100%; font-size:11px; ">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>id</th>
+                                                            <th>Nombre</th>
+                                                            <th>Apellido</th>
+                                                            <th>Usuario</th>
+                                                            <th>Password</th>
+                                                            <th>SubirCierre</th>
+                                                            <th>Fecha Alta</th>
+                                                            <th>Area</th>
+                                                            <th>Sucursal</th>
+                                                            <th>Rol</th>
+
+                                                        </tr>
+                                                    </thead>
+
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="fade modal " id="nuevoUsuario" tabindex="" role="dialog"
+                                aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable"
+                                    role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Nuevo</h5>
+                                            <button type="button" id="boton" class="close" data-dismiss="modal"
+                                                aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="row">
+                                                <div class="col-lg-12">
+                                                    <div class="card">
+                                                        <div class="card-header bg-info">
+                                                            <h4 class="m-b-0 text-white">Other Sample form</h4>
+                                                        </div>
+                                                        <div class="card-body">
+                                                            <form action="#">
+                                                                <div class="form-body">
+                                                                    <h3 class="card-title">Person Info</h3>
+                                                                    <hr>
+                                                                    <div class="row p-t-20">
+                                                                        <div class="col-md-6">
+                                                                            <div class="form-group">
+                                                                                <label class="control-label">First Name</label>
+                                                                                <input type="text" id="firstName" class="form-control" placeholder="John doe">
+                                                                                <small class="form-control-feedback"> This is inline help </small> </div>
+                                                                        </div>
+                                                                        <!--/span-->
+                                                                        <div class="col-md-6">
+                                                                            <div class="form-group has-danger">
+                                                                                <label class="control-label">Last Name</label>
+                                                                                <input type="text" id="lastName" class="form-control form-control-danger" placeholder="12n">
+                                                                                <small class="form-control-feedback"> This field has error. </small> </div>
+                                                                        </div>
+                                                                        <!--/span-->
+                                                                    </div>
+                                                                    <!--/row-->
+                                                                    <div class="row">
+                                                                        <div class="col-md-6">
+                                                                            <div class="form-group has-success">
+                                                                                <label class="control-label">Gender</label>
+                                                                                <select class="form-control custom-select">
+                                                                                    <option value="">Male</option>
+                                                                                    <option value="">Female</option>
+                                                                                </select>
+                                                                                <small class="form-control-feedback"> Select your gender </small> </div>
+                                                                        </div>
+                                                                        <!--/span-->
+                                                                        <div class="col-md-6">
+                                                                            <div class="form-group">
+                                                                                <label class="control-label">Date of Birth</label>
+                                                                                <input type="date" class="form-control" placeholder="dd/mm/yyyy">
+                                                                            </div>
+                                                                        </div>
+                                                                        <!--/span-->
+                                                                    </div>
+                                                                    <!--/row-->
+                                                                    <div class="row">
+                                                                        <div class="col-md-6">
+                                                                            <div class="form-group">
+                                                                                <label class="control-label">Category</label>
+                                                                                <select class="form-control custom-select" data-placeholder="Choose a Category" tabindex="1">
+                                                                                    <option value="Category 1">Category 1</option>
+                                                                                    <option value="Category 2">Category 2</option>
+                                                                                    <option value="Category 3">Category 5</option>
+                                                                                    <option value="Category 4">Category 4</option>
+                                                                                </select>
+                                                                            </div>
+                                                                        </div>
+                                                                        <!--/span-->
+                                                                        <div class="col-md-6">
+                                                                            <div class="form-group">
+                                                                                <label class="control-label">Membership</label>
+                                                                                <div class="form-check">
+                                                                                    <label class="custom-control custom-radio">
+                                                                                        <input id="radio1" name="radio" type="radio" checked="" class="custom-control-input">
+                                                                                        <span class="custom-control-indicator"></span>
+                                                                                        <span class="custom-control-description">Free</span>
+                                                                                    </label>
+                                                                                    <label class="custom-control custom-radio">
+                                                                                        <input id="radio2" name="radio" type="radio" class="custom-control-input">
+                                                                                        <span class="custom-control-indicator"></span>
+                                                                                        <span class="custom-control-description">Paid</span>
+                                                                                    </label>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <!--/span-->
+                                                                    </div>
+                                                                    <!--/row-->
+                                                                    <h3 class="box-title m-t-40">Address</h3>
+                                                                    <hr>
+                                                                    <div class="row">
+                                                                        <div class="col-md-12 ">
+                                                                            <div class="form-group">
+                                                                                <label>Street</label>
+                                                                                <input type="text" class="form-control">
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="row">
+                                                                        <div class="col-md-6">
+                                                                            <div class="form-group">
+                                                                                <label>City</label>
+                                                                                <input type="text" class="form-control">
+                                                                            </div>
+                                                                        </div>
+                                                                        <!--/span-->
+                                                                        <div class="col-md-6">
+                                                                            <div class="form-group">
+                                                                                <label>State</label>
+                                                                                <input type="text" class="form-control">
+                                                                            </div>
+                                                                        </div>
+                                                                        <!--/span-->
+                                                                    </div>
+                                                                    <!--/row-->
+                                                                    <div class="row">
+                                                                        <div class="col-md-6">
+                                                                            <div class="form-group">
+                                                                                <label>Post Code</label>
+                                                                                <input type="text" class="form-control">
+                                                                            </div>
+                                                                        </div>
+                                                                        <!--/span-->
+                                                                        <div class="col-md-6">
+                                                                            <div class="form-group">
+                                                                                <label>Country</label>
+                                                                                <select class="form-control custom-select">
+                                                                                    <option>--Select your Country--</option>
+                                                                                    <option>India</option>
+                                                                                    <option>Sri Lanka</option>
+                                                                                    <option>USA</option>
+                                                                                </select>
+                                                                            </div>
+                                                                        </div>
+                                                                        <!--/span-->
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-actions">
+                                                                    <button type="submit" class="btn btn-success"> <i class="fa fa-check"></i> Save</button>
+                                                                    <button type="button" class="btn btn-inverse">Cancel</button>
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- ============================================================== -->
+                            <!-- End Container fluid  -->
+                            <!-- ============================================================== -->
+                            <%- include ('../partials/footer.ejs') -%>
+
+
+                                <script>
+
+                                    $(document).ready(function () {
+
+
+                                        let usuarios = $('#usuarios').DataTable({
+                                            "bDestroy": true,
+                                            "autoWidth": true,
+                                            "ajax": {
+                                                url: `/usuarios`,
+                                                type: "POST"
+                                            },
+                                            "columns": [
+                                                { "data": "id" },
+                                                { "data": "nombre" },
+                                                { "data": "apellido" },
+                                                { "data": "user" },
+                                                {
+                                                    "data": null,
+                                                    "defaultContent": "*************"
+                                                },
+                                                {
+                                                    "data": "upload",
+                                                    render: (data, type, row) => data ? 'si' : 'no'
+                                                },
+                                                { "data": "fecha_alta" },
+                                                { "data": "area" },
+                                                { "data": "sucursal" },
+                                                { "data": "rol" },
+                                            ],
+                                            "dom": 'Bfrtip',
+                                            "buttons": [{
+                                                text: 'Alta',
+                                                action: function (e, dt, node, config) {
+
+                                                },
+                                                attr: {
+                                                    "data-target": '#nuevoUsuario',
+                                                    "data-toggle": "modal"
+                                                }
+                                            }
+                                            ],
+
+                                        })
+
+                                        usuarios.on('draw.dt', function () {
+
+                                            $(this).Tabledit({
+                                                url: `/usuarios`,
+                                                eventType: 'dblclick',
+                                                deleteButton: true,
+                                                editButton: false,
+
+                                                //dataType: 'json',
+                                                columns: {
+                                                    identifier: [0, 'id'],
+                                                    editable: [
+                                                        [1, 'nombre'],
+                                                        [2, 'apellido'],
+                                                        [3, 'user'],
+                                                        [4, 'password'],
+                                                        [5, 'upload', `{
+                                                            "0":"no",
+                                                            "1":"si"
+                                                        }`],
+                                                        [7, "idArea", `{
+                                                            "1":"Sistemas",
+                                                            "2":"Ventas",
+                                                            "3":"Otro",
+                                                            "4":"Compras",
+                                                            "5":"Almacen",
+                                                            "6":"Contabilidad",
+                                                            "7":"Recursos Humanos",
+                                                            "8":"Credito y Cobranza"
+                                                        }`],
+                                                        [8, 'idSucursal', '{"1":"Mexico","2":"Monterrey","3":"Mexicali","4":"Veracruz","5":"Cancun","6":"Queretaro"} '],
+                                                        [9, 'idRol', '{"1":"administrador","2":"Almacenista","3":"Vendedor","4":"Usuario"}']
+                                                    ]
+                                                },
+                                                onSuccess: function (data, textStatus, jqXHR) {
+
+                                                    console.log(data)
+                                                }
+
+
+                                            })
+
+                                        })
+
+
+
+
+
+
+                                        async function getData() {
+
+                                            return $.ajax({
+                                                url: '/usuarios',
+                                                type: 'PUT'
+                                            })
+
+                                        }
+
+
+
+                                    })
+
+
+                                </script>

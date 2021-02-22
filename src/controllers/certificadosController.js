@@ -93,7 +93,7 @@ var aColumns = [
 
 
 
-controller.pdf = (req, res) =>{
+controller.pdf = (req, res) => {
 
     let pdf = req.params.id;
     let c = new Client();
@@ -104,29 +104,29 @@ controller.pdf = (req, res) =>{
         password: 'Ag7348pp**'
     })
 
-    c.on('ready', function(){
+    c.on('ready', function () {
 
-        if(fs.existsSync(path.join(__dirname,`../public/uploads/${pdf}`))){
+        if (fs.existsSync(path.join(__dirname, `../public/uploads/${pdf}`))) {
 
             return res.json({
                 ok: true,
-                message:'Ya esta cargado'
+                message: 'Ya esta cargado'
             })
         }
 
-        c.get(`/certificados/${pdf}`,function(err,stream){
-            if (err){
+        c.get(`/certificados/${pdf}`, function (err, stream) {
+            if (err) {
                 return res.status(500).json({
-                    ok:false,
+                    ok: false,
                     err
                 })
             }
-            stream.once('close', function() { c.end(); });
-            stream.pipe(fs.createWriteStream(path.join(__dirname,`../public/uploads/${pdf}`)));
-            stream.on('end', function(){
+            stream.once('close', function () { c.end(); });
+            stream.pipe(fs.createWriteStream(path.join(__dirname, `../public/uploads/${pdf}`)));
+            stream.on('end', function () {
                 res.json({
                     ok: true,
-                    message:'No estaba cargado'
+                    message: 'No estaba cargado'
                 })
             })
 
@@ -137,7 +137,7 @@ controller.pdf = (req, res) =>{
 
 
 
- 
+
 
 }
 
@@ -149,7 +149,7 @@ controller.certificadosQuery = async (req, res) => {
 
 }
 
-controller.uploadData =  (req, res) => {
+controller.uploadData = (req, res) => {
 
 
     upload(req, res, async function (err) {
@@ -184,19 +184,15 @@ controller.uploadData =  (req, res) => {
                 })
             }
         }
-    
-        await asincrinos(certificado, coladas, data, res).then((resp) => {
-    
-    
-    
-        }).catch((err) => {
+
+        await asincrinos(certificado, coladas, data, res).catch((err) => {
             res.status(500).json({
                 ok: false,
-                err:'error'
+                err: 'error'
             })
         })
 
- 
+
     })
 
 }
@@ -212,7 +208,7 @@ async function asincrinos(certificado, coladas, data, res) {
 
     let proveedoresDB = await query(`Select * from proveedores where codigo = ?`, data.PRVCOD);
 
-    
+
 
     // Si no existe el proveedor en nuestra base de datos
     if (proveedoresDB.length === 0) {
@@ -220,46 +216,12 @@ async function asincrinos(certificado, coladas, data, res) {
         proveedoresDB = await query(`Select idProveedor from proveedores where codigo = ?`, data.PRVCOD)
     }
 
-    
-
-    insertarDB.push(
-        {
-            table: 'proveedores',
-            values: {
-                codigo: data.PRVCOD,
-                nombre: data.PRVNOM,
-                rfc: data.PRVRFC
-            },
-            id: proveedoresDB[0].idProveedor
-        }
-    );
-
-
-    //Si existe el proveedor
-
-    /*     let ordenesDB = await query('SELECT * FROM ordenes where orden = ?', [data.DREFER]);
-    
-        console.log(ordenesDB)
-    
-        insertarDB.push({
-            table:'ordenes',
-            values:{
-                orden: data.DREFER
-            }
-        })
-    
-        if(ordenesDB.length === 0){
-            await query('INSERT INTO ordenes SET orden = ?', [data.DREFER]);
-            ordenesDB = await query('SELECT * FROM ordenes where orden = ?', [data.DREFER]);
-        }
-    
-        console.log(ordenesDB) */
 
 
 
     let documentosDB = await query(`Select * from documentos  where entrada = ?`, data.DNUM)
 
-    
+
 
     if (documentosDB.length === 0) {
 
@@ -267,19 +229,7 @@ async function asincrinos(certificado, coladas, data, res) {
             [data.DNUM, data.DFECHA, data.DREFERELLOS, proveedoresDB[0].idProveedor, data.DREFER])
 
         documentosDB = await query(`Select * from documentos  where entrada = ?`, data.DNUM)
-    } /* else {
-
-        await query(`
-            UPDATE documentos
-            SET entrada = ?, fecha = ?, factura = ?, ordenCompra = ?, idProveedor = ? where ordenCompra = ?`,
-            [data.DNUM, data.DFECHA, data.DREFERELLOS, data.DREFER, proveedoresDB[0].idProveedor, data.DREFER]);
-
-    } */
-
-    
-
-
-
+    }
 
 
     let productosDB = await query(`Select * from producto  where codigo = ?`, [data.ICOD]);
@@ -289,7 +239,7 @@ async function asincrinos(certificado, coladas, data, res) {
         productosDB = await query(`Select * from producto  where codigo = ?`, [data.ICOD]);
     }
 
-    
+
 
 
     let productosOrdenesDB = await query(`
@@ -304,7 +254,7 @@ async function asincrinos(certificado, coladas, data, res) {
         await query('INSERT INTO productos_documentos set idProducto = ?, idDocumento = ?', [productosDB[0].idProducto, documentosDB[0].idDocumento]);
     }
 
-    
+
 
     let certificadosDB = await query('SELECT idCertificado, descripcion from certificados where descripcion = ?', [certificado.originalname]);
 
@@ -323,36 +273,23 @@ async function asincrinos(certificado, coladas, data, res) {
 
     for (let colada of coladas) {
 
-        
-
-        let coladaDB = await query('SELECT * FROM coladas where colada = ?', [colada]);
-
-        /*         if (coladaDB.length > 0) {
-                    await query('UPDATE coladas SET  idCertificado = ? where colada = ? ', [certificadosDB[0].idCertificado, colada])
-                    coladaDB = await query('SELECT * FROM coladas where colada = ?', [colada]);
-                } else {
-                    await query('INSERT INTO coladas SET colada = ?, idCertificado = ?', [colada, certificadosDB[0].idCertificado])
-                    coladaDB = await query('SELECT * FROM coladas where colada = ?', [colada]);
-                } */
 
 
-        if (coladaDB.length === 0) {
-            await query('INSERT INTO coladas SET colada = ?, idCertificado = ?', [colada, certificadosDB[0].idCertificado])
-            coladaDB = await query('SELECT * FROM coladas where colada = ?', [colada]);
-        }
 
-        let productoColada = await query(`select * from producto_coladas where idProducto = ? and idColada = ?`, [productosDB[0].idProducto, coladaDB[0].idColada]);
+        await query('INSERT INTO coladas SET colada = ?, idCertificado = ?', [colada, certificadosDB[0].idCertificado])
+        coladaDB = await query('SELECT * FROM coladas where colada = ? and idCertificado = ?', [colada, certificadosDB[0].idCertificado]);
 
-        if(productoColada.length === 0){
-            await query('INSERT INTO producto_coladas SET IdProducto = ?, idColada = ?', [productosDB[0].idProducto, coladaDB[0].idColada]);
-        }
 
-        
+
+        await query('INSERT INTO producto_coladas SET IdProducto = ?, idColada = ?', [productosDB[0].idProducto, coladaDB[0].idColada]);
+
+
+
 
     }
 
 
-    
+
 
 
 
@@ -403,10 +340,64 @@ async function asyncTables(tabla, body, res) {
         })
     }
 
+    if (tabla === "productos") {
+
+        let recepcion = body.codigo;
+
+        let productos = await queryProscai(`
+        SELECT  DMULTICIA,PRVCOD,PRVNOM,PRVRFC,DNUM,DATE_FORMAT(DFECHA,"%Y-%m-%d") as DFECHA,DREFERELLOS,DREFER, ICOD,IUM,IEAN,I2DESCR,AICANTF FROM FAXINV
+        LEFT JOIN FDOC ON FDOC.DSEQ=FAXINV.DSEQ
+        LEFT JOIN FINV ON FINV.ISEQ=FAXINV.ISEQ
+        LEFT JOIN FINV2 ON FINV2.I2KEY=FINV.ISEQ
+        LEFT JOIN FPRV ON FPRV.PRVSEQ=FDOC.PRVSEQ
+        WHERE DNUM='${recepcion}' AND DESFACT=2 AND MID(PRVCOD,1,1)='3'  AND DESFACT=2 AND MID(DNUM,1,2)='RA'
+        ORDER BY DNUM,AISEQ`);
+
+        //console.log(productos)
+
+
+
+        let productosDBTuvansa = await query(`
+            SELECT pc.idProductoColadas ,prod.codigo,prod.descripcion,doc.entrada,doc.orden,prov.nombre FROM producto_coladas as pc
+            INNER JOIN producto as prod on prod.idProducto = pc.idProducto
+            INNER JOIN coladas as col on col.idColada = pc.idColada
+            INNER JOIN certificados as cer on cer.idCertificado = col.idCertificado
+            INNER JOIN productos_documentos as po on po.idProducto = prod.idProducto
+            INNER JOIN documentos as doc on doc.idDocumento = po.idDocumento
+            INNER JOIN proveedores as prov on prov.idProveedor = doc.idProveedor
+            WHERE doc.entrada = '${recepcion}'
+        `);
+
+        //console.log(productosDBTuvansa)
+
+        if (productosDBTuvansa.length > 0) {
+
+            for (let productoDB of productosDBTuvansa) {
+
+                for (let [i, prod] of productos.entries()) {
+
+                    if (productoDB.codigo == prod.ICOD) {
+
+
+                        productos.splice(i, 1)
+
+                    }
+                }
+            }
+        }
+
+    
+        return res.json({
+            ok: true,
+            data: productos
+        })
+    }
+
     if (tabla === 'proveedores') {
 
         let proveedores = await queryProscai('SELECT PRVCOD,PRVNOM,PRVRFC FROM FPRV WHERE MID(PRVCOD,1,1)="3"');
 
+        
 
 
         for (let proveedor of proveedores) {
@@ -430,16 +421,20 @@ async function asyncTables(tabla, body, res) {
 
     }
 
+    
+    
     if (tabla === 'ordenes') {
 
         let codigoProveedor = body.codigo
 
-
+        
 
         let ordenes = await queryProscai(`SELECT PRVCOD,PRVNOM,PRVRFC,DNUM,DATE_FORMAT(DFECHA,"%Y-%m-%d") as DFECHA,DREFERELLOS,DREFER FROM FDOC
             LEFT JOIN FPRV ON FPRV.PRVSEQ=FDOC.PRVSEQ
             WHERE PRVCOD='${codigoProveedor}' AND MID(PRVCOD,1,1)='3'  AND DESFACT=2 AND MID(DNUM,1,2)='RA'
             ORDER BY DFECHA,DNUM`);
+
+ 
 
         let columns = [
             { title: "RFC" },
@@ -453,6 +448,7 @@ async function asyncTables(tabla, body, res) {
 
         for (let orden of ordenes) {
             let ordenArray = [];
+
 
             ordenArray.push(orden.PRVRFC, orden.DNUM, orden.DFECHA, orden.DREFERELLOS, orden.DREFER);
 
@@ -468,57 +464,7 @@ async function asyncTables(tabla, body, res) {
 
     }
 
-    if (tabla === "productos") {
 
-        let recepcion = body.codigo;
-
-        let productos = await queryProscai(`
-        SELECT  DMULTICIA,PRVCOD,PRVNOM,PRVRFC,DNUM,DATE_FORMAT(DFECHA,"%Y-%m-%d") as DFECHA,DREFERELLOS,DREFER, ICOD,IUM,IEAN,I2DESCR,AICANTF FROM FAXINV
-        LEFT JOIN FDOC ON FDOC.DSEQ=FAXINV.DSEQ
-        LEFT JOIN FINV ON FINV.ISEQ=FAXINV.ISEQ
-        LEFT JOIN FINV2 ON FINV2.I2KEY=FINV.ISEQ
-        LEFT JOIN FPRV ON FPRV.PRVSEQ=FDOC.PRVSEQ
-        WHERE DNUM='${recepcion}' AND DESFACT=2 AND MID(PRVCOD,1,1)='3'  AND DESFACT=2 AND MID(DNUM,1,2)='RA'
-        ORDER BY DNUM,AISEQ`);
-
-        console.log(productos)
-
-
-
-        let productosDBTuvansa = await query(`
-                
-                     select doc.entrada, doc.orden, prod.codigo, prod.descripcion, prod.cantidad, prod.unidad from productos_documentos as po
-                      inner join documentos as doc on doc.idDocumento = po.idDocumento
-                      inner join producto as prod on prod.idProducto = po.idProducto
-                      where doc.entrada = '${recepcion}'
-                
-                `);
-
-        //console.log(productosDBTuvansa)
-
-        if (productosDBTuvansa.length > 0) {
-
-            for (let productoDB of productosDBTuvansa) {
-
-                for (let [i, prod] of productos.entries()) {
-
-                    if (productoDB.codigo == prod.ICOD) {
-
-
-                        productos.splice(i, 1)
-
-                    }
-                }
-            }
-        }
-
-
-
-        return res.json({
-            ok: true,
-            data: productos
-        })
-    }
 
     res.status(400).json({
         ok: false,
@@ -595,66 +541,66 @@ async function server(res) {
 
 
 
-        let results = await query(sQuery)
-            .catch( err =>{
-                console.log(err)
-            })
-            
-        if (!results) {
-            return;
+    let results = await query(sQuery)
+        .catch(err => {
+            console.log(err)
+        })
+
+    if (!results) {
+        return;
+    }
+
+    rResult = results;
+
+    //Data set length after filtering 
+    sQuery = "SELECT FOUND_ROWS()";
+
+    results = await query(sQuery);
+
+    rResultFilterTotal = results;
+    aResultFilterTotal = rResultFilterTotal;
+    iFilteredTotal = aResultFilterTotal[0]['FOUND_ROWS()'];
+
+    //Total data set length 
+    sQuery = "SELECT COUNT(" + sIndexColumn + ") FROM " + sTable;
+
+    results = await query(sQuery);
+
+    rResultTotal = results;
+    aResultTotal = rResultTotal;
+    iTotal = aResultTotal[0]['COUNT(*)'];
+
+    //Output
+    var output = {};
+    var temp = [];
+
+    output.sEcho = parseInt(request['sEcho']);
+    output.iTotalRecords = iTotal;
+    output.iTotalDisplayRecords = iFilteredTotal;
+    output.aaData = [];
+
+    var aRow = rResult;
+    var row = [];
+
+    for (var i in aRow) {
+        for (Field in aRow[i]) {
+            if (!aRow[i].hasOwnProperty(Field)) continue;
+            temp.push(aRow[i][Field]);
         }
-
-        rResult = results;
-
-        //Data set length after filtering 
-        sQuery = "SELECT FOUND_ROWS()";
-
-        results = await query(sQuery);
-
-        rResultFilterTotal = results;
-        aResultFilterTotal = rResultFilterTotal;
-        iFilteredTotal = aResultFilterTotal[0]['FOUND_ROWS()'];
-
-        //Total data set length 
-        sQuery = "SELECT COUNT(" + sIndexColumn + ") FROM " + sTable;
-
-        results = await query(sQuery);
-
-        rResultTotal = results;
-        aResultTotal = rResultTotal;
-        iTotal = aResultTotal[0]['COUNT(*)'];
-
-        //Output
-        var output = {};
-        var temp = [];
-
-        output.sEcho = parseInt(request['sEcho']);
-        output.iTotalRecords = iTotal;
-        output.iTotalDisplayRecords = iFilteredTotal;
-        output.aaData = [];
-
-        var aRow = rResult;
-        var row = [];
-
-        for (var i in aRow) {
-            for (Field in aRow[i]) {
-                if (!aRow[i].hasOwnProperty(Field)) continue;
-                temp.push(aRow[i][Field]);
-            }
-            output.aaData.push(temp);
-            temp = [];
-        }
+        output.aaData.push(temp);
+        temp = [];
+    }
 
 
 
 
-        sendJSON(res, 200, output);
+    sendJSON(res, 200, output);
 
 
 
 
 
-   
+
 
 }
 
