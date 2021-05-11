@@ -7,5 +7,7 @@ app.use(require('./cierre'));
 app.use(require('./usuarios'));
 app.use(require('./certificados'));
 
+app.use(require('./tablas.routes'));
+
 
 module.exports = app;

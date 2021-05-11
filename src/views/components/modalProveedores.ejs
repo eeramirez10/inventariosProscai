@@ -1,7 +1,7 @@
 <!--Alta                  Modal Proveedores-->
-<div class=" fade modal mt-5" id="windowProveedor" tabindex="" role="dialog" aria-labelledby="exampleModalCenterTitle"
+<div class=" fade modal " id="windowProveedor" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
     aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable" role="document">
+    <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Busqueda</h5>
@@ -11,6 +11,17 @@
             </div>
             <div class="modal-body">
                 <table id="TablaProveedores" class="table table-hover table-sm" style="width:100%;">
+                    <thead>
+                        <tr>
+                            <td>Codigo</td>
+                            <td>Proveedor</td>
+                            <td>RFC</td>
+                            <td>Entrada</td>
+                            <td>Fecha </td>
+                            <td>DREFER </td>
+                            <td>Orden Compra </td>
+                        </tr>
+                    </thead>
                 </table>
             </div>
         </div>
@@ -18,32 +29,14 @@
 </div>
 
 
-<div class=" fade modal mt-5" id="windowOrdenes" tabindex="" role="dialog" aria-labelledby="exampleModalCenterTitle"
+
+<div class=" modal fade " id="windowProductos" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
     aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable" role="document">
+    <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable " role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title text-center">Busqueda</h5>
                 <button type="button" id="boton" class="close" data-dismiss="modal" aria-label="Close" data-toggle="modal" data-target="#windowProveedor">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <table id="TablaOrdenes" class="table table-hover table-sm" style="width:100%;">
-
-                </table>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class=" modal fade " id="windowProductos" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
-    aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-xl " role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title text-center">Busqueda</h5>
-                <button type="button" id="boton" class="close" data-dismiss="modal" aria-label="Close" data-toggle="modal" data-target="#windowOrdenes">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>

@@ -12,7 +12,7 @@ const app = express();
 
 
 // Procesos de inserccion 
-require('./procesos/procesos.js');
+/* require('./procesos/procesos.js'); */
 
 //Settings
 
@@ -24,6 +24,7 @@ app.set('view engine', 'ejs');
 //middlewares
 //app.use(morgan('dev'));
 app.use(express.urlencoded({ extended: false }))
+
 
 app.use(cors());
 app.use(flash());

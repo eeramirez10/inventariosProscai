@@ -37,7 +37,7 @@ const upload = multer({
             host: 'tuvansa-server.dyndns.org',
             secure: false,
             user: 'Administrador',
-            password: 'Ag7348pp**'
+            password: '912522Pop'
         }
     }),
 
@@ -84,7 +84,7 @@ controller.getFiles = (req, res) => {
         host: 'tuvansa-server.dyndns.org',
         secure: false,
         user: 'Administrador',
-        password: 'Ag7348pp**'
+        password: '912522Pop'
     })
 
     let path = usuario.rol === "administrador" || usuario.rol === "upload" ?  `/uploads${ruta}`: `/uploads/${sucursal}${ruta}`;

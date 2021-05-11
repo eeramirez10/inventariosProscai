@@ -42,8 +42,8 @@ if (typeof jQuery === 'undefined') {
             restoreButton: true,
             buttons: {
                 edit: {
-                    class: 'btn btn-sm btn-default',
-                    html: '<span class="glyphicon glyphicon-pencil"></span>',
+                    class: 'btn btn-sm btn-secondary',
+                    html: '<span class="fa fa-pencil"></span>',
                     action: 'edit'
                 },
                 delete: {

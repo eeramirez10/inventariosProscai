@@ -23,7 +23,9 @@ passport.use(new passportLocal( async  (username, password, done) =>  {
     let usuarios = await query(queryUsuarios,[username, password])
         .catch( err => err);
 
-        //console.log(usuarios)
+
+
+        console.log(usuarios);
 
     if (usuarios.length > 0){
 

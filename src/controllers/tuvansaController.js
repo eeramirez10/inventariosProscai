@@ -4,14 +4,14 @@ const moment = require('moment-timezone');
 
 const query = require('../connection/tuvansaConnection');
 
+let { table } = require('../helpers/tableServerPro')
 
 
 
-let sIndexColumn = '*';
+let sjoin="";
 let sTable = 'FINV';
-var request = {};
-var aColumns = [
-    'ISEQ', 'ICOD', 'IEAN', 'I2DESCR', ' DATE_FORMAT(IALTA,"%Y-%m-%d")', 'ALMCANT','IUM','ALMCANTMTY','ALMCANTVER', 'ALMASIGNADO', '(ALMCANT - ALMASIGNADO) ', 'ALMCANTREAL',
+let aColumns = [
+    'ISEQ', 'ICOD', 'IEAN', 'I2DESCR', 'DATE_FORMAT(IALTA,"%Y-%m-%d") as IALTA', 'ALMCANT','IUM','ALMCANTMTY','ALMCANTVER', 'ALMASIGNADO', '(ALMCANT-ALMASIGNADO) as DIF', 'ALMCANTREAL',
     'USUARIO','COMENTARIOS'];
 
 
@@ -197,10 +197,9 @@ controller.actualizaAlmacenesMexicoMonterreyVeracruz = async (inventarios) =>{
 }
 
 
-controller.cargaDataTable = (req, res) => {
-    console.log('GET request to /server');
-    request = req.query;
-    server(res);
+controller.cargaDataTable = async  (req, res) => {
+    let resp = await table(sTable, aColumns, sjoin,'','Tuvansa', req);
+    res.status(200).send(resp)
 }
 
 controller.inserta = (req, res) => {
@@ -338,247 +337,6 @@ controller.creaColumnaAFinDeMes = async () => {
 
 
 }
-
-
-//------------------------- Functions
-
-function server(res) {
-    //Paging
-    var sLimit = "";
-    if (request['length'] && request['length'] != -1) {
-        sLimit = 'LIMIT ' + request['start'] + ', ' + request['length']
-    }
-
-    //Ordering
-    var sOrder = "";
-
-    if (request['order']) {
-
-        sOrder = `ORDER BY ${aColumns[request['order'][0]['column']]} ${request['order']['0']['dir']}`;
-
-        //console.log(`ORDER BY ${aColumns[request['order'][0]['column']] } ${request['order']['0']['dir']}`)
-    }
-    //Filtering
-    var sWhere = "";
-    if (request['search']['value'] && request['search']['value'] != "") {
-
-        let busqueda = request['search']['value'].toUpperCase();
-        sWhere = "WHERE (";
-        for (var i = 0; i < aColumns.length; i++) {
-            sWhere += aColumns[i] + " LIKE " + "\'%" + busqueda + "%\'" + " OR ";
-        }
-
-        sWhere = sWhere.substring(0, sWhere.length - 4);
-        sWhere += ')';
-    }
-
-
-
-    //Queries
-    //var sQuery = "SELECT SQL_CALC_FOUND_ROWS " +aColumns.join(',')+ " FROM " +sTable+" "+sWhere+" "+sOrder+" "+sLimit +" limit 10";
-
-
-    var sQuery = `SELECT SQL_CALC_FOUND_ROWS  ${aColumns.join(',')} FROM ${sTable}  ${sWhere} ${sOrder} ${sLimit} `;
-
-    var rResult = {};
-    var rResultFilterTotal = {};
-    var aResultFilterTotal = {};
-    var iFilteredTotal = {};
-    var iTotal = {};
-    var rResultTotal = {};
-    var aResultTotal = {};
-
-    (async () => {
-
-        let results = await query(sQuery);
-        if (!results) {
-            return;
-        }
-
-        rResult = results;
-
-        //Data set length after filtering 
-        sQuery = "SELECT FOUND_ROWS()";
-
-        results = await query(sQuery);
-
-        rResultFilterTotal = results;
-        aResultFilterTotal = rResultFilterTotal;
-        iFilteredTotal = aResultFilterTotal[0]['FOUND_ROWS()'];
-
-        //Total data set length 
-        sQuery = "SELECT COUNT(" + sIndexColumn + ") FROM " + sTable;
-
-        results = await query(sQuery);
-
-        rResultTotal = results;
-        aResultTotal = rResultTotal;
-        iTotal = aResultTotal[0]['COUNT(*)'];
-
-        //Output
-        var output = {};
-        var temp = [];
-
-        output.sEcho = parseInt(request['sEcho']);
-        output.iTotalRecords = iTotal;
-        output.iTotalDisplayRecords = iFilteredTotal;
-        output.aaData = [];
-
-        var aRow = rResult;
-        var row = [];
-
-        for (var i in aRow) {
-            for (Field in aRow[i]) {
-                if (!aRow[i].hasOwnProperty(Field)) continue;
-                temp.push(aRow[i][Field]);
-            }
-            output.aaData.push(temp);
-            temp = [];
-        }
-
-
-        sendJSON(res, 200, output);
-
-
-
-
-
-    })();
-
-}
-
-function sendJSON(res, httpCode, body) {
-    var response = JSON.stringify(body);
-
-    res.status(httpCode).send(response)
-
-}
-
-
-function server2(res) {
-    //Paging
-    var sLimit = "";
-    if (request['iDisplayStart'] && request['iDisplayLength'] != -1) {
-        sLimit = 'LIMIT ' + request['iDisplayStart'] + ', ' + request['iDisplayLength']
-    }
-
-    //Ordering
-    var sOrder = "";
-    if (request['iSortCol_0']) {
-        sOrder = 'ORDER BY ';
-
-        for (var i = 0; i < request['iSortingCols']; i++) {
-            if (request['bSortable_' + parseInt(request['iSortCol_' + i])] == "true") {
-                sOrder += aColumns[parseInt(request['iSortCol_' + i])] + " " + request['sSortDir_' + i] + ", ";
-            }
-        }
-
-        sOrder = sOrder.substring(0, sOrder.length - 2)
-        if (sOrder == 'ORDER BY') {
-            console.log("sOrder == ORDER BY");
-            sOrder = "";
-        }
-    }
-
-    //Filtering
-    var sWhere = "";
-    if (request['sSearch'] && request['sSearch'] != "") {
-        let busqueda = request['sSearch'].toUpperCase();
-        sWhere = "WHERE (";
-        for (var i = 0; i < aColumns.length; i++) {
-            sWhere += aColumns[i] + " LIKE " + "\'%" + busqueda + "%\'" + " OR ";
-        }
-
-        sWhere = sWhere.substring(0, sWhere.length - 4);
-        sWhere += ')';
-    }
-
-    //Individual column filtering
-    for (var i = 0; i < aColumns.length; i++) {
-        if (request['bSearchable_' + i] && request['bSearchable_' + i] == "true" && request['sSearch_' + i] != '') {
-            if (sWhere == "") {
-                sWhere = "WHERE ";
-            }
-            else {
-                sWhere += " AND ";
-            }
-            sWhere += " " + aColumns[i] + " LIKE " + request['sSearch_' + i] + " ";
-        }
-    }
-
-    //Queries
-    //var sQuery = "SELECT SQL_CALC_FOUND_ROWS " +aColumns.join(',')+ " FROM " +sTable+" "+sWhere+" "+sOrder+" "+sLimit +" limit 10";
-
-
-    var sQuery = `SELECT SQL_CALC_FOUND_ROWS  ${aColumns.join(',')} FROM ${sTable} left join usuario as u on finv.IdUsuario = u.id  ${sWhere} ${sOrder} ${sLimit} `;
-
-    var rResult = {};
-    var rResultFilterTotal = {};
-    var aResultFilterTotal = {};
-    var iFilteredTotal = {};
-    var iTotal = {};
-    var rResultTotal = {};
-    var aResultTotal = {};
-
-    (async () => {
-
-        let results = await query(sQuery);
-        if (!results) {
-            return;
-        }
-
-        rResult = results;
-
-        //Data set length after filtering 
-        sQuery = "SELECT FOUND_ROWS()";
-
-        results = await query(sQuery);
-
-        rResultFilterTotal = results;
-        aResultFilterTotal = rResultFilterTotal;
-        iFilteredTotal = aResultFilterTotal[0]['FOUND_ROWS()'];
-
-        //Total data set length 
-        sQuery = "SELECT COUNT(" + sIndexColumn + ") FROM " + sTable;
-
-        results = await query(sQuery);
-
-        rResultTotal = results;
-        aResultTotal = rResultTotal;
-        iTotal = aResultTotal[0]['COUNT(*)'];
-
-        //Output
-        var output = {};
-        var temp = [];
-
-        output.sEcho = parseInt(request['sEcho']);
-        output.iTotalRecords = iTotal;
-        output.iTotalDisplayRecords = iFilteredTotal;
-        output.aaData = [];
-
-        var aRow = rResult;
-        var row = [];
-
-        for (var i in aRow) {
-            for (Field in aRow[i]) {
-                if (!aRow[i].hasOwnProperty(Field)) continue;
-                temp.push(aRow[i][Field]);
-            }
-            output.aaData.push(temp);
-            temp = [];
-        }
-
-
-        sendJSON(res, 200, output);
-
-
-
-
-
-    })();
-
-}
-
 
 module.exports = controller;
 

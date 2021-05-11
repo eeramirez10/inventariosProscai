@@ -10,29 +10,7 @@ const queryProscai = require('../connection/proscaiConnection');
 
 const query = require('../connection/tuvansaConnection');
 
-/* let storage = multer.diskStorage({
-    destination: path.join(__dirname, '../public/uploads'),
-    filename: (req, file, cb) => {
-        
-        cb(null, file.originalname)
-    }
-
-}) */
-
-/* controller.upload = multer({
-    storage: storage
-}) */
-
-/* const upload = multer({
-    fileFilter: function (req, file, cb) {
-        if (file.mimetype !== 'application/pdf') {
-            return cb(new Error('Archivo no permitido'))
-        }
-        cb(null, true)
-    },
-    storage: storage
-
-}).single('certificado'); */
+let { table } = require('../helpers/tableServerPro')
 
 
 const upload = multer({
@@ -58,7 +36,7 @@ const upload = multer({
             host: 'tuvansa-server.dyndns.org',
             secure: false,
             user: 'Administrador',
-            password: 'Ag7348pp**'
+            password: '912522Pop'
         }
     }),
 
@@ -69,9 +47,9 @@ const upload = multer({
 
 
 
-let sIndexColumn = '*';
-let sTable = 'producto_coladas';
-var request = {};
+
+let sTable = 'producto_coladas as pc';
+
 var aColumns = [
     "pc.idProductoColadas as ID",
     'DATE_FORMAT(pc.fecha,"%Y-%m-%d") as Alta',
@@ -85,6 +63,15 @@ var aColumns = [
     "doc.orden as Orden",
     "prov.nombre as Proveedor",
 ];
+
+const sjoin = `
+    inner join producto as prod on prod.idProducto = pc.idProducto
+    inner join coladas as col on col.idColada = pc.idColada
+    inner join certificados as cer on cer.idCertificado = col.idCertificado
+    inner join productos_documentos as po on po.idProducto = prod.idProducto
+    inner join documentos as doc on doc.idDocumento = po.idDocumento
+    inner join proveedores as prov on prov.idProveedor = doc.idProveedor
+`;
 
 
 
@@ -143,9 +130,9 @@ controller.pdf = (req, res) => {
 
 controller.certificadosQuery = async (req, res) => {
 
-    console.log('GET request to /Certificados');
-    request = req.query;
-    server(res);
+    let resp = await table(sTable, aColumns, sjoin,'','Tuvansa', req);
+
+    res.status(200).send(resp)
 
 }
 
@@ -342,19 +329,18 @@ async function asyncTables(tabla, body, res) {
 
     if (tabla === "productos") {
 
-        let recepcion = body.codigo;
+        let {codigo} = body;
 
         let productos = await queryProscai(`
-        SELECT  DMULTICIA,PRVCOD,PRVNOM,PRVRFC,DNUM,DATE_FORMAT(DFECHA,"%Y-%m-%d") as DFECHA,DREFERELLOS,DREFER, ICOD,IUM,IEAN,I2DESCR,AICANTF FROM FAXINV
+        SELECT  DMULTICIA,PRVCOD,PRVNOM,PRVRFC,DNUM,DATE_FORMAT(DFECHA,"%Y-%m-%d") as DFECHA,DREFERELLOS,DREFER, ICOD,IUM,IEAN,I2DESCR,AICANT as AICANTF FROM FAXINV
         LEFT JOIN FDOC ON FDOC.DSEQ=FAXINV.DSEQ
         LEFT JOIN FINV ON FINV.ISEQ=FAXINV.ISEQ
         LEFT JOIN FINV2 ON FINV2.I2KEY=FINV.ISEQ
         LEFT JOIN FPRV ON FPRV.PRVSEQ=FDOC.PRVSEQ
-        WHERE DNUM='${recepcion}' AND DESFACT=2 AND MID(PRVCOD,1,1)='3'  AND DESFACT=2 AND MID(DNUM,1,2)='RA'
+        WHERE DNUM='${codigo}' 
         ORDER BY DNUM,AISEQ`);
 
-        //console.log(productos)
-
+        
 
 
         let productosDBTuvansa = await query(`
@@ -365,7 +351,7 @@ async function asyncTables(tabla, body, res) {
             INNER JOIN productos_documentos as po on po.idProducto = prod.idProducto
             INNER JOIN documentos as doc on doc.idDocumento = po.idDocumento
             INNER JOIN proveedores as prov on prov.idProveedor = doc.idProveedor
-            WHERE doc.entrada = '${recepcion}'
+            WHERE doc.entrada = '${codigo}'
         `);
 
         //console.log(productosDBTuvansa)
@@ -386,7 +372,7 @@ async function asyncTables(tabla, body, res) {
             }
         }
 
-    
+
         return res.json({
             ok: true,
             data: productos
@@ -397,7 +383,7 @@ async function asyncTables(tabla, body, res) {
 
         let proveedores = await queryProscai('SELECT PRVCOD,PRVNOM,PRVRFC FROM FPRV WHERE MID(PRVCOD,1,1)="3"');
 
-        
+
 
 
         for (let proveedor of proveedores) {
@@ -421,20 +407,20 @@ async function asyncTables(tabla, body, res) {
 
     }
 
-    
-    
+
+
     if (tabla === 'ordenes') {
 
         let codigoProveedor = body.codigo
 
-        
+
 
         let ordenes = await queryProscai(`SELECT PRVCOD,PRVNOM,PRVRFC,DNUM,DATE_FORMAT(DFECHA,"%Y-%m-%d") as DFECHA,DREFERELLOS,DREFER FROM FDOC
             LEFT JOIN FPRV ON FPRV.PRVSEQ=FDOC.PRVSEQ
             WHERE PRVCOD='${codigoProveedor}' AND MID(PRVCOD,1,1)='3'  AND DESFACT=2 AND MID(DNUM,1,2)='RA'
             ORDER BY DFECHA,DNUM`);
 
- 
+
 
         let columns = [
             { title: "RFC" },
@@ -472,144 +458,9 @@ async function asyncTables(tabla, body, res) {
     })
 }
 
-async function server(res) {
-    //Paging
-    var sLimit = "";
-    if (request['length'] && request['length'] != -1) {
-        sLimit = 'LIMIT ' + request['start'] + ', ' + request['length']
-    }
-
-    //Ordering
-    var sOrder = "";
-
-    if (request['order']) {
-
-        sOrder = `ORDER BY ${aColumns[request['order'][0]['column']].split(" ")[0]} ${request['order']['0']['dir']}`;
-
-        //console.log(`ORDER BY ${aColumns[request['order'][0]['column']] } ${request['order']['0']['dir']}`)
-    }
-    //Filtering
-    var sWhere = "";
-    if (request['search']['value'] && request['search']['value'] != "") {
-
-        let busqueda = request['search']['value'].toUpperCase();
-        sWhere = "WHERE (";
-        for (var i = 0; i < aColumns.length; i++) {
-            sWhere += aColumns[i].split(" ")[0] + " LIKE " + "\'%" + busqueda + "%\'" + " OR ";
-        }
-
-        sWhere = sWhere.substring(0, sWhere.length - 4);
-        sWhere += ')';
-    }
 
 
 
-    //Queries
-    //var sQuery = "SELECT SQL_CALC_FOUND_ROWS " +aColumns.join(',')+ " FROM " +sTable+" "+sWhere+" "+sOrder+" "+sLimit +" limit 10";
-
-
-    var sQuery = `
-        SELECT SQL_CALC_FOUND_ROWS  ${aColumns.join(',')} 
-        FROM ${sTable} as pc
-        inner join producto as prod on prod.idProducto = pc.idProducto
-        inner join coladas as col on col.idColada = pc.idColada
-        inner join certificados as cer on cer.idCertificado = col.idCertificado
-        inner join productos_documentos as po on po.idProducto = prod.idProducto
-        inner join documentos as doc on doc.idDocumento = po.idDocumento
-        inner join proveedores as prov on prov.idProveedor = doc.idProveedor
-        
-        ${sWhere} 
-       
-        ${sOrder} 
-        ${sLimit} 
-
-        
-        `;
-
-
-    //console.log(sQuery)
-
-
-
-    var rResult = {};
-    var rResultFilterTotal = {};
-    var aResultFilterTotal = {};
-    var iFilteredTotal = {};
-    var iTotal = {};
-    var rResultTotal = {};
-    var aResultTotal = {};
-
-
-
-    let results = await query(sQuery)
-        .catch(err => {
-            console.log(err)
-        })
-
-    if (!results) {
-        return;
-    }
-
-    rResult = results;
-
-    //Data set length after filtering 
-    sQuery = "SELECT FOUND_ROWS()";
-
-    results = await query(sQuery);
-
-    rResultFilterTotal = results;
-    aResultFilterTotal = rResultFilterTotal;
-    iFilteredTotal = aResultFilterTotal[0]['FOUND_ROWS()'];
-
-    //Total data set length 
-    sQuery = "SELECT COUNT(" + sIndexColumn + ") FROM " + sTable;
-
-    results = await query(sQuery);
-
-    rResultTotal = results;
-    aResultTotal = rResultTotal;
-    iTotal = aResultTotal[0]['COUNT(*)'];
-
-    //Output
-    var output = {};
-    var temp = [];
-
-    output.sEcho = parseInt(request['sEcho']);
-    output.iTotalRecords = iTotal;
-    output.iTotalDisplayRecords = iFilteredTotal;
-    output.aaData = [];
-
-    var aRow = rResult;
-    var row = [];
-
-    for (var i in aRow) {
-        for (Field in aRow[i]) {
-            if (!aRow[i].hasOwnProperty(Field)) continue;
-            temp.push(aRow[i][Field]);
-        }
-        output.aaData.push(temp);
-        temp = [];
-    }
-
-
-
-
-    sendJSON(res, 200, output);
-
-
-
-
-
-
-
-}
-
-function sendJSON(res, httpCode, body) {
-    var response = JSON.stringify(body);
-
-    res.status(httpCode).send(response)
-
-}
 
 
 

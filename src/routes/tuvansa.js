@@ -9,7 +9,7 @@ const {  isAuthenticated } = require('../middlewares/loginMiddleware');
 
 
 router.get('/server', tuvansaController.cargaDataTable );
-router.post('/data', tuvansaController.inserta);
+router.post('/data', tuvansaController.inserta );
 
 
 

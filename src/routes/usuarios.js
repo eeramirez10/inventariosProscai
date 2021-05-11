@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
 
-const {  isAuthenticated } = require('../middlewares/loginMiddleware');
+const {  isAuthenticated, isCertificado} = require('../middlewares/loginMiddleware');
 
-let { getUpdateUsuarios } = require('../controllers/usuarioController');
+let { actualizar, usuarios, usuarioNuevo } = require('../controllers/usuarioController');
 
-router.get('/usuarios',isAuthenticated, (req, res) => {
+router.get('/usuarios',[isAuthenticated,isCertificado], (req, res) => {
 
     const data = {
         user: req.user,
@@ -16,8 +16,12 @@ router.get('/usuarios',isAuthenticated, (req, res) => {
    
 })
 
+router.get('/usuariosTable', usuarios );
 
-router.post('/usuarios', getUpdateUsuarios);
+
+router.post('/usuarios', actualizar);
+
+router.post('/usuarioNuevo', usuarioNuevo);
 
 
 

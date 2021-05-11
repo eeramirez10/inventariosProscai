@@ -130,7 +130,7 @@
                                     <div class="card-body">
 
                                         <div class="table-responsive">
-                                            <table id="sample_data" class="table table-bordered "
+                                            <table id="sample_data" class="table table-bordered table-hover"
                                                 style="width:100%; font-size:11px; ">
                                                 <thead>
                                                     <tr>
@@ -174,253 +174,241 @@
 
             <script>
 
-                let tituloOrden = document.querySelector('#windowOrdenes .modal-title');
-
-                let tituloProductos = document.querySelector('#windowProductos .modal-title');
+                $(document).ready(function () {
 
 
+                    let tituloProductos = document.querySelector('#windowProductos .modal-title');
 
-                let codigo;
-                let proveedor;
-                let entrada;
-                let ordenCompra;
+                    let codigo;
+                    let proveedor;
+                    let entrada;
+                    let ordenCompra;
 
-                let productos;
+                    let productos;
 
-                /*                 $('#windowProveedor').modal({
-                                    backdrop: false
-                                });
-                
-                                $('#windowOrdenes').modal({
-                                    backdrop: false
-                                });
-                
-                                $('#windowProductos').modal({
-                                    backdrop: false
-                                }); */
-
-                tablaCertificadosTuvansa()
+                    tablaCertificadosTuvansa()
 
 
-                function format(d) {
-                    console.log(d)
-                    let template2 = `
-                        <table  cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">
-                            <tr>
-                                <td>Proveedor:</td>
-                                <td>${d[10]} </td>
-                            </tr>
-                            <tr>
-                                <td>Entrada:</td>
-                            
-                                <td> ${d[8]} </td>
-                            </tr>
-                            <tr>
-                                <td>Orden:</td>
-                                <td> ${d[9]} </td>
-                            </tr>
-                            <tr>
-                                <td>Fecha:</td>
-                                <td> ${d[6]} </td>
-                            </tr>
+                    function format(d) {
+                        console.log(d)
+                        let template2 = `
+        <table  cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">
+            <tr>
+                <td>Proveedor:</td>
+                <td>${d[10]} </td>
+            </tr>
+            <tr>
+                <td>Entrada:</td>
+            
+                <td> ${d[8]} </td>
+            </tr>
+            <tr>
+                <td>Orden:</td>
+                <td> ${d[9]} </td>
+            </tr>
+            <tr>
+                <td>Fecha:</td>
+                <td> ${d[6]} </td>
+            </tr>
 
-                        </table>
-                        `
+        </table>
+        `
 
-                    return template2;
-                }
+                        return template2;
+                    }
 
-                verPdf();
+                    verPdf();
 
-                function verPdf() {
-                    $(document).on('click', '.view-pdf', async function () {
+                    function verPdf() {
 
-                        var pdf_link = $(this).attr('href');
+                        $(document).on('click', '.view-pdf', async function () {
 
-                        cargaSpinner()
+                            var pdf_link = $(this).attr('href');
 
-                        let resp = await $.ajax({
-                            url: `/pdf/${pdf_link}`,
-                            type: 'GET'
+                            cargaSpinner()
+
+                            let resp = await $.ajax({
+                                url: `/pdf/${pdf_link}`,
+                                type: 'GET'
+                            })
+
+                            console.log(resp);
+
+                            if (resp.ok) {
+                                cierraSpinner()
+                            }
+                            let uri = `uploads/${pdf_link}`;
+                            var iframe = `<object type="application/pdf" data="${uri}" width="100%" height="600">No Support</object>`
+                            $.createModal({
+                                title: '',
+                                message: iframe,
+                                closeButton: true,
+                                scrollable: false
+                            });
+                            return true;
+
                         })
 
-                        console.log(resp);
 
-                        if (resp.ok) {
-                            cierraSpinner()
-                        }
-                        let uri = `uploads/${pdf_link}`;
-                        var iframe = `<object type="application/pdf" data="${uri}" width="100%" height="600">No Support</object>`
-                        $.createModal({
-                            title: '',
-                            message: iframe,
-                            closeButton: true,
-                            scrollable: false
+                    }
+
+                    function tablaCertificadosTuvansa() {
+
+                        var dataTable = $('#sample_data').DataTable({
+                            "bDestroy": true,
+                            "processing": true,
+                            "serverSide": true,
+                            "order": [],
+                            "ajax": { url: `/certificadosTable`, type: "GET" },
+                            "columns": [
+                                { "data": [0], "class": "details-control" },
+                                { "data": [1] },
+                                { "data": [2] },
+                                { "data": [3] },
+                                { "data": [4] },
+                                { "data": [5] },
+                                {
+                                    "data": [7],
+                                    render: (data, type, row) => `<btn class="btn btn-xs bg-success view-pdf" href='${data}' ><i class ="fa fa-file-pdf-o"></i></></btn>`
+                                },
+
+                            ],
+                            "dom": 'Bfrtip',
+                            "buttons": [{
+                                text: 'Alta',
+                                action: function (e, dt, node, config) {
+                                    printTable()
+                                },
+                                attr: {
+                                    "data-target": '#windowProveedor',
+                                    "data-toggle": "modal"
+                                }
+                            }
+                            ],
+                            "order": [[0, "desc"]]
                         });
-                        return true;
-
-                    })
 
 
-                }
-                function tablaCertificadosTuvansa() {
-
-                    var dataTable = $('#sample_data').DataTable({
-                        "bDestroy": true,
-                        "processing": true,
-                        "serverSide": true,
-                        "order": [],
-                        "ajax": {
-                            url: `/certificadosTable`,
-                            type: "GET"
-                        },
-                        "columns": [
-
-                            { "data": [0], "class": "details-control" },
-                            { "data": [1] },
-                            { "data": [2] },
-                            { "data": [3] },
-                            { "data": [4] },
-                            { "data": [5] },
-                            /* { "data": [6] }, */
-
-                            { "data": [7] ,
-                                render: function (data, type, row) {
-
-                                    return `<btn class="btn btn-outline-secondary btn-xs view-pdf" href='${data}' ><i class ="fa fa-file-pdf-o"></i></> </btn>`
-                                }},
-                            /* { "data": [8] }, */
-                            /* { "data": [9] }, */
-                           /*  { "data": [10] }, */
+                        // Add event listener for opening and closing details
+                        $('#sample_data tbody').on('click', 'td.details-control', async function () {
 
 
-                        ],
-                        "dom": 'Bfrtip',
-                        "buttons": [{
-                            text: 'Alta',
-                            action: function (e, dt, node, config) {
-                                printTable()
-                            },
-                            attr: {
-                                "data-target": '#windowProveedor',
-                                "data-toggle": "modal"
+                            var tr = $(this).closest('tr');
+                            var row = dataTable.row(tr);
+                            //let entrada = row.data()[2]
+
+
+
+                            //let extra = await getData('extra', entrada);
+
+
+                            if (row.child.isShown()) {
+                                // This row is already open - close it
+                                row.child.hide();
+                                tr.removeClass('shown');
                             }
-                        }
-                        ],
-                        "columnDefs": [
-                            {
-                                "targets": [ ],
-                                "visible": false
+                            else {
+                                // Open this row
+                                row.child(format(row.data())).show();
+                                tr.addClass('shown');
+
+                                //$('.extra').DataTable()
                             }
-                        ],
-                        "order": [[0, "asc"]]
-                    });
+                        });
+
+                        $('#sample_data').on('draw.dt', function () {
+
+                            $(this).Tabledit({
+                                url: `/usuarios`,
+                                eventType: 'dblclick',
+                                deleteButton: false,
+                                editButton: true,
+
+                                //dataType: 'json',
+                                columns: {
+                                    identifier: [2, 'ISEC'],
+                                    editable: [
+                                        [5, 'colda'],
+                                    ]
+                                },
+                                onSuccess: function (data, textStatus, jqXHR) {
 
 
-                    // Add event listener for opening and closing details
-                    $('#sample_data tbody').on('click', 'td.details-control', async function () {
+                                    Swal.fire({
+                                        position: 'top-end',
+                                        icon: 'success',
+                                        title: `${data.message}`,
+                                        showConfirmButton: true
+                                    })
+                                    
+                                },
+                                onFail: function (jqXHR, textStatus, errorThrown) {
+
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Error',
+                                        text: `${jqXHR.responseJSON.message}`,
+                                    })
+
+                                },
 
 
-                        var tr = $(this).closest('tr');
-                        var row = dataTable.row(tr);
-                        //let entrada = row.data()[2]
+                            })
 
+                        })
 
-
-                        //let extra = await getData('extra', entrada);
-
-
-                        if (row.child.isShown()) {
-                            // This row is already open - close it
-                            row.child.hide();
-                            tr.removeClass('shown');
-                        }
-                        else {
-                            // Open this row
-                            row.child(format(row.data())).show();
-                            tr.addClass('shown');
-
-                            //$('.extra').DataTable()
-                        }
-                    });
-
-                }
-
-
-                async function printTable() {
-
-                    cargaSpinner();
-
-                    let data = await getData('proveedores', '');
-
-                    getTable(data);
-
-                }
-
-                function getTable(data) {
-
-
-                    let proveedores = $("#TablaProveedores").DataTable({
-                        "bDestroy": true,
-                        "data": data.data,
-                        "columns": data.columns,
-                    })
-
-                    if (data.data.length > 0) {
-                        cierraSpinner()
                     }
 
 
+                    async function printTable() {
 
-                    $('#TablaProveedores tbody').on('click', 'tr', async function () {
+                        let proveedores = $('#TablaProveedores').DataTable({
+                            "bDestroy": true,
+                            "processing": true,
+                            "serverSide": true,
+                            "order": [],
+                            "ajax": { url: `/table`, type: "GET" },
+                            "columns": [
+                                { "data": [0] },
+                                { "data": [1] },
+                                { "data": [2] },
+                                { "data": [3] },
+                                { "data": [4] },
+                                { "data": [5] },
+                                { "data": [6] },
 
 
-                        cargaSpinner();
-
-                        codigo = proveedores.row(this).data()[0];
-                        proveedor = proveedores.row(this).data()[1];
-
-                        let data = await getData('ordenes', codigo);
-
-                        $('#windowProveedor').modal('hide')
-                        $('#windowOrdenes').modal('show')
-
-
-                        tituloOrden.textContent = `${codigo} -  ${proveedor} `;
-
-
-                        let ordenes = $("#TablaOrdenes").DataTable({
-                            "destroy": true,
-                            "data": data.data,
-                            "columns": data.columns,
+                            ],
+                            "order": [[6, "desc"]]
                         })
 
-                        cierraSpinner()
 
-                        $('#TablaOrdenes tbody').on('click', 'tr', async function () {
-                            codigo = ordenes.row(this).data()[1];
-                            entrada = ordenes.row(this).data()[1];
-                            ordenCompra = ordenes.row(this).data()[4];
 
-                            tituloProductos.innerHTML = ` 
-                                Proveedor: <strong>${proveedor} </strong>  
-                                Entrada:  <strong>${entrada}   </strong>  
-                                OrdenCompra: <strong>${ordenCompra}</strong> `
-                                ;
+                        $('#TablaProveedores tbody').on('click', 'tr', async function () {
+
 
                             cargaSpinner();
+
+                            codigo = proveedores.row(this).data()[3];
+                            proveedor = proveedores.row(this).data()[1];
+                            entrada = proveedores.row(this).data()[3];
+                            ordenCompra = proveedores.row(this).data()[6];
 
                             let datas = await getData('productos', codigo)
 
                             let data = datas.data;
 
-
-                            cierraSpinner()
-
+                            if (data) cierraSpinner();
 
                             $('#windowProductos').modal('show')
-                            $('#windowOrdenes').modal('hide')
-                            $('#windowProvedores').modal('hide')
+                            $('#windowProveedor').modal('hide')
+
+                            tituloProductos.innerHTML = ` 
+                Proveedor: <strong>${proveedor} </strong>  
+                Entrada:  <strong>${entrada}   </strong>  
+                OrdenCompra: <strong>${ordenCompra}</strong> `
+                                ;
+
 
                             productos = $("#TablaProductos").DataTable({
                                 "bDestroy": true,
@@ -443,31 +431,29 @@
                                     {
                                         "defaultContent": `
 
-                                        <form class="coladas-archivo" name="coladas-archivo" method="POST" enctype="multipart/form-data" >
-                                            <div class="form-horizontal form-material ">
-                                                <div class="form-group row">
-                                                    
-                                                    <div class="col-sm-12">
-                                                        <a href="javascript:void(0);" for="inputEmail3" class="add_button mx-3"><img src="images/add-icon.png"/></a>
-                                                        <input type="text" class="form-control form-control-line " name="coladas[]" placeholder="colada" required>
-                                                    </div>
-                                                    
-                                                </div>
+                        <form class="coladas-archivo" name="coladas-archivo" method="POST" enctype="multipart/form-data" >
+                            <div class="form-horizontal form-material ">
+                                <div class="form-group row">
+                                    
+                                    <div class="col-sm-12">
+                                        <a href="javascript:void(0);" for="inputEmail3" class="add_button mx-3"><img src="images/add-icon.png"/></a>
+                                        <input type="text" class="form-control form-control-line " name="coladas[]" placeholder="colada" required>
+                                    </div>
+                                    
+                                </div>
 
-                                            </div>
-                                            <div class="col-sm-12 mb-2">
-                                                <input type="file" class="certificado form-control-line "  name="certificado" placeholder="Certificado">
-                                            </div>
-                                            <div class="d-grid gap-2">
-                                                <button style="display:none"  class='button-enviar btn btn-primary btn-sm'>enviar</button>
-                                            </div>
-                                        </form>
-
-
-
-                                        ` },
+                            </div>
+                            <div class="col-sm-12 mb-2">
+                                <input type="file" class="certificado form-control-line "  name="certificado" placeholder="Certificado">
+                            </div>
+                            <div class="d-grid gap-2">
+                                <button style="display:none"  class='button-enviar btn btn-primary btn-sm'>enviar</button>
+                            </div>
+                        </form>
 
 
+
+                        ` },
 
                                 ],
                                 "columnDefs": [
@@ -477,128 +463,137 @@
 
                         })
 
-                    })
-                }
-
-
-                async function getData(param, codigo) {
-
-                    return await $.ajax({
-                        url: `/certificadosData/${param}`,
-                        data: { codigo },
-                        type: 'POST',
-                    })
-                }
-
-                function cargaSpinner() {
-                    Swal.fire({
-                        showConfirmButton: false,
-                        allowOutsideClick: false
-                    })
-                    Swal.showLoading({
-                        allowOutsideClick: false
-                    })
-                }
-
-                function cierraSpinner() {
-                    Swal.close()
-                }
-
-
-                $('#TablaProductos tbody').on('click', '.add_button', function (e) {
-                    var fieldHTML = `
-                        <div class="form-group row">
-                            <div class="col-sm-12">
-                                <a href="javascript:void(0);" for="inputEmail3" class=" remove_button mx-3"><img src="images/remove-icon.png"/></a>
-                                <input type="text" class="form-control form-control-line " name="coladas[]" placeholder="colada">
-                            </div>
-                        </div>
-                    `;
-
-                    $(this).parent('div').parent('div').parent('div').append(fieldHTML)
-
-                })
-
-                $('#TablaProductos tbody').on('click', '.remove_button', function () {
-                    $(this).parent('div').parent('div').remove();
-                });
-
-
-                $('#TablaProductos tbody').on('change', '.certificado', function () {
-
-                    let botonEnviar = $(this)[0].parentElement.parentElement.children[2].children[0];
-
-
-                    if ($(this)[0].value === '') {
-                        botonEnviar.style.display = 'none'
-                    } else {
-                        botonEnviar.style.display = 'block'
                     }
 
+                    async function getData(param, codigo) {
 
-                })
+                        return await $.ajax({
+                            url: `/certificadosData/${param}`,
+                            data: { codigo },
+                            type: 'POST',
+                        })
+                    }
+
+                    function cargaSpinner() {
+                        Swal.fire({
+                            showConfirmButton: false,
+                            allowOutsideClick: false
+                        })
+                        Swal.showLoading({
+                            allowOutsideClick: false
+                        })
+                    }
+
+                    function cierraSpinner() {
+                        Swal.close()
+                    }
+
+                    //Agrega mas coladas
+                    $('#TablaProductos tbody').on('click', '.add_button', function (e) {
+                        var fieldHTML = `
+        <div class="form-group row">
+            <div class="col-sm-12">
+                <a href="javascript:void(0);" for="inputEmail3" class=" remove_button mx-3"><img src="images/remove-icon.png"/></a>
+                <input type="text" class="form-control form-control-line " name="coladas[]" placeholder="colada">
+            </div>
+        </div>
+    `;
+
+                        $(this).parent('div').parent('div').parent('div').append(fieldHTML)
+
+                    });
+
+                    //Quita coladas
+                    $('#TablaProductos tbody').on('click', '.remove_button', function () {
+                        $(this).parent('div').parent('div').remove();
+                    });
 
 
-                $('#TablaProductos tbody').on('click', '.button-enviar', function (e) {
-                    e.preventDefault()
-                    let tablaProductosRow = productos.row($(this).parents('tr')).data();
-                    let tr = $(this)[0].parentElement.parentElement.parentElement.parentElement;
-                    let formColadasCertificado = $(this).parent('div').parent('form')[0];
-                    let formData = new FormData(formColadasCertificado);
+                    $('#TablaProductos tbody').on('change', '.certificado', function () {
 
-                    let string = JSON.stringify(tablaProductosRow)
-
-                    //console.log(tablaProductosRow)
-
-                    formData.append('data', string)
-
-                    // Ver los valores de un form data
-                    /*                    for(let data of formData.entries()){
-                                          console.log(data)
-                                      }  */
-
-                    cargaSpinner();
-
-                    $.ajax({
-                        url: '/certificadosUpload',
-                        type: 'POST',
-                        data: formData,
-                        cache: false,
-                        contentType: false,
-                        processData: false,
-                        success: function (resp) {
-
-                            console.log(resp)
-
-                            Swal.fire({
-                                position: 'top-end',
-                                icon: 'success',
-                                title: `${resp.message} `,
-                                showConfirmButton: false,
-                                timer: 1500
-                            })
+                        let botonEnviar = $(this)[0].parentElement.parentElement.children[2].children[0];
 
 
-
-                            tr.remove()
-
-                            cierraSpinner()
-
-                            tablaCertificadosTuvansa()
-
-                        },
-                        error: function (err) {
-
-                            console.log(err.responseJSON)
-
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Oops...',
-                                text: `${err.responseJSON.message} `
-                            })
-
+                        if ($(this)[0].value === '') {
+                            botonEnviar.style.display = 'none'
+                        } else {
+                            botonEnviar.style.display = 'block'
                         }
+
+
                     })
+
+
+                    $('#TablaProductos tbody').on('click', '.button-enviar', function (e) {
+                        e.preventDefault()
+                        let tablaProductosRow = productos.row($(this).parents('tr')).data();
+                        let tr = $(this)[0].parentElement.parentElement.parentElement.parentElement;
+                        let formColadasCertificado = $(this).parent('div').parent('form')[0];
+                        let formData = new FormData(formColadasCertificado);
+
+                        let string = JSON.stringify(tablaProductosRow)
+
+                        console.log(tablaProductosRow)
+
+                        //console.log(tablaProductosRow)
+
+                        formData.append('data', string)
+
+                        // Ver los valores de un form data
+                        /*                    for(let data of formData.entries()){
+                                              console.log(data)
+                                          }  */
+                        /* 
+                            cargaSpinner();
+                        
+                            $.ajax({
+                                url: '/certificadosUpload',
+                                type: 'POST',
+                                data: formData,
+                                cache: false,
+                                contentType: false,
+                                processData: false,
+                                success: function (resp) {
+                        
+                                    console.log(resp)
+                        
+                                    Swal.fire({
+                                        position: 'top-end',
+                                        icon: 'success',
+                                        title: `${resp.message} `,
+                                        showConfirmButton: false,
+                                        timer: 1500
+                                    })
+                        
+                        
+                        
+                                    tr.remove()
+                        
+                                    cierraSpinner()
+                        
+                                    tablaCertificadosTuvansa()
+                        
+                                },
+                                error: function (err) {
+                        
+                                    console.log(err.responseJSON)
+                        
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Oops...',
+                                        text: `${err.responseJSON.message} `
+                                    })
+                        
+                                }
+                            }) */
+
+                    })
+
+
+                    //Edita 
+
+
+
 
                 })
 
