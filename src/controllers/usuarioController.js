@@ -8,12 +8,25 @@ let { table } = require('../helpers/tableServerPro')
 controller.actualizar = async (req, res) => {
 
     let user = req.body;
-
+    
 
     try {
 
 
         let { action, id, ...data } = user;
+
+
+
+        if (action === 'delete'){
+
+            await query('delete from usuario where id = ?', id);
+
+            return res.json({
+                ok:true,
+                message:'Borrado corrctamente'
+            });
+
+        }
 
 
 

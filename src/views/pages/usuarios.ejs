@@ -370,7 +370,7 @@
                                             },
                                             onSuccess: function (data, textStatus, jqXHR) {
 
-
+                                                usuarios.draw() 
 
                                                 Swal.fire({
                                                     position: 'top-end',
@@ -409,11 +409,6 @@
                                         }
 
 
-
-
-
-
-
                                         $.ajax({
                                             url: '/usuarioNuevo',
                                             type: 'POST',
@@ -422,6 +417,10 @@
                                             success: function (resp) {
 
                                                 console.log(resp);
+
+                                                $('#nuevoUsuario').modal('hide');
+
+                                                usuarios.draw();
 
                                                 Swal.fire({
                                                     position: 'top-end',

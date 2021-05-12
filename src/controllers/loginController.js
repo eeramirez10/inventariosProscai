@@ -89,7 +89,7 @@ controller.login = (req, res, next) => {
 
 
     if (req.isAuthenticated()) {
-        return res.redirect('/inventarios');
+        return res.redirect('/cierre');
     }
     res.render('login');
 
@@ -98,7 +98,7 @@ controller.login = (req, res, next) => {
 
 controller.loginPost = passport.authenticate('local', {
     failureRedirect: '/',
-    successRedirect: '/inventarios',
+    successRedirect: '/cierre',
     failureFlash: true
 
 })
