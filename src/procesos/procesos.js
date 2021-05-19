@@ -14,21 +14,20 @@ const { creaColumnaAFinDeMes, insertaActualiza, insertaABdTuvansa, actualizaAlmc
 //
 
 // Se usa una sola vez para insertar la bd de proscai a bd Tuvansa
-/* inventarios()
-    .then( (inventario) => {
+// inventarios()
+//     .then( (inventario) => {
 
-        
-
-        insertaABdTuvansa(inventario)
-        .then( resp => console.log(resp))
-        .catch( err => console.log(err))
-    })
-    .catch ( err => console.log(err)) */
-
+    
+//         insertaABdTuvansa(inventario)
+//         .then( resp => console.log(resp))
+//         .catch( err => console.log(err))
+//     })
+//     .catch ( err => console.log(err))
 
 
 
-cron.schedule('*/20 * * * *', async () => {
+
+cron.schedule('*/10 * * * *', async () => {
 
     console.log('Buscando cambios en Almacenes', momentTZMexico);
 
@@ -44,7 +43,7 @@ cron.schedule('*/20 * * * *', async () => {
 })
 
 
-cron.schedule(`*/5 * * * *`, async () => {
+cron.schedule(`*/17 * * * *`, async () => {
     console.log('Buscando registros nuevos', momentTZMexico)
 
     let registrosNuevos = await buscaRegistrosNuevos()

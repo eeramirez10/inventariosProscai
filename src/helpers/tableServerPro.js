@@ -108,9 +108,4 @@ const table = async (sTable, aColumns, sjoin, sWhere, DB, req) => {
 
 
 
-
-
-
-
-
 module.exports = { table }

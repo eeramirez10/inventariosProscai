@@ -6,45 +6,55 @@ const passportLocal = require('passport-local').Strategy;
 const query = require('../connection/tuvansaConnection');
 
 
-
-
-
-
 passport.use(new passportLocal( async  (username, password, done) =>  {
 
+    try {
 
+        const queryUsuarios = `SELECT u.id,u.nombre, u.user,u.apellido,u.upload, a.area, r.rol,s.sucursal from usuario as u
+        inner join area as a on u.idArea = a.idArea
+        inner join rol as r on u.idRol = r.idRol
+        inner join sucursal as s on u.idSucursal = s.idSucursal
+        where user = ? && password = ?`;
+    
+        let usuarios = await query(queryUsuarios,[username, password])
 
-    const queryUsuarios = `SELECT u.id,u.nombre, u.user,u.apellido,u.upload, a.area, r.rol,s.sucursal from usuario as u
-    inner join area as a on u.idArea = a.idArea
-    inner join rol as r on u.idRol = r.idRol
-    inner join sucursal as s on u.idSucursal = s.idSucursal
-    where user = ? && password = ?`;
+            if (usuarios.length > 0){
 
-    let usuarios = await query(queryUsuarios,[username, password])
-        .catch( err => err);
-
-
-
-        console.log(usuarios);
-
-    if (usuarios.length > 0){
-
-        return done(null,
-            {
-                idUsuario: usuarios[0].id,      
-                nombre: usuarios[0].nombre,
-                apellido: usuarios[0].apellido,
-                user: usuarios[0].user,
-                area: usuarios[0].area,
-                rol: usuarios[0].rol,
-                upload: usuarios[0].upload,
-                sucursal: usuarios[0].sucursal
+                return done(null,
+                    {
+                        idUsuario: usuarios[0].id,      
+                        nombre: usuarios[0].nombre,
+                        apellido: usuarios[0].apellido,
+                        user: usuarios[0].user,
+                        area: usuarios[0].area,
+                        rol: usuarios[0].rol,
+                        upload: usuarios[0].upload,
+                        sucursal: usuarios[0].sucursal
+                    }
+                );
+        
             }
-        );
+        
+            return done(null, false, { message: 'Usuario o password incorrecto' });
+        
+    } catch (error) {
 
+        console.log(error);
+
+        return res.status(500).json({
+            ok:false,
+            message:'Hubo un error recisar con el desarrollador'
+        })
+        
     }
 
-    return done(null, false, { message: 'Usuario o password incorrecto' });
+
+
+
+
+        
+
+
 
 /*     connection.query(queryUsuarios,[username, password],(err, results)=>{
 

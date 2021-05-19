@@ -149,8 +149,8 @@
                     },
                     onFail: function (jqXHR, textStatus, errorThrown) {
 
-                        console.log('onFail(jqXHR, textStatus, errorThrown)');
-                        console.log(jqXHR);
+                        
+                        console.log(jqXHR.responseJSON);
                         console.log(textStatus);
                         console.log(errorThrown);
                     },
