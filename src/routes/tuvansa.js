@@ -5,7 +5,7 @@ const router = express.Router();
 const tuvansaController = require('../controllers/tuvansaController');
 
 //Middlewares
-const {  isAuthenticated } = require('../middlewares/loginMiddleware');
+const {  isAuthenticated, isAlmacenista } = require('../middlewares/loginMiddleware');
 
 
 router.get('/server', tuvansaController.cargaDataTable );
@@ -26,7 +26,7 @@ router.get('/estadisticas',isAuthenticated, (req, res)=>{
 })
 
 
-router.get('/inventarios',isAuthenticated,(req, res) => {
+router.get('/inventarios',[isAuthenticated, isAlmacenista],(req, res) => {
     const data = {
         user: req.user,
         title: 'Inventarios'

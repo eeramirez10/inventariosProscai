@@ -2,10 +2,18 @@ const router = require('express').Router();
 
 const loginController = require('../controllers/loginController');
 
-router.get('/',loginController.login);
-router.post('/login', loginController.loginPost);
+const { redirect }  = require('../helpers/rolRuta')
 
-router.get('/logout', (req, res)=>{
+router.get('/', loginController.login);
+router.post('/login', loginController.loginPost, (req, res) => {
+    let { area, rol } = req.user;
+
+    res.redirect(redirect[rol]);
+
+
+});
+
+router.get('/logout', (req, res) => {
     req.logout();
     res.redirect('/')
 })

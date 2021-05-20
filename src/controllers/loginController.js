@@ -106,12 +106,7 @@ controller.login = (req, res, next) => {
 
 }
 
-controller.loginPost = passport.authenticate('local', {
-    failureRedirect: '/',
-    successRedirect: '/cierre',
-    failureFlash: true
-
-})
+controller.loginPost = passport.authenticate('local',{failureRedirect:'/',failureFlash: true });
 
 
 module.exports = controller;

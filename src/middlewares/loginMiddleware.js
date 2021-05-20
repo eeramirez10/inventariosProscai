@@ -1,7 +1,11 @@
 
 const login = {};
 
+let {  redirect } = require('../helpers/rolRuta');
+
 login.isAuthenticated = (req, res, next)=>{
+
+   
    
     if (req.isAuthenticated()) return next();
     res.redirect('/');
@@ -9,17 +13,46 @@ login.isAuthenticated = (req, res, next)=>{
 
 }
 
+login.isAlmacenista = (req, res, next)=>{
+
+    let { rol } = req.user;
+
+
+    if(rol !== 'administrador' && rol !== 'Almacenista' ) return res.redirect(redirect[rol]);
+   
+    next();
+
+}
+
 login.isCertificado = (req, res, next)=>{
 
-    if(req.user.rol !== 'administrador' && req.user.rol !== 'certificado' ) return res.redirect('/');
+    let { rol } = req.user;
+
+    if(rol !== 'administrador' && rol !== 'Certificado' ) return res.redirect(redirect[rol]);
    
     next();
 }
 
 login.isAdmin = (req, res, next)=>{
-    if(req.user.rol !== 'administrador') return res.redirect('/');
+
+    let { rol } = req.user;
+
+    if(rol !== 'administrador') return res.redirect(redirect[rol]);
    
     next();
 }
+
+
+login.isCierre =  (req, res, next)=>{
+
+    let { rol } = req.user;
+
+    if(rol !== 'Upload' && rol !== 'administrador') return res.redirect(redirect[rol]);
+   
+    next();
+}
+
+
+
 
 module.exports = login;

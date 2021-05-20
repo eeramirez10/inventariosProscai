@@ -88,7 +88,7 @@ controller.pdf = (req, res) => {
         host: 'tuvansa-server.dyndns.org',
         secure: false,
         user: 'Administrador',
-        password: 'Ag7348pp**'
+        password: '912522Pop'
     })
 
     c.on('ready', function () {
