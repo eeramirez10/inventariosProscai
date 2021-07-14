@@ -8,8 +8,24 @@ const mes = String(moment().tz('America/Mexico_City').format('M'))
 let ultimoDiaMes = moment().tz('America/Mexico_City').endOf('month').format('D');
 
 //controllers
-const { buscaRegistrosNuevos, inventarios, traeAlmcantAlmasigandoAlmacenesMexicoMonterreyVeracruz, unidad } = require('../controllers/proscaiController');
-const { creaColumnaAFinDeMes, insertaActualiza, insertaABdTuvansa, actualizaAlmcantAlmasignado, actualizaAlmacenesMexicoMonterreyVeracruz, insertaIum } = require('../controllers/tuvansaController');
+const {
+    buscaRegistrosNuevos,
+    inventarios,
+    traeAlmcantAlmasigandoAlmacenesMexicoMonterreyVeracruz,
+    unidad,
+    getProveedores,
+    getLastProveedores
+} = require('../controllers/proscaiController');
+
+const { 
+    creaColumnaAFinDeMes, 
+    insertaActualiza, 
+    insertaABdTuvansa, 
+    actualizaAlmcantAlmasignado, 
+    actualizaAlmacenesMexicoMonterreyVeracruz, 
+    insertaIum,
+    insertaProveedores
+} = require('../controllers/tuvansaController');
 
 //
 
@@ -17,7 +33,7 @@ const { creaColumnaAFinDeMes, insertaActualiza, insertaABdTuvansa, actualizaAlmc
 // inventarios()
 //     .then( (inventario) => {
 
-    
+
 //         insertaABdTuvansa(inventario)
 //         .then( resp => console.log(resp))
 //         .catch( err => console.log(err))
@@ -76,6 +92,22 @@ cron.schedule(`0 22 ${ultimoDiaMes} ${mes} *`, () => {
     schedule: true,
     timezone: "America/Mexico_City"
 })
+
+
+
+cron.schedule('*/12 * * * *', async () => {
+
+    const proveedoresProscai = await getProveedores()
+
+    insertaProveedores( proveedoresProscai )
+
+}, {
+    schedule: true,
+    timezone: "America/Mexico_City"
+});
+
+
+
 
 
 

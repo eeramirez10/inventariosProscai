@@ -130,7 +130,7 @@ controller.pdf = (req, res) => {
 
 controller.certificadosQuery = async (req, res) => {
 
-    let resp = await table(sTable, aColumns, sjoin,'','Tuvansa', req);
+    let resp = await table(sTable, aColumns, sjoin, '', 'Tuvansa', req);
 
     res.status(200).send(resp)
 
@@ -173,6 +173,7 @@ controller.uploadData = (req, res) => {
         }
 
         await asincrinos(certificado, coladas, data, res).catch((err) => {
+            console.log(err)
             res.status(500).json({
                 ok: false,
                 err: 'error'
@@ -188,102 +189,131 @@ controller.uploadData = (req, res) => {
 
 async function asincrinos(certificado, coladas, data, res) {
 
-    console.log(data)
-    console.log(coladas)
+    const {
+        DMULTICIA,
+        PRVCOD,
+        PRVNOM,
+        PRVRFC,
+        DNUM,
+        DFECHA,
+        DREFERELLOS,
+        DREFER,
+        ICOD,
+        IUM,
+        IEAN,
+        I2DESCR,
+        AICANTF,
 
-    let insertarDB = [];
+    } = data;
 
-    let proveedoresDB = await query(`Select * from proveedores where codigo = ?`, data.PRVCOD);
+    const {
+        fieldname,
+        originalname,
+        encoding,
+        mimetype,
+        path
+    } = certificado;
+
+    try {
+
+        let idProveedor = PRVCOD === null
+            ? 4499
+            : await query('SELECT idProveedor From proveedores where codigo = ?', [PRVCOD])
+                .then(resp => resp[0].idProveedor);
+
+
+        const documentosTable = await query(`
+        INSERT INTO documentos (entrada , fecha, factura ,  idProveedor , orden)
+        SELECT * FROM (SELECT '${DNUM}','${DFECHA}','${DREFERELLOS}', ${idProveedor},'${DREFER}') AS tmp
+        WHERE NOT EXISTS (SELECT entrada FROM documentos WHERE entrada = '${DNUM}' ) 
+    `)
+
+        const { insertId } = documentosTable;
+
+        let idDocumento = (insertId === 0)
+            ?
+            await query(`SELECT idDocumento FROM documentos WHERE entrada = '${DNUM}'`)
+                .then(resp => resp[0].idDocumento)
+            : insertId;
+
+        console.log('idDocumento', idDocumento)
+
+        const productosTable = await query(`
+    INSERT INTO producto (codigo , descripcion, cantidad ,  unidad , iean)
+    SELECT * FROM (SELECT '${ICOD}','${I2DESCR}',${AICANTF}, '${IUM}','${IEAN}') AS tmp
+    WHERE NOT EXISTS (SELECT idProducto FROM producto WHERE codigo = '${ICOD}' ) 
+    `)
+
+        let idProducto = productosTable.insertId === 0
+            ?
+            await query(`SELECT idProducto FROM producto WHERE codigo = '${ICOD}'`)
+                .then(resp => resp[0].idProducto)
+            : productosTable.insertId
+
+        console.log('idProducto', idProducto)
+
+
+        const productoDocumentos = await query(`
+        INSERT INTO productos_documentos (idProducto, idDocumento)
+        SELECT * FROM (SELECT ${idProducto},${idDocumento}) AS tmp
+        WHERE NOT EXISTS ( SELECT * from productos_documentos 
+        WHERE idProducto = ${idProducto} AND IdDocumento = ${idDocumento})
+        
+        `
+        );
+
+
+        const certificadosTable = await query(`
+    INSERT INTO certificados (descripcion , destino, ruta )
+    SELECT * FROM (SELECT '${originalname}','${certificado.destination}','${path}') AS tmp
+    WHERE NOT EXISTS (SELECT idCertificado FROM certificados WHERE descripcion = '${originalname}' ) 
+    `);
+
+
+        let idCertificado =
+            (certificadosTable.insertId === 0)
+                ?
+                await query(`SELECT idCertificado FROM certificados WHERE descripcion = '${originalname}'`)
+                    .then(resp => resp[0].idCertificado)
+                :
+                certificadosTable.insertId;
+
+        console.log('idCertificado', idCertificado)
+
+        coladas.forEach(async (colada) => {
+
+            const coladasTable = await query(`
+            INSERT INTO coladas  (colada,idCertificado)
+            SELECT * FROM ( SELECT '${colada}', ${idCertificado}) as tmp
+            WHERE NOT EXISTS (SELECT idColada FROM coladas WHERE colada = '${colada}' ) 
+            
+            `
+            );
+
+            const { insertId: idColada } = coladasTable;
+
+            const productoColadasTable = await query('INSERT INTO producto_coladas SET IdProducto = ?, idColada= ?', [idProducto, idColada]);
+
+
+        })
 
 
 
-    // Si no existe el proveedor en nuestra base de datos
-    if (proveedoresDB.length === 0) {
-        await query(`INSERT INTO proveedores SET codigo = ?, nombre = ?, rfc = ?`, [data.PRVCOD, data.PRVNOM, data.PRVRFC])
-        proveedoresDB = await query(`Select idProveedor from proveedores where codigo = ?`, data.PRVCOD)
+        res.json({
+            ok: true,
+            message: 'Agregado Correctamente'
+        })
+
+
+    } catch (error) {
+
+        console.log(error)
+
+        res.status(500).json({
+            ok: false,
+            message: 'Revisar logs'
+        })
     }
-
-
-
-
-    let documentosDB = await query(`Select * from documentos  where entrada = ?`, data.DNUM)
-
-
-
-    if (documentosDB.length === 0) {
-
-        await query(`INSERT INTO documentos SET entrada = ?, fecha = ?, factura = ?,  idProveedor = ?, orden = ?`,
-            [data.DNUM, data.DFECHA, data.DREFERELLOS, proveedoresDB[0].idProveedor, data.DREFER])
-
-        documentosDB = await query(`Select * from documentos  where entrada = ?`, data.DNUM)
-    }
-
-
-    let productosDB = await query(`Select * from producto  where codigo = ?`, [data.ICOD]);
-
-    if (productosDB.length === 0) {
-        await query('INSERT INTO producto SET codigo = ?, descripcion = ?, cantidad = ?, unidad = ?, iean = ?', [data.ICOD, data.I2DESCR, data.AICANTF, data.IUM, data.IEAN])
-        productosDB = await query(`Select * from producto  where codigo = ?`, [data.ICOD]);
-    }
-
-
-
-
-    let productosOrdenesDB = await query(`
-        SELECT p.codigo, p.descripcion, p.cantidad, p.unidad, doc.orden, doc.entrada
-        FROM productos_documentos as po
-        inner join producto as p on p.idProducto =  po.idProducto
-        inner join documentos as doc on doc.idDocumento = po.idDocumento
-        WHERE p.codigo = ? AND doc.idDocumento = ?
-    `, [productosDB[0].codigo, documentosDB[0].idDocumento]);
-
-    if (productosOrdenesDB.length === 0) {
-        await query('INSERT INTO productos_documentos set idProducto = ?, idDocumento = ?', [productosDB[0].idProducto, documentosDB[0].idDocumento]);
-    }
-
-
-
-    let certificadosDB = await query('SELECT idCertificado, descripcion from certificados where descripcion = ?', [certificado.originalname]);
-
-
-    // Si no existe el certificado en la base de datos Tuvansa
-    if (certificadosDB.length === 0) {
-        //Si no existe lo inserta
-        await query('INSERT INTO certificados SET descripcion = ?, destino = ?, ruta = ?', [certificado.originalname, certificado.destination, certificado.path]);
-        //Guardamos el Id ultimo del certificado
-        certificadosDB = await query('SELECT idCertificado, descripcion from certificados where descripcion = ?', [certificado.originalname]);
-    }
-
-    //console.log(certificadosDB)
-
-    console.log(certificadosDB[0].idCertificado)
-
-    for (let colada of coladas) {
-
-
-
-
-        await query('INSERT INTO coladas SET colada = ?, idCertificado = ?', [colada, certificadosDB[0].idCertificado])
-        coladaDB = await query('SELECT * FROM coladas where colada = ? and idCertificado = ?', [colada, certificadosDB[0].idCertificado]);
-
-
-
-        await query('INSERT INTO producto_coladas SET IdProducto = ?, idColada = ?', [productosDB[0].idProducto, coladaDB[0].idColada]);
-
-
-
-
-    }
-
-
-
-
-
-
-    res.json({
-        ok: true,
-        message: 'Agregado Correctamente'
-    })
 }
 
 controller.getTables = async (req, res) => {
@@ -329,7 +359,7 @@ async function asyncTables(tabla, body, res) {
 
     if (tabla === "productos") {
 
-        let {codigo} = body;
+        let { codigo } = body;
 
         let productos = await queryProscai(`
         SELECT  DMULTICIA,PRVCOD,PRVNOM,PRVRFC,DNUM,DATE_FORMAT(DFECHA,"%Y-%m-%d") as DFECHA,DREFERELLOS,DREFER, ICOD,IUM,IEAN,I2DESCR,AICANT as AICANTF FROM FAXINV
@@ -340,7 +370,7 @@ async function asyncTables(tabla, body, res) {
         WHERE DNUM='${codigo}' 
         ORDER BY DNUM,AISEQ`);
 
-        
+
 
 
         let productosDBTuvansa = await query(`

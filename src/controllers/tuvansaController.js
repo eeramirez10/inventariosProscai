@@ -346,6 +346,37 @@ controller.creaColumnaAFinDeMes = async () => {
 
 }
 
+controller.insertaProveedores = async (proveedoresProscai)=>{
+
+
+    try {
+
+        const [fecha] = await query('SELECT MAX( DATE_FORMAT(fecha_alta,"%Y-%m-%d" )) as ultimaAlta FROM proveedores');
+
+        const proveedores = proveedoresProscai.filter( proveedores => proveedores.prvalta > fecha.ultimaAlta );
+    
+        if( proveedores.length === 0){
+            console.log('No hay proveedores nuevos')
+            return;
+        }
+
+        console.log(proveedores)
+
+        proveedores.map( async ({prvcod, prvnom, prvrfc, prvalta}) =>{
+        
+            await query('Insert into proveedores set codigo = ?, nombre = ?, rfc = ?, fecha_alta = ?', [prvcod, prvnom, prvrfc, prvalta]);
+    
+        })
+
+        console.log('insertados correctamente')
+        
+    } catch (error) {
+        console.log(error)
+    }
+
+
+}
+
 module.exports = controller;
 
 

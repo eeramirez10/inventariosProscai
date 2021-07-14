@@ -99,6 +99,11 @@ controller.buscaRegistrosNuevos = async () => {
     return registrosNuevos;
 }
 
+controller.getProveedores = async () => await query('SELECT prvcod, prvnom,prvrfc, DATE_FORMAT(prvalta, "%Y-%m-%d") as prvalta  from fprv');
+
+   
+// controller.getLastProveedores = async () => await query('SELECT MAX( DATE_FORMAT(prvalta,"%Y-%m-%d" )) as ultimaFecha FROM FPRV');
+
 
 module.exports = controller;
 

@@ -18,7 +18,7 @@ controller.dataTableOrdenes = async (req, res) => {
     let sTable = 'FDOC';
 
     let aColumns = [
-        `IF(PRVNOM  IS NULL,0,PRVNOM) as PRVCOD`,
+        `IF(PRVNOM  IS NULL,'TRASP',PRVNOM) as PRVCOD`,
         `IF(PRVNOM  IS NULL,'TRASPASO',PRVNOM) as PRVNOM`,
         `IF(PRVNOM  IS NULL,'TRASPASO',PRVNOM) as PRVRFC`,
         'DNUM',

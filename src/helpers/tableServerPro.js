@@ -58,7 +58,7 @@ const table = async (sTable, aColumns, sjoin, sWhere, DB, req) => {
 
  
     let results = await query(sQuery)
-    .catch(err => console.error(err))
+    
 
     if (!results) return;
     
