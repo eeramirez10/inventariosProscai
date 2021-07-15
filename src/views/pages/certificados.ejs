@@ -186,38 +186,40 @@
 
                     let productos;
 
+                    let dataTable;
+
                     tablaCertificadosTuvansa()
 
+                    verPdf();
 
                     function format(d) {
-                        console.log(d)
-                        let template2 = `
-        <table  cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">
-            <tr>
-                <td>Proveedor:</td>
-                <td>${d[10]} </td>
-            </tr>
-            <tr>
-                <td>Entrada:</td>
-            
-                <td> ${d[8]} </td>
-            </tr>
-            <tr>
-                <td>Orden:</td>
-                <td> ${d[9]} </td>
-            </tr>
-            <tr>
-                <td>Fecha:</td>
-                <td> ${d[6]} </td>
-            </tr>
 
-        </table>
-        `
+                        let template2 = `
+                            <table  cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">
+                                <tr>
+                                    <td>Proveedor:</td>
+                                    <td>${d[10]} </td>
+                                </tr>
+                                <tr>
+                                    <td>Entrada:</td>
+                                
+                                    <td> ${d[8]} </td>
+                                </tr>
+                                <tr>
+                                    <td>Orden:</td>
+                                    <td> ${d[9]} </td>
+                                </tr>
+                                <tr>
+                                    <td>Fecha:</td>
+                                    <td> ${d[6]} </td>
+                                </tr>
+                            
+                            </table>
+                            `
 
                         return template2;
                     }
 
-                    verPdf();
 
                     function verPdf() {
 
@@ -232,7 +234,7 @@
                                 type: 'GET'
                             })
 
-                            console.log(resp);
+
 
                             if (resp.ok) {
                                 cierraSpinner()
@@ -254,7 +256,7 @@
 
                     function tablaCertificadosTuvansa() {
 
-                        var dataTable = $('#sample_data').DataTable({
+                        dataTable = $('#sample_data').DataTable({
                             "bDestroy": true,
                             "processing": true,
                             "serverSide": true,
@@ -269,16 +271,15 @@
                                 { "data": [5] },
                                 {
                                     "data": [7],
-                                    render: (data, type, row) => `<btn class="btn btn-xs bg-success view-pdf" href='${data}' ><i class ="fa fa-file-pdf-o"></i></></btn>`
+                                    render: (data, type, row) =>
+                                        `<btn class="btn btn-xs bg-success view-pdf" href='${data}' ><i class ="fa fa-file-pdf-o"></i></></btn>`
                                 },
 
                             ],
                             "dom": 'Bfrtip',
                             "buttons": [{
                                 text: 'Alta',
-                                action: function (e, dt, node, config) {
-                                    printTable()
-                                },
+                                action: (e, dt, node, config) => printTable(),
                                 attr: {
                                     "data-target": '#windowProveedor',
                                     "data-toggle": "modal"
@@ -316,46 +317,46 @@
                             }
                         });
 
-                        $('#sample_data').on('draw.dt', function () {
+                        // $('#sample_data').on('draw.dt', function () {
 
-                            $(this).Tabledit({
-                                url: `/usuarios`,
-                                eventType: 'dblclick',
-                                deleteButton: false,
-                                editButton: true,
+                        //     $(this).Tabledit({
+                        //         url: `/usuarios`,
+                        //         eventType: 'dblclick',
+                        //         deleteButton: false,
+                        //         editButton: true,
 
-                                //dataType: 'json',
-                                columns: {
-                                    identifier: [2, 'ISEC'],
-                                    editable: [
-                                        [5, 'colda'],
-                                    ]
-                                },
-                                onSuccess: function (data, textStatus, jqXHR) {
-
-
-                                    Swal.fire({
-                                        position: 'top-end',
-                                        icon: 'success',
-                                        title: `${data.message}`,
-                                        showConfirmButton: true
-                                    })
-                                    
-                                },
-                                onFail: function (jqXHR, textStatus, errorThrown) {
-
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Error',
-                                        text: `${jqXHR.responseJSON.message}`,
-                                    })
-
-                                },
+                        //         //dataType: 'json',
+                        //         columns: {
+                        //             identifier: [2, 'ISEC'],
+                        //             editable: [
+                        //                 [5, 'colda'],
+                        //             ]
+                        //         },
+                        //         onSuccess: function (data, textStatus, jqXHR) {
 
 
-                            })
+                        //             Swal.fire({
+                        //                 position: 'top-end',
+                        //                 icon: 'success',
+                        //                 title: `${data.message}`,
+                        //                 showConfirmButton: true
+                        //             })
 
-                        })
+                        //         },
+                        //         onFail: function (jqXHR, textStatus, errorThrown) {
+
+                        //             Swal.fire({
+                        //                 icon: 'error',
+                        //                 title: 'Error',
+                        //                 text: `${jqXHR.responseJSON.message}`,
+                        //             })
+
+                        //         },
+
+
+                        //     })
+
+                        // })
 
                     }
 
@@ -394,9 +395,10 @@
                             entrada = proveedores.row(this).data()[3];
                             ordenCompra = proveedores.row(this).data()[6];
 
-                            let datas = await getData('productos', codigo)
 
-                            let data = datas.data;
+                            let datas = await getData('productos', codigo);
+
+                            let { data } = datas;
 
                             if (data) cierraSpinner();
 
@@ -404,9 +406,9 @@
                             $('#windowProveedor').modal('hide')
 
                             tituloProductos.innerHTML = ` 
-                Proveedor: <strong>${proveedor} </strong>  
-                Entrada:  <strong>${entrada}   </strong>  
-                OrdenCompra: <strong>${ordenCompra}</strong> `
+                                Proveedor: <strong>${proveedor} </strong>  
+                                Entrada:  <strong>${entrada}   </strong>  
+                                OrdenCompra: <strong>${ordenCompra}</strong> `
                                 ;
 
 
@@ -431,29 +433,26 @@
                                     {
                                         "defaultContent": `
 
-                        <form class="coladas-archivo" name="coladas-archivo" method="POST" enctype="multipart/form-data" >
-                            <div class="form-horizontal form-material ">
-                                <div class="form-group row">
-                                    
-                                    <div class="col-sm-12">
-                                        <a href="javascript:void(0);" for="inputEmail3" class="add_button mx-3"><img src="images/add-icon.png"/></a>
-                                        <input type="text" class="form-control form-control-line " name="coladas[]" placeholder="colada" required>
-                                    </div>
-                                    
-                                </div>
+                                            <form class="coladas-archivo" name="coladas-archivo" method="POST" enctype="multipart/form-data" >
+                                                <div class="form-horizontal form-material ">
+                                                    <div class="form-group row">
 
-                            </div>
-                            <div class="col-sm-12 mb-2">
-                                <input type="file" class="certificado form-control-line "  name="certificado" placeholder="Certificado">
-                            </div>
-                            <div class="d-grid gap-2">
-                                <button style="display:none"  class='button-enviar btn btn-primary btn-sm'>enviar</button>
-                            </div>
-                        </form>
+                                                        <div class="col-sm-12">
+                                                            <a href="javascript:void(0);" for="inputEmail3" class="add_button mx-3"><img src="images/details_open.png"/></a>
+                                                            <input type="text" class="form-control form-control-line " name="coladas[]" placeholder="colada" required>
+                                                        </div>
 
-
-
-                        ` },
+                                                    </div>
+                                                
+                                                </div>
+                                                <div class="col-sm-12 mb-2">
+                                                    <input type="file" class="certificado form-control-line "  name="certificado" placeholder="Certificado">
+                                                </div>
+                                                <div class="d-grid gap-2">
+                                                    <button style="display:none"  class='button-enviar btn btn-primary btn-sm'>enviar</button>
+                                                </div>
+                                            </form>
+                                    ` },
 
                                 ],
                                 "columnDefs": [
@@ -491,13 +490,15 @@
                     //Agrega mas coladas
                     $('#TablaProductos tbody').on('click', '.add_button', function (e) {
                         var fieldHTML = `
-        <div class="form-group row">
-            <div class="col-sm-12">
-                <a href="javascript:void(0);" for="inputEmail3" class=" remove_button mx-3"><img src="images/remove-icon.png"/></a>
-                <input type="text" class="form-control form-control-line " name="coladas[]" placeholder="colada">
-            </div>
-        </div>
-    `;
+                                <div class="form-group row">
+                                    <div class="col-sm-12">
+                                        <a href="javascript:void(0);" for="inputEmail3" class="remove_button mx-3"><img src="images/details_close.png"/></a>
+                                        <input type="text" class="form-control form-control-line " name="coladas[]" placeholder="colada">
+                                    </div>
+                                </div>
+                            `;
+
+
 
                         $(this).parent('div').parent('div').parent('div').append(fieldHTML)
 
@@ -534,7 +535,7 @@
                         let string = JSON.stringify(tablaProductosRow)
 
 
-                        //console.log(tablaProductosRow)
+
 
                         formData.append('data', string)
 
@@ -542,49 +543,54 @@
                         /*                    for(let data of formData.entries()){
                                               console.log(data)
                                           }  */
-                        
-                            cargaSpinner();
-                        
-                            $.ajax({
-                                url: '/certificadosUpload',
-                                type: 'POST',
-                                data: formData,
-                                cache: false,
-                                contentType: false,
-                                processData: false,
-                                success: function (resp) {
-                        
-                                    console.log(resp)
-                        
-                                    Swal.fire({
-                                        position: 'top-end',
-                                        icon: 'success',
-                                        title: `${resp.message} `,
-                                        showConfirmButton: false,
-                                        timer: 1500
-                                    })
-                        
-                        
-                        
-                                    tr.remove()
-                        
-                                    cierraSpinner()
-                        
-                                    tablaCertificadosTuvansa()
-                        
-                                },
-                                error: function (err) {
-                        
-                                    console.log(err.responseJSON)
-                        
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Oops...',
-                                        text: `${err.responseJSON.message} `
-                                    })
-                        
-                                }
-                            })
+
+                        cargaSpinner();
+
+                        $.ajax({
+                            url: '/certificadosUpload',
+                            type: 'POST',
+                            data: formData,
+                            cache: false,
+                            contentType: false,
+                            processData: false,
+                            success: function (resp) {
+
+                                console.log(resp)
+
+                                tr.remove()
+
+                                cierraSpinner()
+
+                                $('#windowProductos').modal('hide')
+                                $('#windowProveedor').modal('hide')
+
+                                dataTable.draw()
+
+                                Swal.fire({
+                                    position: 'top-end',
+                                    icon: 'success',
+                                    title: `${resp.message} `,
+                                    showConfirmButton: false,
+                                    timer: 1500
+                                })
+
+
+
+
+
+                            },
+                            error: function (err) {
+
+                                console.log(err.responseJSON)
+
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Oops...',
+                                    text: `${err.responseJSON.message} `
+                                })
+
+                            }
+                        })
 
                     })
 

@@ -6,9 +6,12 @@ const { redirect }  = require('../helpers/rolRuta')
 
 router.get('/', loginController.login);
 router.post('/login', loginController.loginPost, (req, res) => {
+    
     let { area, rol } = req.user;
 
-    res.redirect(redirect[rol]);
+
+    console.log(redirect[rol])
+    res.redirect('/certificados');
 
 
 });
