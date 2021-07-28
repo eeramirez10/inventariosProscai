@@ -561,8 +561,8 @@
 
                                 cierraSpinner()
 
-                                $('#windowProductos').modal('hide')
-                                $('#windowProveedor').modal('hide')
+                                // $('#windowProductos').modal('hide')
+                                // $('#windowProveedor').modal('hide')
 
                                 dataTable.draw()
 
@@ -575,18 +575,18 @@
                                 })
 
 
-
-
-
                             },
-                            error: function (err) {
+                            error: function ({ responseJSON } ) {
 
-                                console.log(err.responseJSON)
+                              
+
+                                // $('#windowProductos').modal('hide')
+                                // $('#windowProveedor').modal('hide')
 
                                 Swal.fire({
                                     icon: 'error',
                                     title: 'Oops...',
-                                    text: `${err.responseJSON.message} `
+                                    text: `${responseJSON.message} `
                                 })
 
                             }

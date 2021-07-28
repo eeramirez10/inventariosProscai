@@ -140,6 +140,7 @@ controller.uploadData = (req, res) => {
 
 
     upload(req, res, async function (err) {
+
         if (err) {
 
             return res.status(500).json({
@@ -160,7 +161,8 @@ controller.uploadData = (req, res) => {
 
         }
         let certificado = req.file;
-        let coladas = req.body.coladas;
+        let { coladas } = req.body;
+
         let data = JSON.parse(req.body.data);
 
         for (let colada of coladas) {
@@ -172,13 +174,13 @@ controller.uploadData = (req, res) => {
             }
         }
 
-        await asincrinos(certificado, coladas, data, res).catch((err) => {
-            console.log(err)
-            res.status(500).json({
-                ok: false,
-                err: 'error'
-            })
+
+        let { status, resp } = await asincrinos(certificado, coladas, data)
+
+        res.status(status).json({
+            ...resp
         })
+
 
 
     })
@@ -195,9 +197,7 @@ async function asincrinos(certificado, coladas, data, res) {
         PRVNOM,
         PRVRFC,
         DNUM,
-        DFECHA,
-        DREFERELLOS,
-        DREFER,
+        DFECHA, DREFERELLOS, DREFER,
         ICOD,
         IUM,
         IEAN,
@@ -206,13 +206,7 @@ async function asincrinos(certificado, coladas, data, res) {
 
     } = data;
 
-    const {
-        fieldname,
-        originalname,
-        encoding,
-        mimetype,
-        path
-    } = certificado;
+    const { fieldname, originalname, encoding, mimetype, path } = certificado;
 
     try {
 
@@ -280,212 +274,174 @@ async function asincrinos(certificado, coladas, data, res) {
 
         console.log('idCertificado', idCertificado)
 
-        coladas.forEach(async (colada) => {
 
-            const coladasTable = await query(`
-            INSERT INTO coladas  (colada,idCertificado)
-            SELECT * FROM ( SELECT '${colada}', ${idCertificado}) as tmp
-            WHERE NOT EXISTS (SELECT idColada FROM coladas WHERE colada = '${colada}' ) 
-            
-            `
-            );
+        for (let colada of coladas) {
 
-            const { insertId: idColada } = coladasTable;
+            try {
 
-            const productoColadasTable = await query('INSERT INTO producto_coladas SET IdProducto = ?, idColada= ?', [idProducto, idColada]);
+                const isInColadas = await query('SELECT idColada from coladas where colada = ?  limit 1', [colada])
 
 
-        })
+                if (isInColadas.length > 0) {
+                    return {
+                        status: 400,
+                        resp: {
+                            ok: false,
+                            message: `La colada =  ${colada}    ya existe y debe de ser unica`
+                        }
+
+                    }
+                }
+
+
+                const coladasTable = await query(`
+                    INSERT INTO coladas  (colada,idCertificado)
+                    SELECT * FROM ( SELECT '${colada}', ${idCertificado}) as tmp
+                    WHERE NOT EXISTS (SELECT idColada FROM coladas WHERE colada = '${colada}' ) `
+                );
+
+                console.log(coladasTable)
+
+
+                let idColada =
+                    (coladasTable.insertId === 0)
+                        ? await query(`SELECT idColada FROM coladas WHERE colada = '${colada}'`)
+                            .then(resp => resp[0].idColada)
+                        : coladasTable.insertId
 
 
 
-        res.json({
-            ok: true,
-            message: 'Agregado Correctamente'
-        })
+
+
+                const productoColadasTable = await query(`
+                    INSERT INTO producto_coladas (idProducto, idColada) 
+                    SELECT * FROM (SELECT ${idProducto}, ${idColada}) as tmp
+                    WHERE NOT EXISTS (SELECT idColada, idProducto FROM producto_coladas WHERE idProducto = ${idProducto} AND idColada = ${idColada} ) 
+                `);
+
+
+            } catch (error) {
+                console.log(error);
+                return {
+                    status: 500,
+                    resp: {
+                        ok: false,
+                        message: 'Revisar logs'
+                    }
+                }
+
+            }
+
+
+        }
+
+        return {
+            status: 200,
+            resp: {
+                ok: true,
+                message: 'Agregado Correctamente'
+            }
+
+        }
 
 
     } catch (error) {
 
         console.log(error)
 
-        res.status(500).json({
-            ok: false,
-            message: 'Revisar logs'
-        })
+        return {
+            status: 500,
+            resp: {
+                ok: false,
+                message: 'Revisar logs'
+            }
+
+        }
+
     }
 }
 
 controller.getTables = async (req, res) => {
 
-    let tabla = req.params.table;
-    let body = req.body;
+    let { table } = req.params;
+    let { body } = req
 
 
+    const { status, payload } = await asyncTables(table, body)
 
-    asyncTables(tabla, body, res)
-        .catch(err => {
-            console.log(err)
-        })
-
+    res.status(status).json({ 
+        ...payload
+    })
 
 
 }
 
 
-async function asyncTables(tabla, body, res) {
+async function asyncTables(tabla, body) {
 
-    let dataArray = [];
 
-    if (tabla === 'extra') {
-        let entrada = body.codigo
+    try {
 
-        let productosDBTuvansa = await query(`
-        
-        select doc.entrada, doc.orden, prod.codigo, prod.descripcion, prod.cantidad, prod.unidad from productos_documentos as po
-        inner join documentos as doc on doc.idDocumento = po.idDocumento
-        inner join producto as prod on prod.idProducto = po.idProducto
-        where doc.entrada = '${entrada}'
+        if (tabla === "productos") {
+
+
+            let { codigo } = body;
     
-    `);
-
-        console.log(entrada)
-
-        return res.json({
-            ok: true,
-            productosDBTuvansa
-        })
-    }
-
-    if (tabla === "productos") {
-
-        let { codigo } = body;
-
-        let productos = await queryProscai(`
-        SELECT  DMULTICIA,PRVCOD,PRVNOM,PRVRFC,DNUM,DATE_FORMAT(DFECHA,"%Y-%m-%d") as DFECHA,DREFERELLOS,DREFER, ICOD,IUM,IEAN,I2DESCR,AICANT as AICANTF FROM FAXINV
-        LEFT JOIN FDOC ON FDOC.DSEQ=FAXINV.DSEQ
-        LEFT JOIN FINV ON FINV.ISEQ=FAXINV.ISEQ
-        LEFT JOIN FINV2 ON FINV2.I2KEY=FINV.ISEQ
-        LEFT JOIN FPRV ON FPRV.PRVSEQ=FDOC.PRVSEQ
-        WHERE DNUM='${codigo}' 
-        ORDER BY DNUM,AISEQ`);
-
-
-
-
-        let productosDBTuvansa = await query(`
-            SELECT pc.idProductoColadas ,prod.codigo,prod.descripcion,doc.entrada,doc.orden,prov.nombre FROM producto_coladas as pc
-            INNER JOIN producto as prod on prod.idProducto = pc.idProducto
-            INNER JOIN coladas as col on col.idColada = pc.idColada
-            INNER JOIN certificados as cer on cer.idCertificado = col.idCertificado
-            INNER JOIN productos_documentos as po on po.idProducto = prod.idProducto
-            INNER JOIN documentos as doc on doc.idDocumento = po.idDocumento
-            INNER JOIN proveedores as prov on prov.idProveedor = doc.idProveedor
-            WHERE doc.entrada = '${codigo}'
-        `);
-
-        //console.log(productosDBTuvansa)
-
-        if (productosDBTuvansa.length > 0) {
-
-            for (let productoDB of productosDBTuvansa) {
-
-                for (let [i, prod] of productos.entries()) {
-
-                    if (productoDB.codigo == prod.ICOD) {
-
-
-                        productos.splice(i, 1)
-
-                    }
-                }
-            }
-        }
-
-
-        return res.json({
-            ok: true,
-            data: productos
-        })
-    }
-
-    if (tabla === 'proveedores') {
-
-        let proveedores = await queryProscai('SELECT PRVCOD,PRVNOM,PRVRFC FROM FPRV WHERE MID(PRVCOD,1,1)="3"');
-
-
-
-
-        for (let proveedor of proveedores) {
-            let proveedorArray = []
-            proveedorArray.push(proveedor.PRVCOD, proveedor.PRVNOM, proveedor.PRVRFC)
-            dataArray.push(proveedorArray);
-        }
-
-        let columns = [
-            { title: "Codigo" },
-            { title: "Nombre" },
-            { title: "RFC" },
-        ]
-
-        return res.json({
-            ok: true,
-            data: dataArray,
-            columns
-        })
-
-
-    }
-
-
-
-    if (tabla === 'ordenes') {
-
-        let codigoProveedor = body.codigo
-
-
-
-        let ordenes = await queryProscai(`SELECT PRVCOD,PRVNOM,PRVRFC,DNUM,DATE_FORMAT(DFECHA,"%Y-%m-%d") as DFECHA,DREFERELLOS,DREFER FROM FDOC
+            let productos = await queryProscai(`
+            SELECT  DMULTICIA,PRVCOD,PRVNOM,PRVRFC,DNUM,DATE_FORMAT(DFECHA,"%Y-%m-%d") as DFECHA,DREFERELLOS,DREFER, ICOD,IUM,IEAN,I2DESCR,AICANT as AICANTF FROM FAXINV
+            LEFT JOIN FDOC ON FDOC.DSEQ=FAXINV.DSEQ
+            LEFT JOIN FINV ON FINV.ISEQ=FAXINV.ISEQ
+            LEFT JOIN FINV2 ON FINV2.I2KEY=FINV.ISEQ
             LEFT JOIN FPRV ON FPRV.PRVSEQ=FDOC.PRVSEQ
-            WHERE PRVCOD='${codigoProveedor}' AND MID(PRVCOD,1,1)='3'  AND DESFACT=2 AND MID(DNUM,1,2)='RA'
-            ORDER BY DFECHA,DNUM`);
-
-
-
-        let columns = [
-            { title: "RFC" },
-            { title: "Entrada" },
-            { title: "Fecha" },
-            { title: "Factura" },
-            { title: "Orden" },
-
-        ]
-
-
-        for (let orden of ordenes) {
-            let ordenArray = [];
-
-
-            ordenArray.push(orden.PRVRFC, orden.DNUM, orden.DFECHA, orden.DREFERELLOS, orden.DREFER);
-
-            dataArray.push(ordenArray);
+            WHERE DNUM='${codigo}' 
+            ORDER BY DNUM,AISEQ`);
+    
+    
+            let productosDBTuvansa = await query(`
+                SELECT prod.codigo FROM producto_coladas as pc
+                INNER JOIN producto as prod on prod.idProducto = pc.idProducto
+                INNER JOIN productos_documentos as po on po.idProducto = prod.idProducto
+                INNER JOIN documentos as doc on doc.idDocumento = po.idDocumento
+                WHERE doc.entrada = '${codigo}'
+            `);
+    
+    
+    
+            if (productosDBTuvansa.length > 0) {
+    
+                productosDBTuvansa.forEach(
+                    ({ codigo }) => 
+                    productos = productos.filter(producto => producto.ICOD !== codigo)
+                )
+    
+            }
+    
+    
+            return ({
+                status: 200,
+                payload:{
+                    ok: true,
+                    data: productos
+                }
+               
+            })
         }
+        
+    } catch (error) {
 
-        return res.json({
-            ok: true,
-            data: dataArray,
-            columns
+        console.log(error)
+
+        return ({
+            status: 500,
+            payload:{
+                ok: false,
+                message: 'Revisar Logs'
+            }
+  
         })
-
-
+        
     }
 
-
-
-    res.status(400).json({
-        ok: false,
-        message: 'Se necesita un parametro'
-    })
 }
 
 

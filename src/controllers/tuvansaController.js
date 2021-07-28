@@ -8,6 +8,8 @@ let { table } = require('../helpers/tableServerPro')
 
 
 
+
+
 let sjoin = " left join usuario as u on finv.usuario = u.id ";
 let sTable = 'FINV';
 let aColumns = [
@@ -40,165 +42,159 @@ controller.insertaABdTuvansa = async (inventarios) => {
     }
 }
 
+
+
+
+const indexedByKey = (arr, key) => 
+    new Promise( resolve => resolve( arr.reduce((acc, el) => ({ ...acc, [el[key]]: el }), {}) ) )
+
+
+
+const nuevosInventarios = (indexed, inventarios) =>
+    new Promise(resolve => resolve( inventarios.filter(({ ISEQ }) => !indexed[ISEQ])));
+
+const registrosActualizados = (indexed, array, key, value) =>
+    new Promise(resolve => resolve( array.filter(  item  => indexed[item[key]][value] !== item[value]) ) );
+
+
+
+
+
+
 //Inserta o actualiza los datos desde proscai a la BD Tuvansa
-controller.insertaActualiza = async (inventarios) => {
-
-    let actualizados = [];
-    let insertados = [];
+controller.insertaActualiza = async (inventariosProscai, [almMty, almVer]) => {
 
 
-    if (!inventarios.length > 0) { // si no hay inventarios en porscai en la fecha actual
-        return {
-            ok: false,
-            message: 'No hay inventarios que insertar o actualizar'
+    try {
+
+        console.time(1)
+
+        const invMexico = await query(`Select ISEQ, ALMASIGNADO, ALMCANT, ALMCANTVER, ALMCANTMTY, I2DESCR, IUM FROM FINV `);
+
+        let indexedInvMexico = await indexedByKey(invMexico, 'ISEQ');
+
+        const nuevos = await nuevosInventarios(indexedInvMexico, inventariosProscai);
+
+        if (nuevos.length > 0) {
+
+            for (let inv of nuevos) {
+
+                await query(`INSERT INTO FINV SET ?`, [inv])
+            }
+
+            console.log('insertados correctamente', nuevos)
+
+            const indexedNuevos = await indexedByKey(nuevos, 'ISEQ');
+
+            indexedInvMexico = { ...indexedInvMexico, ...indexedNuevos }
+
+
+
         }
-    }
 
-    //console.log('DE PROSCAI', inventarios);
 
-    for (const inventario of inventarios) {
+        const AlmMtyResult = await registrosActualizados(indexedInvMexico, almMty,'ISEQ','ALMCANTMTY');
 
-        if (inventario.ALMCANT === null) {
-            inventario.ALMCANT = 0;
+        console.log(AlmMtyResult)
+
+        const AlmVerResult = await registrosActualizados(indexedInvMexico, almVer,'ISEQ','ALMCANTVER');
+
+        const almasignadoResutl = await registrosActualizados(indexedInvMexico, inventariosProscai,'ISEQ','ALMASIGNADO');
+
+        const almcantResult = await await registrosActualizados(indexedInvMexico, inventariosProscai,'ISEQ','ALMCANT')
+
+        const nuevoIum = await registrosActualizados(indexedInvMexico, inventariosProscai,'ISEQ','IUM')
+
+        const nuevoDescr = await await registrosActualizados(indexedInvMexico, inventariosProscai,'ISEQ','I2DESCR')
+
+
+        if (nuevoDescr.length > 0) {
+
+            for (const { ISEQ, I2DESCR } of nuevoDescr) {
+
+                await query('UPDATE  FINV SET I2DESCR = ? WHERE ISEQ = ?', [I2DESCR, ISEQ])
+
+                console.log('I2DESCR Actualizado')
+            }
+
         }
 
-        const buscaIseq = await query(`Select * FROM FINV WHERE ISEQ = ?  `, [inventario.ISEQ]);
 
-        if (buscaIseq.length === 0) {
-            let inserta = await query(`INSERT INTO FINV SET ?`, inventario);
-            insertados.push(inventario);
+        if (nuevoIum.length > 0) {
+
+
+
+            for (const { ISEQ, IUM } of nuevoIum) {
+
+                await query('UPDATE  FINV SET IUM = ? WHERE ISEQ = ?', [IUM, ISEQ])
+
+                console.log('IUM Actualizado')
+            }
+
+        }
+
+        if (AlmMtyResult.length > 0) {
+
+
+
+            for (const { ISEQ, ALMCANTMTY } of AlmMtyResult) {
+
+                await query('UPDATE  FINV SET ALMCANTMTY = ? WHERE ISEQ = ?', [ALMCANTMTY, ISEQ])
+
+                console.log('Actualizando Almacen mty')
+            }
+
+        }
+
+        if (AlmVerResult.length > 0) {
+
+            for (const { ISEQ, ALMCANTVER } of AlmVerResult) {
+
+                await query('UPDATE  FINV SET ALMCANTVER = ? WHERE ISEQ = ?', [ALMCANTVER, ISEQ])
+
+                console.log('Actualizando Almacen VER')
+            }
+
+        }
+
+        if (almasignadoResutl.length > 0) {
+
+            for (const { ISEQ, ALMASIGNADO } of almasignadoResutl) {
+
+                await query('UPDATE FINV SET ALMASIGNADO = ? WHERE ISEQ = ?', [ALMASIGNADO, ISEQ])
+
+            }
+
+            console.log('Almasignado Actualizado', almasignadoResutl)
+
+        }
+
+        if (almcantResult.length > 0) {
+
+
+
+            for (const { ALMCANT, ISEQ } of almcantResult) {
+                await query('UPDATE FINV SET ALMCANT = ? WHERE ISEQ = ?', [ALMCANT, ISEQ])
+            }
+
+            console.log('Almcant actualizado', almcantResult);
+
+
         }
 
 
-        /*         if (buscaIseq.length > 0) {
-        
-        
-                    //console.log(`el iseq ${buscaIseq[0].ISEQ} se encuentra en la bd tuvansa `)
-                    const buscaAlmcant = await query(`SELECT * FROM FINV WHERE ISEQ = ? AND ALMCANT != ?  `, [inventario.ISEQ, inventario.ALMCANT])
-        
-                    if (buscaAlmcant.length > 0) {
-        
-                        const actualiza = await query(`UPDATE FINV  SET ALMCANT = ${inventario.ALMCANT} WHERE ISEQ = ?`, [inventario.ISEQ])
-        
-                        if (actualiza) {
-                            actualizados.push(buscaAlmcant[0])
-                            //console.log(`el iseq ${inventario.ISEQ} tiene diferente valor PROSCAI ALMCANT= ${inventario.ALMCANT} TUVANSA ALMCANT = ${buscaIseq[0].ALMCANT}`)
-                        }
-        
-                    } else {
-                        // console.log(`el iseq ${buscaIseq[0].ISEQ} esta en la bd tuvansa pero los valores son iguales PROSCAI ALMCANT= ${inventario.ALMCANT} TUVANSA ALMCANT = ${buscaIseq[0].ALMCANT} `)
-                    }
-        
-                } else {
-        
-                    let inserta = await query(`INSERT INTO FINV SET ?`, inventario);
-                    insertados.push(inventario);
-                    // console.log(`el iseq ${inventario.ISEQ} es nuevo  `)
-        
-                } */
+        console.timeEnd(1)
 
 
-    }
 
 
-    if (actualizados.length > 0) {
-        return {
-            ok: true,
-            message: 'Registros actualizados',
-            data: actualizados
-        };
-    }
 
-    if (insertados.length > 0) {
-        return {
-            ok: true,
-            message: 'Registros insertados',
-            data: insertados
-        };
-    }
-
-    return {
-        ok: false,
-        message: 'No hay nada que hacer',
-    }
-
-}
-
-controller.insertaIum = async (ium) => {
-
-    for (let unidad of ium) {
-
-        console.log(unidad)
-
-        if (await query(`UPDATE FINV SET IUM = ? WHERE ISEQ = ?`, [unidad.IUM, unidad.ISEQ])) {
-
-            console.log('ok')
-        }
-    }
-
-
-    return {
-        ok: true,
-        message: 'Unidad de medida insertado correctamente'
+    } catch (error) {
+        console.log(error)
     }
 
 
 
-}
-
-controller.actualizaAlmcantAlmasignado = async (inventarioProscai) => {
-
-
-    for (let inventario of inventarioProscai) {
-
-        await query('UPDATE FINV SET ALMCANT = ? WHERE ISEQ = ?', [inventario.ALMCANT, inventario.ISEQ])
-
-
-        await query('UPDATE FINV SET ALMASIGNADO = ? WHERE ISEQ = ?', [inventario.ALMASIGNADO, inventario.ISEQ])
-
-    }
-
-
-    return {
-        ok: true,
-        message: `Actualizado cambios en inventario y asignados ${moment().tz('America/Mexico_City').format()} `,
-    }
-}
-
-
-controller.actualizaAlmacenesMexicoMonterreyVeracruz = async (inventarios) => {
-
-    const mexico = inventarios.almacenMexico
-    const monterrey = inventarios.almacenMonterrey
-    const veracruz = inventarios.almacenVeracruz
-
-    if (mexico.length > 0) {
-        console.log('Buscando cambios en almacen Mexico')
-        for (let inventario of mexico) {
-            await query(`UPDATE FINV SET ALMCANT = ?, ALMASIGNADO = ?, IUM = ? WHERE ISEQ = ?`, [inventario.ALMCANT, inventario.ALMASIGNADO, inventario.IUM, inventario.ISEQ]);
-        }
-    }
-
-    if (monterrey.length > 0) {
-        console.log('Buscando cambios en almacen Mexico/Monterrey')
-        for (let inventario of monterrey) {
-            await query(`UPDATE FINV SET ALMCANTMTY = ? WHERE ISEQ = ?`, [inventario.ALMCANT, inventario.ISEQ]);
-        }
-    }
-
-    if (veracruz.length > 0) {
-        console.log('Buscando cambios en almacen Mexico/Veracruz')
-        for (let inventario of veracruz) {
-            await query(`UPDATE FINV SET ALMCANTVER = ? WHERE ISEQ = ?`, [inventario.ALMCANT, inventario.ISEQ]);
-        }
-    }
-
-
-
-    return {
-        ok: true,
-        message: 'Almacenes actualizados'
-    }
 
 }
 
@@ -218,8 +214,8 @@ controller.inserta = async (req, res) => {
 
         if (req.user === undefined) {
 
-            return res.status(400).json({ ok:false,  message: 'No hay usuario' })
-            
+            return res.status(400).json({ ok: false, message: 'No hay usuario' })
+
         }
 
 
@@ -229,8 +225,8 @@ controller.inserta = async (req, res) => {
 
 
         if (isNaN(datos.ALMCANTREAL) || datos.ALMCANTREAL === '') {
-            return res.status(400).json({ ok:false, message: 'Solo datos numericos' })
-            
+            return res.status(400).json({ ok: false, message: 'Solo datos numericos' })
+
         }
 
 
@@ -243,7 +239,7 @@ controller.inserta = async (req, res) => {
         await query(`insert into usuariofinv set idFinv = (select id from finv where iseq = ${datos.ISEQ}), idUsuario = ${datos.idUsuario}`);
 
 
-        return res.json( {
+        return res.json({
             ok: true,
             message: 'Registros actualizados'
         })
@@ -346,30 +342,30 @@ controller.creaColumnaAFinDeMes = async () => {
 
 }
 
-controller.insertaProveedores = async (proveedoresProscai)=>{
+controller.insertaProveedores = async (proveedoresProscai) => {
 
 
     try {
 
         const [fecha] = await query('SELECT MAX( DATE_FORMAT(fecha_alta,"%Y-%m-%d" )) as ultimaAlta FROM proveedores');
 
-        const proveedores = proveedoresProscai.filter( proveedores => proveedores.prvalta > fecha.ultimaAlta );
-    
-        if( proveedores.length === 0){
+        const proveedores = proveedoresProscai.filter(proveedores => proveedores.prvalta > fecha.ultimaAlta);
+
+        if (proveedores.length === 0) {
             console.log('No hay proveedores nuevos')
             return;
         }
 
         console.log(proveedores)
 
-        proveedores.map( async ({prvcod, prvnom, prvrfc, prvalta}) =>{
-        
+        proveedores.map(async ({ prvcod, prvnom, prvrfc, prvalta }) => {
+
             await query('Insert into proveedores set codigo = ?, nombre = ?, rfc = ?, fecha_alta = ?', [prvcod, prvnom, prvrfc, prvalta]);
-    
+
         })
 
         console.log('insertados correctamente')
-        
+
     } catch (error) {
         console.log(error)
     }

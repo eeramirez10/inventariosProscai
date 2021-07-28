@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
 
-const {  isAuthenticated, isCertificado} = require('../middlewares/loginMiddleware');
+const {  isAuthenticated, isCertificado, isAdmin} = require('../middlewares/loginMiddleware');
 
 let { actualizar, usuarios, usuarioNuevo } = require('../controllers/usuarioController');
 
-router.get('/usuarios',[isAuthenticated,isCertificado], (req, res) => {
+router.get('/usuarios',[isAuthenticated,isAdmin], (req, res) => {
 
     const data = {
         user: req.user,

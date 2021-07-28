@@ -2,16 +2,15 @@ const router = require('express').Router();
 
 const loginController = require('../controllers/loginController');
 
-const { redirect }  = require('../helpers/rolRuta')
+const { types }  = require('../helpers/rolRuta')
 
 router.get('/', loginController.login);
+
 router.post('/login', loginController.loginPost, (req, res) => {
     
     let { area, rol } = req.user;
 
-
-    console.log(redirect[rol])
-    res.redirect('/certificados');
+    res.redirect(types[rol]);
 
 
 });

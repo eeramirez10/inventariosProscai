@@ -9,71 +9,42 @@ let ultimoDiaMes = moment().tz('America/Mexico_City').endOf('month').format('D')
 
 //controllers
 const {
-    buscaRegistrosNuevos,
     inventarios,
-    traeAlmcantAlmasigandoAlmacenesMexicoMonterreyVeracruz,
-    unidad,
+    AlmacenesMtyVer,
     getProveedores,
-    getLastProveedores
+ 
 } = require('../controllers/proscaiController');
 
 const { 
     creaColumnaAFinDeMes, 
     insertaActualiza, 
-    insertaABdTuvansa, 
-    actualizaAlmcantAlmasignado, 
-    actualizaAlmacenesMexicoMonterreyVeracruz, 
-    insertaIum,
     insertaProveedores
 } = require('../controllers/tuvansaController');
-
-//
-
-// Se usa una sola vez para insertar la bd de proscai a bd Tuvansa
-// inventarios()
-//     .then( (inventario) => {
-
-
-//         insertaABdTuvansa(inventario)
-//         .then( resp => console.log(resp))
-//         .catch( err => console.log(err))
-//     })
-//     .catch ( err => console.log(err))
 
 
 
 
 cron.schedule('*/10 * * * *', async () => {
 
-    console.log('Buscando cambios en Almacenes', momentTZMexico);
+    try {
 
-    let almacenes = await traeAlmcantAlmasigandoAlmacenesMexicoMonterreyVeracruz()
+        console.log('Buscando cambios en Almacenes', momentTZMexico);
 
-    actualizaAlmacenesMexicoMonterreyVeracruz(almacenes)
-        .then(resp => console.log(resp))
-        .catch(err => console.log(err))
+        const inventariosProscai = await inventarios();
+        const almMtyVer = await AlmacenesMtyVer();
+    
+        await insertaActualiza(inventariosProscai, almMtyVer );
+        
+    } catch (error) {
+        console.log(error)
+    }
 
-}, {
-    schedule: true,
-    timezone: "America/Mexico_City"
-})
 
-
-cron.schedule(`*/17 * * * *`, async () => {
-    console.log('Buscando registros nuevos', momentTZMexico)
-
-    let registrosNuevos = await buscaRegistrosNuevos()
-
-    insertaActualiza(registrosNuevos)
-        .then(resp => console.log(resp))
-        .catch(err => console.log(err))
 
 }, {
     schedule: true,
     timezone: "America/Mexico_City"
 })
-
-
 
 
 

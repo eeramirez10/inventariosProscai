@@ -1,12 +1,13 @@
 
 
-let redirect = {
+let types = {
     Upload: '/cierre',
     Almacenista: '/inventarios',
     administrador: '/usuarios',
     Certificados: '/certificados'
+    
 }
 
 
 
-module.exports = {  redirect }
+module.exports = {  types }

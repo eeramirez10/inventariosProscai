@@ -5,6 +5,8 @@ const passportLocal = require('passport-local').Strategy;
 
 const query = require('../connection/tuvansaConnection');
 
+const { types } = require('../helpers/rolRuta')
+
 
 passport.use(new passportLocal( async  (username, password, done) =>  {
 
@@ -20,16 +22,19 @@ passport.use(new passportLocal( async  (username, password, done) =>  {
 
             if (usuarios.length > 0){
 
+                const { id,nombre,apellido, user, area, rol,upload, sucursal } = usuarios[0];
+
+
                 return done(null,
                     {
-                        idUsuario: usuarios[0].id,      
-                        nombre: usuarios[0].nombre,
-                        apellido: usuarios[0].apellido,
-                        user: usuarios[0].user,
-                        area: usuarios[0].area,
-                        rol: usuarios[0].rol,
-                        upload: usuarios[0].upload,
-                        sucursal: usuarios[0].sucursal
+                        idUsuario: id,      
+                        nombre: nombre,
+                        apellido: apellido,
+                        user: user,
+                        area: area,
+                        rol: rol,
+                        upload: upload,
+                        sucursal: sucursal
                     }
                 );
         
@@ -49,39 +54,6 @@ passport.use(new passportLocal( async  (username, password, done) =>  {
     }
 
 
-
-
-
-        
-
-
-
-/*     connection.query(queryUsuarios,[username, password],(err, results)=>{
-
-        if (err) throw err;
-       console.log(results) 
-        if (results.length > 0 ){
-            return done(null,
-                {
-                    idUsuario: results[0].id,
-                    nombre: results[0].nombre,
-                    apellido: results[0].apellido,
-                    user: results[0].user,
-                    area: results[0].area,
-                    rol: results[0].rol,
-                    upload: results[0].upload,
-                    sucursal: results[0].sucursal
-                }
-            );
-
-            
-        }
-
-       return done(null, false, { message: 'Usuario o password incorrecto' });
-    }) */
-
-    
-
 }))
 
 passport.serializeUser((user, done) => {
@@ -97,9 +69,12 @@ passport.deserializeUser((user, done) => {
 
 controller.login = (req, res, next) => {
 
-
+    
     if (req.isAuthenticated()) {
-        return res.redirect('/cierre');
+
+        let { rol } = req.user;
+        
+        return res.redirect(types[rol]);
     }
     res.render('login');
 
