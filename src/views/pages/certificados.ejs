@@ -60,7 +60,7 @@
             cursor: pointer;
         }
 
-        tr.details td.details-control {
+        tr.shown td.details-control {
             background: url('images/details_close.png') no-repeat center center;
         }
 
@@ -130,17 +130,17 @@
                                     <div class="card-body">
 
                                         <div class="table-responsive">
-                                            <table id="sample_data" class="table table-bordered table-hover"
+                                            <table id="sample_data" class="table table-bordered "
                                                 style="width:100%; font-size:11px; ">
                                                 <thead>
                                                     <tr>
                                                         <th>UID</th>
                                                         <th>Alta</th>
-                                                        <th>Codigo</th>
-                                                        <th>EAN</th>
-                                                        <th>Descripcion</th>
-                                                        <th>Colada</th>
-                                                        <th>Archivo</th>
+                                                        <th>Entrada</th>
+                                                        <th>Orden</th>
+                                                        <th>Proveedor</th>
+                                                        <th>Coladas</th>
+
                                                     </tr>
                                                 </thead>
                                                 <tbody></tbody>
@@ -194,26 +194,49 @@
 
                     function format(d) {
 
-                        let template2 = `
-                            <table  cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">
+
+                        let body = ``;
+
+                        for (let { ID, Codigo, EAN, Descripcion, Colada, Fecha, Certificado } of d) {
+
+                            body += `
+
                                 <tr>
-                                    <td>Proveedor:</td>
-                                    <td>${d[10]} </td>
-                                </tr>
-                                <tr>
-                                    <td>Entrada:</td>
-                                
-                                    <td> ${d[8]} </td>
-                                </tr>
-                                <tr>
-                                    <td>Orden:</td>
-                                    <td> ${d[9]} </td>
-                                </tr>
-                                <tr>
-                                    <td>Fecha:</td>
-                                    <td> ${d[6]} </td>
+                                    <td>${ID} </td>
+                                    <td> ${Codigo} </td>
+                                    <td> ${EAN} </td>
+                                    <td> ${Descripcion} </td>
+                                   
+                                    <td> ${Colada} </td>
+                                    <td> <btn class="btn btn-xs bg-success view-pdf" href='${Certificado}' ><i class ="fa fa-file-pdf-o"></i></></btn>  </td>
+                                    
                                 </tr>
                             
+                            
+                            `
+
+                        }
+
+                      
+                        let template2 = `
+                            <table class="table table-primary table-striped table-hover "  cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Codigo</th>  
+                                        <th>EAN</th>  
+                                        <th>Descripcion</th>
+                                       
+                                        <th>Colada</th>  
+                                        <th>Certificado</th>  
+                                         
+                                    </tr>
+                                    
+                                </thead>
+                                <tbody>
+                                  ${body}
+                                </tbody>
+
                             </table>
                             `
 
@@ -269,11 +292,11 @@
                                 { "data": [3] },
                                 { "data": [4] },
                                 { "data": [5] },
-                                {
-                                    "data": [7],
-                                    render: (data, type, row) =>
-                                        `<btn class="btn btn-xs bg-success view-pdf" href='${data}' ><i class ="fa fa-file-pdf-o"></i></></btn>`
-                                },
+                                // {
+                                //     "data": [7],
+                                //     render: (data, type, row) =>
+                                //         `<btn class="btn btn-xs bg-success view-pdf" href='${data}' ><i class ="fa fa-file-pdf-o"></i></></btn>`
+                                // },
 
                             ],
                             "dom": 'Bfrtip',
@@ -286,7 +309,8 @@
                                 }
                             }
                             ],
-                            "order": [[0, "desc"]]
+                            "order": [[0, "desc"]],
+                            "columnDefs": [{ "visible": false, "targets": [5] }]
                         });
 
 
@@ -294,13 +318,11 @@
                         $('#sample_data tbody').on('click', 'td.details-control', async function () {
 
 
-                            var tr = $(this).closest('tr');
-                            var row = dataTable.row(tr);
-                            //let entrada = row.data()[2]
+                            let tr = $(this).closest('tr');
+                            let row = dataTable.row(tr);
+                            const entrada = row.data()[2];
 
-
-
-                            //let extra = await getData('extra', entrada);
+                            let { data } = await getData('coladas', entrada);
 
 
                             if (row.child.isShown()) {
@@ -310,53 +332,11 @@
                             }
                             else {
                                 // Open this row
-                                row.child(format(row.data())).show();
+                                row.child(format(data)).show();
                                 tr.addClass('shown');
 
-                                //$('.extra').DataTable()
                             }
                         });
-
-                        // $('#sample_data').on('draw.dt', function () {
-
-                        //     $(this).Tabledit({
-                        //         url: `/usuarios`,
-                        //         eventType: 'dblclick',
-                        //         deleteButton: false,
-                        //         editButton: true,
-
-                        //         //dataType: 'json',
-                        //         columns: {
-                        //             identifier: [2, 'ISEC'],
-                        //             editable: [
-                        //                 [5, 'colda'],
-                        //             ]
-                        //         },
-                        //         onSuccess: function (data, textStatus, jqXHR) {
-
-
-                        //             Swal.fire({
-                        //                 position: 'top-end',
-                        //                 icon: 'success',
-                        //                 title: `${data.message}`,
-                        //                 showConfirmButton: true
-                        //             })
-
-                        //         },
-                        //         onFail: function (jqXHR, textStatus, errorThrown) {
-
-                        //             Swal.fire({
-                        //                 icon: 'error',
-                        //                 title: 'Error',
-                        //                 text: `${jqXHR.responseJSON.message}`,
-                        //             })
-
-                        //         },
-
-
-                        //     })
-
-                        // })
 
                     }
 
@@ -396,9 +376,7 @@
                             ordenCompra = proveedores.row(this).data()[6];
 
 
-                            let datas = await getData('productos', codigo);
-
-                            let { data } = datas;
+                            let { data } = await getData('productos', codigo);
 
                             if (data) cierraSpinner();
 
@@ -434,23 +412,32 @@
                                         "defaultContent": `
 
                                             <form class="coladas-archivo" name="coladas-archivo" method="POST" enctype="multipart/form-data" >
-                                                <div class="form-horizontal form-material ">
+
+                                                <div>
+                                                    <div class="form-horizontal form-material ">
                                                     <div class="form-group row">
 
                                                         <div class="col-sm-12">
                                                             <a href="javascript:void(0);" for="inputEmail3" class="add_button mx-3"><img src="images/details_open.png"/></a>
-                                                            <input type="text" class="form-control form-control-line " name="coladas[]" placeholder="colada" required>
+                                                            <input type="text" class="form-control form-control-line " name="coladas" placeholder="colada"  required value=""  onkeyup="javascript:this.value=this.value.toUpperCase();">
                                                         </div>
+                                                    </div>
+                                                    <div class="col-sm-12 mb-2">
+                                                        <input type="file" class="certificado form-control-line "  name="certificados" placeholder="Certificado" required>
+                                                    </div>
 
+
+                                                </div>
+                                                    
+                                                    
+                                                </div>
+
+
+                                                <div class="d-grid gap-2">
+                                                        <button type="submit"  class='button-enviar btn btn-primary btn-sm'>enviar</button>
                                                     </div>
                                                 
-                                                </div>
-                                                <div class="col-sm-12 mb-2">
-                                                    <input type="file" class="certificado form-control-line "  name="certificado" placeholder="Certificado">
-                                                </div>
-                                                <div class="d-grid gap-2">
-                                                    <button style="display:none"  class='button-enviar btn btn-primary btn-sm'>enviar</button>
-                                                </div>
+                   
                                             </form>
                                     ` },
 
@@ -488,61 +475,63 @@
                     }
 
                     //Agrega mas coladas
-                    $('#TablaProductos tbody').on('click', '.add_button', function (e) {
-                        var fieldHTML = `
-                                <div class="form-group row">
-                                    <div class="col-sm-12">
-                                        <a href="javascript:void(0);" for="inputEmail3" class="remove_button mx-3"><img src="images/details_close.png"/></a>
-                                        <input type="text" class="form-control form-control-line " name="coladas[]" placeholder="colada">
-                                    </div>
+                    $('#TablaProductos tbody').on('click', '.add_button', function ({ target }) {
+
+                        let fieldHTML = `
+                            <div class="form-group row">
+
+                                <div class="col-sm-12">
+                                    <a href="javascript:void(0);" for="inputEmail3" class="remove_button mx-3"><img src="images/details_close.png"/></a>
+                                    <input type="text" class="form-control form-control-line " name="coladas" placeholder="colada" required value=""  onkeyup="javascript:this.value=this.value.toUpperCase();">
                                 </div>
-                            `;
+                            </div>
+                            <div class="col-sm-12 mb-2">
+                                <input type="file" class="certificado form-control-line "  name="certificados" placeholder="Certificado" required>
+                            </div>`
+                            ;
 
+                        let div = document.createElement('div')
 
+                        div.classList.add('form-horizontal', 'form-material')
 
-                        $(this).parent('div').parent('div').parent('div').append(fieldHTML)
+                        div.innerHTML = fieldHTML;
+
+                        target.parentElement.parentElement.parentElement.parentElement.parentElement.append(div)
+
 
                     });
 
                     //Quita coladas
                     $('#TablaProductos tbody').on('click', '.remove_button', function () {
-                        $(this).parent('div').parent('div').remove();
+
+                        $(this).parent('div').parent('div').parent('div').remove()
+
                     });
 
 
-                    $('#TablaProductos tbody').on('change', '.certificado', function () {
-
-                        let botonEnviar = $(this)[0].parentElement.parentElement.children[2].children[0];
+                    $('#TablaProductos tbody').on('submit', '.coladas-archivo', function (e) {
 
 
-                        if ($(this)[0].value === '') {
-                            botonEnviar.style.display = 'none'
-                        } else {
-                            botonEnviar.style.display = 'block'
-                        }
-
-
-                    })
-
-
-                    $('#TablaProductos tbody').on('click', '.button-enviar', function (e) {
                         e.preventDefault()
+
+
                         let tablaProductosRow = productos.row($(this).parents('tr')).data();
-                        let tr = $(this)[0].parentElement.parentElement.parentElement.parentElement;
-                        let formColadasCertificado = $(this).parent('div').parent('form')[0];
-                        let formData = new FormData(formColadasCertificado);
+                        let tr = $(this)[0].closest('tr');
+                        let formData = new FormData($(this)[0]);
 
                         let string = JSON.stringify(tablaProductosRow)
 
-
-
-
                         formData.append('data', string)
 
+
+                        console.log($(this)[0].closest('tr'))
+
+
+
                         // Ver los valores de un form data
-                        /*                    for(let data of formData.entries()){
-                                              console.log(data)
-                                          }  */
+                        // for (let data of formData.entries()) {
+                        //     console.log(data)
+                        // }
 
                         cargaSpinner();
 
@@ -576,9 +565,9 @@
 
 
                             },
-                            error: function ({ responseJSON } ) {
+                            error: function ({ responseJSON }) {
 
-                              
+
 
                                 // $('#windowProductos').modal('hide')
                                 // $('#windowProveedor').modal('hide')

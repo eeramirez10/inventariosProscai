@@ -4,7 +4,7 @@
 
 
 
-const table = async (sTable, aColumns, sjoin, sWhere, DB, req) => {
+const table = async (sTable, aColumns, sjoin, sWhere, DB,  req) => {
 
     const request = req.query;
 
@@ -47,7 +47,9 @@ const table = async (sTable, aColumns, sjoin, sWhere, DB, req) => {
 
     }
 
-    let sQuery = ` SELECT SQL_CALC_FOUND_ROWS  ${aColumns.join(',')} FROM ${sTable} ${sjoin} ${sWhere} ${sOrder}  ${sLimit} `;
+    let sQuery = ` SELECT SQL_CALC_FOUND_ROWS  ${aColumns.join(',')} FROM ${sTable} ${sjoin} ${sWhere}  ${sOrder}  ${sLimit} `;
+
+    
 
 
     let rResult = {};
