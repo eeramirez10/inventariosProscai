@@ -215,7 +215,8 @@ async function asyncTables(tabla, body) {
             prod.descripcion as Descripcion,
             col.colada as Colada,
             DATE_FORMAT(doc.fecha,"%Y-%m-%d") as Fecha,
-            cer.descripcion as Certificado
+            cer.descripcion as Certificado,
+            prod.cantidad as Cantidad
         
             from producto_coladas pc
             join coladas col on col.idColada = pc.idColada

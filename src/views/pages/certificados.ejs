@@ -197,7 +197,7 @@
 
                         let body = ``;
 
-                        for (let { ID, Codigo, EAN, Descripcion, Colada, Fecha, Certificado } of d) {
+                        for (let { ID, Codigo, EAN, Descripcion, Colada, Fecha,Cantidad, Certificado } of d) {
 
                             body += `
 
@@ -206,7 +206,7 @@
                                     <td> ${Codigo} </td>
                                     <td> ${EAN} </td>
                                     <td> ${Descripcion} </td>
-                                   
+                                    <td> ${Cantidad} </td>
                                     <td> ${Colada} </td>
                                     <td> <btn class="btn btn-xs bg-success view-pdf" href='${Certificado}' ><i class ="fa fa-file-pdf-o"></i></></btn>  </td>
                                     
@@ -226,7 +226,7 @@
                                         <th>Codigo</th>  
                                         <th>EAN</th>  
                                         <th>Descripcion</th>
-                                       
+                                        <th>Cantidad</th>
                                         <th>Colada</th>  
                                         <th>Certificado</th>  
                                          
