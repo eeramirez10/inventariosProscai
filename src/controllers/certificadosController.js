@@ -109,23 +109,7 @@ async function asincrinos(certiCol, data) {
 
     try {
 
-        for (const { colada } of certiCol) {
 
-            let existeColada = await getIdColada(colada);
-
-            if (existeColada) {
-
-                return {
-                    status: 400,
-                    resp: {
-                        ok: false,
-                        message: `La colada   ya existe y debe de ser unica`
-                    }
-                }
-
-            }
-
-        }
 
 
 
@@ -146,9 +130,9 @@ async function asincrinos(certiCol, data) {
 
                 const idCertificado = await getIdCertificado(certificado);
 
-                const idColada = await SetColada(colada, idCertificado)
+                const idColada = await getIdColada(colada)
 
-                const idProductoColadas = await getIdProductoColadas(idColada, idProductoDocumentos);
+                const idProductoColadas = await getIdProductoColadas(idColada,idCertificado, idProductoDocumentos);
 
 
 
@@ -235,7 +219,7 @@ async function asyncTables(tabla, body) {
         
             from producto_coladas pc
             join coladas col on col.idColada = pc.idColada
-            join certificados cer on cer.idCertificado = col.idCertificado
+            join certificados cer on cer.idCertificado = pc.idCertificado
             join productos_documentos pd on pd.idProductoDocumentos = pc.idProductoDocumentos
             join producto prod on prod.idProducto = pd.idProducto
             join documentos doc on doc.idDocumento = pd.idDocumento

@@ -77,8 +77,21 @@ helper.getIdCertificado = async ({originalname, path }) =>{
    
 }
 
-helper.getIdColada = async ( colada ) => 
-    await query('SELECT idColada from coladas where colada = ?  limit 1', [colada]).then( ([resp]) => resp && resp.idColada);
+helper.getIdColada = async ( colada ) =>{
+
+    let idColada = await query('SELECT idColada from coladas where colada = ?  limit 1', [colada]).then( ([resp]) => resp && resp.idColada);
+
+    if(!idColada){
+        return await query(` INSERT INTO coladas SET colada = '${colada}'`).then( resp => resp.insertId)
+    }
+
+    return idColada;
+
+}
+
+
+
+
 
 
 helper.SetColada = async ( colada, idCertificado ) =>  
@@ -90,16 +103,18 @@ helper.SetColada = async ( colada, idCertificado ) =>
 
 
 
-helper.getIdProductoColadas = async (idColada,idProductoDocumentos) =>{
+helper.getIdProductoColadas = async (idColada,idCertificado, idProductoDocumentos) =>{
 
     const idProductoColadas = await 
-        query(`SELECT idProductoColadas FROM  producto_coladas WHERE  idColada = ${idColada} AND  idProductoDocumentos = ${idProductoDocumentos} `).then( ([resp]) =>  resp && resp.idProductoColadas );
+        query(`
+            SELECT idProductoColadas FROM  producto_coladas 
+            WHERE  idColada = ${idColada} AND  idProductoDocumentos = ${idProductoDocumentos} AND  idCertificado = ${idCertificado}`).then( ([resp]) =>  resp && resp.idProductoColadas );
 
        
 
     if(!idProductoColadas){
 
-       return  await query(`INSERT INTO producto_coladas SET idColada = ${idColada}, idProductoDocumentos = ${idProductoDocumentos}`).then(resp => resp.insertId)
+       return  await query(`INSERT INTO producto_coladas SET idColada = ${idColada}, idProductoDocumentos = ${idProductoDocumentos}, idCertificado = ${idCertificado}`).then(resp => resp.insertId)
     }
 
    
