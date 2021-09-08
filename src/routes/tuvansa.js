@@ -26,7 +26,7 @@ router.get('/estadisticas',isAuthenticated, (req, res)=>{
 })
 
 
-router.get('/inventarios',[isAuthenticated, isAlmacenista, isVendedor],(req, res) => {
+router.get('/inventarios',[isAuthenticated, isAlmacenista],(req, res) => {
     const data = {
         user: req.user,
         title: 'Inventarios'
