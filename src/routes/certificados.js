@@ -1,12 +1,14 @@
 const express = require('express')
 const router = express.Router();
 
-const { certificadosQuery, getTables, uploadData, edit } = require('../controllers/certificadosController');
+const { certificadosQuery, getTables, uploadData, edit, certificadosVentas } = require('../controllers/certificadosController');
 const viewPdf = require('../controllers/viewPdf');
 
 const {  isAuthenticated, isCertificado, isAlmacenista, isAdmin } = require('../middlewares/loginMiddleware');
 
 router.get('/certificadosTable',certificadosQuery);
+
+router.get('/certificadosTableVentas', certificadosVentas )
 
 router.post('/certificadosData/:table',getTables );
 

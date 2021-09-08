@@ -19,28 +19,61 @@ const storageOptions = require('../helpers/uploadFiles');
 
 
 
-const sTable = 'producto_coladas as pc';
-
-const aColumns = [
-    "pd.idProductoDocumentos as ID",
-    'DATE_FORMAT(pc.fecha,"%Y-%m-%d") as Alta',
-    "doc.entrada as Entrada",
-    "doc.orden as Orden",
-    "prov.nombre as Proveedor",
-    "GROUP_CONCAT( col.colada,' ' ) as coladas"
-];
-
-const sjoin = `
-join coladas col on col.idColada = pc.idColada
-join productos_documentos pd on pd.idProductoDocumentos = pc.idProductoDocumentos
-join documentos doc on doc.idDocumento = pd.idDocumento
-join proveedores prov on prov.idProveedor = doc.idProveedor
-Group By doc.entrada
-`;
 
 
 
 controller.certificadosQuery = async (req, res) => {
+
+
+    const sTable = 'producto_coladas as pc';
+
+    const aColumns = [
+        "pd.idProductoDocumentos as ID",
+        'DATE_FORMAT(pc.fecha,"%Y-%m-%d") as Alta',
+        "doc.entrada as Entrada",
+        "doc.orden as Orden",
+        "prov.nombre as Proveedor",
+        "GROUP_CONCAT( col.colada,' ' ) as coladas"
+    ];
+
+    const sjoin = `
+        join coladas col on col.idColada = pc.idColada
+        join productos_documentos pd on pd.idProductoDocumentos = pc.idProductoDocumentos
+        join documentos doc on doc.idDocumento = pd.idDocumento
+        join proveedores prov on prov.idProveedor = doc.idProveedor
+        Group By doc.entrada
+    `;
+
+
+    let resp = await table(sTable, aColumns, sjoin, '', 'Tuvansa', req);
+
+    res.status(200).send(resp)
+
+}
+
+controller.certificadosVentas = async (req, res) => {
+
+    const sTable = 'producto_coladas as pc';
+
+    const aColumns = [
+        "pc.idProductoColadas as ID",
+        'prod.codigo as Codigo',
+        "prod.iean as EAN",
+        "prod.descripcion as Descripcion",
+        'DATE_FORMAT(doc.fecha,"%Y-%m-%d") as Fecha',
+        "prod.cantidad as Cantidad",
+        'col.colada as Colada',
+        'cer.descripcion as Certificado'
+    ];
+
+    const sjoin = `
+        join coladas col on col.idColada = pc.idColada
+        join certificados cer on cer.idCertificado = pc.idCertificado
+        join productos_documentos pd on pd.idProductoDocumentos = pc.idProductoDocumentos
+        join producto prod on prod.idProducto = pd.idProducto
+        join documentos doc on doc.idDocumento = pd.idDocumento
+        join proveedores prov on prov.idProveedor = doc.idProveedor
+    `;
 
     let resp = await table(sTable, aColumns, sjoin, '', 'Tuvansa', req);
 
@@ -315,7 +348,7 @@ controller.edit = async (req, res) => {
 
         const { id } = req.body
 
-       
+
 
         if (req.files[0]) {
 
@@ -336,8 +369,8 @@ controller.edit = async (req, res) => {
             }
         }
 
-        if( req.body.coladas ){
-            
+        if (req.body.coladas) {
+
             const { coladas } = req.body;
 
             const updateColada = await query(` 
@@ -354,7 +387,7 @@ controller.edit = async (req, res) => {
                 })
             }
 
-            
+
 
         }
 

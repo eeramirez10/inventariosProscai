@@ -48,21 +48,21 @@ cron.schedule('*/10 * * * *', async () => {
 
 
 
-// cron.schedule(`0 22 ${ultimoDiaMes} ${mes} *`, () => {
+cron.schedule(`0 22 ${ultimoDiaMes} ${mes} *`, () => {
 
-//     creaColumnaAFinDeMes()
-//         .then(resp => {
-//             if (resp === undefined) {
-//                 return
-//             }
-//             console.log(resp)
-//         })
-//         .catch(err => console.log(err))
+    creaColumnaAFinDeMes()
+        .then(resp => {
+            if (resp === undefined) {
+                return
+            }
+            console.log(resp)
+        })
+        .catch(err => console.log(err))
 
-// }, {
-//     schedule: true,
-//     timezone: "America/Mexico_City"
-// })
+}, {
+    schedule: true,
+    timezone: "America/Mexico_City"
+})
 
 
 

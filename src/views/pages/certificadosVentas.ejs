@@ -117,11 +117,13 @@
                                                         <thead>
                                                             <tr>
                                                                 <th>UID</th>
-                                                                <th>Alta</th>
-                                                                <th>Entrada</th>
-                                                                <th>Orden</th>
-                                                                <th>Proveedor</th>
-                                                                <th>Coladas</th>
+                                                                <th>Codigo</th>
+                                                                <th>EAN</th>
+                                                                <th>Descripcion</th>
+                                                                <th>Fecha</th>
+                                                                <th>Cantidad</th>
+                                                                <th>Colada</th>
+                                                                <th>Certificado</th>
 
 
                                                             </tr>
@@ -162,20 +164,27 @@
                                 "bDestroy": true,
                                 "processing": true,
                                 "serverSide": true,
-                                "ajax": { url: `/certificadosTable`, type: "GET" },
+                                "ajax": { url: `/certificadosTableVentas`, type: "GET" },
                                 "columns": [
-                                    { "data": [0], "class": "details-control" },
+                                    { "data": [0]},
                                     { "data": [1] },
                                     { "data": [2] },
                                     { "data": [3] },
                                     { "data": [4] },
                                     { "data": [5] },
+                                    { "data": [6] },
+                                    { "data": [7], 
+                                        render:(data,type, row) =>{
+                                            
+                                            return `<td> <btn class="btn btn-xs bg-success view-pdf" href='${data}' ><i class ="fa fa-file-pdf-o"></i></></btn>  </td>` 
+                                        }
+                                    },
 
 
                                 ],
 
                                 "order": [[1, "desc"]],
-                                "columnDefs": [{ "visible": false, "targets": [5] }]
+                                // "columnDefs": [{ "visible": false, "targets": [5] }]
                             });
 
 
