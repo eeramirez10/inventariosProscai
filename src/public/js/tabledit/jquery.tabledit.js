@@ -78,6 +78,8 @@ if (typeof jQuery === 'undefined') {
         var $lastDeletedRow = 'undefined';
         var $lastRestoredRow = 'undefined';
 
+        console.log(settings);
+
         /**
          * Draw Tabledit structure (identifier column, editable columns, toolbar column).
          *
@@ -110,10 +112,14 @@ if (typeof jQuery === 'undefined') {
                 editable: function() {
                     for (var i = 0; i < settings.columns.editable.length; i++) {
                         var $td = $table.find('tbody td:nth-child(' + (parseInt(settings.columns.editable[i][0]) + 1) + ')');
+
+                       
                        
                         $td.each(function() {
                             // Get text of this cell.
                             var text = $(this)[0].outerText;
+
+                           
 
                             // Add pointer as cursor.
                             if (!settings.editButton) {
@@ -143,7 +149,12 @@ if (typeof jQuery === 'undefined') {
                                 input += '</select>';
                             } else {
                                 // Create text input element.
-                                input = '<input class="tabledit-input ' + settings.inputClass + '" type="text" name="' + settings.columns.editable[i][1] + '" value="' + $(this).text() + '" style="display: none;" disabled>';
+
+                                
+                                
+
+                        
+                                input = `<input class="tabledit-input ${settings.inputClass}"  type="text" name=" ${settings.columns.editable[i][1]} " value=" ${$(this).text()}" style="display: none;" disabled>` ;
                             }
 
                             // Add elements and class "view" to table cell.

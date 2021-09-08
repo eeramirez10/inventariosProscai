@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <!-- Favicon icon -->
+    <link rel="icon" type="image/png" sizes="16x16" href="images/favicon.png">
+    <title>Tuvansa</title>
+    <!-- <link rel="stylesheet" href="https://cdn.datatables.net/1.10.22/css/jquery.dataTables.min.css"> -->
+    <!-- Bootstrap Core CSS -->
+    <link href="plugins/bootstrap/css/bootstrap.css" rel="stylesheet">
+
+        
+    <!-- Custom CSS -->
+    <link href="css/style.css" rel="stylesheet">
+    <!-- You can change the theme colors from here -->
+    <link href="css/colors/default-dark.css" id="theme" rel="stylesheet">
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+
+
+    <style>
+        .folder {
+            cursor: pointer;
+        }
+
+        td.details-control {
+            background: url('images/details_open.png') no-repeat center center;
+
+            cursor: pointer;
+        }
+
+        tr.shown td.details-control {
+            background: url('images/details_close.png') no-repeat center center;
+        }
+
+        button.close {
+            padding: 0;
+            background: 0 0;
+            border: 0;
+            -webkit-appearance: none;
+        }
+
+        .close {
+            float: right;
+            font-size: 1.5rem;
+            font-weight: 700;
+            line-height: 1;
+            color: #000;
+            text-shadow: 0 1px 0 #fff;
+            opacity: .5;
+
+        }
+    </style>
+</head>
+
+<body class="fix-header card-no-border fix-sidebar">
+    <!-- ============================================================== -->
+    <!-- Preloader - style you can find in spinners.css -->
+    <!-- ============================================================== -->
+    <%- include ('../partials/preloader.ejs'); -%>
+        <!-- ============================================================== -->
+        <!-- Main wrapper - style you can find in pages.scss -->
+        <!-- ============================================================== -->
+        <div id="main-wrapper">
+            <!-- ============================================================== -->
+            <!-- Topbar header - style you can find in pages.scss -->
+            <!-- ============================================================== -->
+            <%- include ('../partials/header.ejs'); -%>
+                <!-- ============================================================== -->
+                <!-- End Topbar header -->
+                <!-- ============================================================== -->
+                <!-- ============================================================== -->
+                <!-- Left Sidebar - style you can find in sidebar.scss  -->
+                <!-- ============================================================== -->
+                <%- include ('../partials/left-sidebar.ejs') -%>
+                    <!-- ============================================================== -->
+                    <!-- End Left Sidebar - style you can find in sidebar.scss  -->
+                    <!-- ============================================================== -->
+                    <!-- ============================================================== -->
+                    <!-- Page wrapper  -->
+                    <!-- ============================================================== -->
+                    <div class="page-wrapper">
+
+                        <!-- ============================================================== -->
+                        <!-- Container fluid  -->
+                        <!-- ============================================================== -->
+                        <div class="container-fluid">
+                            <!-- ============================================================== -->
+                            <!-- Bread crumb and right sidebar toggle -->
+                            <!-- ============================================================== -->
+                            <%- include ('../partials/breadcrumb.ejs') -%>
+                                <!-- ============================================================== -->
+                                <!-- End Bread crumb and right sidebar toggle -->
+                                <!-- ============================================================== -->
+
+                                <!-- ============================================================== -->
+                                <!-- Start Page Content -->
+                                <!-- ============================================================== -->
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="card">
+                                            <div class="card-body">
+
+                                                <div class="table-responsive">
+                                                    <table id="sample_data" class="table table-bordered "
+                                                        style="width:100%; font-size:11px; ">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>UID</th>
+                                                                <th>Alta</th>
+                                                                <th>Entrada</th>
+                                                                <th>Orden</th>
+                                                                <th>Proveedor</th>
+                                                                <th>Coladas</th>
+
+
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody></tbody>
+                                                    </table>
+                                                </div>
+
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- ============================================================== -->
+                                <!-- End PAge Content -->
+                                <!-- ============================================================== -->
+
+                        </div>
+                        <%- include ('../partials/footer.ejs') -%>
+
+                    </div>
+                    <!-- ============================================================== -->
+                    <!-- End Wrapper -->
+                    <!-- ============================================================== -->
+                    <!-- ============================================================== -->
+                    <!-- All Jquery -->
+                    <!-- ============================================================== -->
+
+
+                    <script>
+                        $(document).ready(function () {
+
+
+                            verPdf();
+
+
+                            dataTable = $('#sample_data').DataTable({
+                                "bDestroy": true,
+                                "processing": true,
+                                "serverSide": true,
+                                "ajax": { url: `/certificadosTable`, type: "GET" },
+                                "columns": [
+                                    { "data": [0], "class": "details-control" },
+                                    { "data": [1] },
+                                    { "data": [2] },
+                                    { "data": [3] },
+                                    { "data": [4] },
+                                    { "data": [5] },
+
+
+                                ],
+
+                                "order": [[1, "desc"]],
+                                "columnDefs": [{ "visible": false, "targets": [5] }]
+                            });
+
+
+                            // Add event listener for opening and closing details
+                            $('#sample_data tbody').on('click', 'td.details-control', async function () {
+
+
+                                let tr = $(this).closest('tr');
+                                let row = dataTable.row(tr);
+                                const entrada = row.data()[2];
+
+                                let { data } = await getData('coladas', entrada);
+
+
+                                if (row.child.isShown()) {
+                                    // This row is already open - close it
+                                    row.child.hide();
+                                    tr.removeClass('shown');
+
+
+                                }
+                                else {
+                                    // Open this row
+                                    row.child(format(data)).show();
+                                    tr.addClass('shown');
+
+                                }
+                            });
+
+
+                            function cargaSpinner() {
+                                Swal.fire({
+                                    showConfirmButton: false,
+                                    allowOutsideClick: false
+                                })
+                                Swal.showLoading({
+                                    allowOutsideClick: false
+                                })
+                            }
+
+                            function cierraSpinner() {
+                                Swal.close()
+                            }
+
+
+
+                            async function getData(param, codigo) {
+
+                                return await $.ajax({
+                                    url: `/certificadosData/${param}`,
+                                    data: { codigo },
+                                    type: 'POST',
+                                })
+                            }
+
+
+
+
+                            function verPdf() {
+
+                                $(document).on('click', '.view-pdf', async function () {
+
+                                    var pdf_link = $(this).attr('href');
+
+                                    cargaSpinner()
+
+                                    let resp = await $.ajax({
+                                        url: `/pdf/${pdf_link}`,
+                                        type: 'GET'
+                                    })
+
+
+
+                                    if (resp.ok) {
+                                        cierraSpinner()
+                                    }
+                                    let uri = `uploads/${pdf_link}`;
+                                    var iframe = `<object type="application/pdf" data="${uri}" width="100%" height="600">No Support</object>`
+                                    $.createModal({
+                                        title: '',
+                                        message: iframe,
+                                        closeButton: true,
+                                        scrollable: false
+                                    });
+                                    return true;
+
+                                })
+
+
+                            }
+
+
+                            function format(d) {
+
+
+                                let body = ``;
+
+                                for (let { ID, Codigo, EAN, Descripcion, Colada, Fecha, Cantidad, Certificado } of d) {
+
+                                    body += `
+
+                                <tr>
+                                    <td>${ID} </td>
+                                    <td> ${Codigo} </td>
+                                    <td> ${EAN} </td>
+                                    <td> ${Descripcion} </td>
+                                    <td> ${Cantidad} </td>
+                                    <td> ${Colada} </td>
+                                    <td> <btn class="btn btn-xs bg-success view-pdf" href='${Certificado}' ><i class ="fa fa-file-pdf-o"></i></></btn>  </td>
+
+                                </tr>
+    
+    
+    `
+
+                                }
+
+
+                                let template2 = `
+                                <table id="example" class="table table-hover table-info "  cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">
+                                    <thead class="thead-dark">
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Codigo</th>  
+                                            <th>EAN</th>  
+                                            <th>Descripcion</th>
+                                            <th>Cantidad</th>
+                                            <th>Colada</th>  
+                                            <th>Certificado</th>  
+
+                                        </tr>
+
+                                    </thead>
+                                    <tbody>
+                                      ${body}
+                                    </tbody>
+                                
+                                </table>
+                            
+                                `
+
+                                return template2;
+                            }
+
+
+
+
+                        })
+
+
+                    </script>

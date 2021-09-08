@@ -4,7 +4,8 @@ let types = {
     Upload: '/cierre',
     Almacenista: '/inventarios',
     administrador: '/usuarios',
-    Certificados: '/certificados'
+    Certificados: '/certificados',
+    Vendedor: '/certificadosVentas'
     
 }
 

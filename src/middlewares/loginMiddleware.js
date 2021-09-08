@@ -18,7 +18,17 @@ login.isAlmacenista = (req, res, next)=>{
     let { rol } = req.user;
 
 
-    if(rol !== 'administrador' && rol !== 'Almacenista' ) return res.redirect(types[rol]);
+    if(rol !== 'administrador' && rol !== 'Almacenista' && rol !== 'Vendedor') return res.redirect(types[rol]);
+   
+    next();
+
+}
+
+login.isVendedor = (req, res, next) =>{
+    
+    let { rol } = req.user;
+
+    if(rol !== 'administrador' && rol !== 'Vendedor' ) return res.redirect(types[rol]);
    
     next();
 

@@ -62,10 +62,10 @@ controller.uploadData = async (req, res) => {
 
 
         let certiCol = certificados.map((cer, index) =>
-            ({
-                colada: typeof coladas === 'string' ? coladas : coladas[index],
-                certificado: cer
-            })
+        ({
+            colada: typeof coladas === 'string' ? coladas : coladas[index],
+            certificado: cer
+        })
         )
 
         let data = JSON.parse(req.body.data);
@@ -132,7 +132,7 @@ async function asincrinos(certiCol, data) {
 
                 const idColada = await getIdColada(colada)
 
-                const idProductoColadas = await getIdProductoColadas(idColada,idCertificado, idProductoDocumentos);
+                const idProductoColadas = await getIdProductoColadas(idColada, idCertificado, idProductoDocumentos);
 
 
 
@@ -197,9 +197,9 @@ controller.getTables = async (req, res) => {
 }
 
 
+
+
 async function asyncTables(tabla, body) {
-
-
     try {
 
         if (tabla === 'coladas') {
@@ -266,11 +266,11 @@ async function asyncTables(tabla, body) {
                 WHERE d.entrada = '${codigo}'
             `);
 
-            
+
 
             if (productosDBTuvansa.length > 0) {
 
-                productosDBTuvansa.forEach( ({ codigo }) => 
+                productosDBTuvansa.forEach(({ codigo }) =>
                     productos = productos.filter(({ ICOD }) => ICOD !== codigo)
                 )
 
@@ -301,6 +301,83 @@ async function asyncTables(tabla, body) {
         })
 
     }
+
+}
+
+
+controller.edit = async (req, res) => {
+
+    try {
+        const upload = util.promisify(storageOptions)
+
+        await upload(req, res);
+
+
+        const { id } = req.body
+
+       
+
+        if (req.files[0]) {
+
+            const { originalname, path } = req.files[0];
+
+            const updateCertificados = await query(`
+            update certificados 
+            inner join producto_coladas on certificados.idCertificado = producto_coladas.idCertificado
+            set certificados.descripcion = '${originalname}', ruta = '${path}' 
+            where producto_coladas.idProductoColadas = ${id}
+        `)
+
+            if (updateCertificados.affectedRows === 0) {
+                return res.status(400).json({
+                    ok: false,
+                    msg: 'Error al Actualizar'
+                })
+            }
+        }
+
+        if( req.body.coladas ){
+            
+            const { coladas } = req.body;
+
+            const updateColada = await query(` 
+                update coladas
+                inner join producto_coladas on producto_coladas.idColada = coladas.idColada
+                set colada = '${coladas}' 
+                where producto_coladas.idProductoColadas = ${id}`
+            )
+
+            if (updateColada.affectedRows === 0) {
+                return res.status(400).json({
+                    ok: false,
+                    msg: 'Error al Actualizar'
+                })
+            }
+
+            
+
+        }
+
+
+
+        return res.json({
+            ok: true,
+            message: 'Actualizado correctamente'
+        })
+
+
+
+
+
+    } catch (error) {
+        console.log(error);
+
+        res.status(500).json({
+            ok: false,
+            message: 'Error revisar logs'
+        })
+    }
+
 
 }
 

@@ -60,6 +60,7 @@ const table = async (sTable, aColumns, sjoin, sWhere, DB,  req) => {
 
  
     let results = await query(sQuery)
+
     
 
     if (!results) return;
@@ -100,6 +101,8 @@ const table = async (sTable, aColumns, sjoin, sWhere, DB,  req) => {
         output.aaData.push(temp);
         temp = [];
     }
+
+
 
     return JSON.stringify(output);
 

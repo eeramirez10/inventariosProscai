@@ -13,8 +13,7 @@
     <link rel="icon" type="image/png" sizes="16x16" href="images/favicon.png">
     <title>Tuvansa</title>
     <!-- Bootstrap Core CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+    <link href="plugins/bootstrap/css/bootstrap.css" rel="stylesheet">
     <!-- Custom CSS -->
     <link href="css/style.css" rel="stylesheet">
     <!-- You can change the theme colors from here -->
@@ -140,6 +139,7 @@
                                                         <th>Orden</th>
                                                         <th>Proveedor</th>
                                                         <th>Coladas</th>
+                                                        <th> Actions </th>
 
                                                     </tr>
                                                 </thead>
@@ -188,16 +188,50 @@
 
                     let dataTable;
 
+                    
+
                     tablaCertificadosTuvansa()
 
                     verPdf();
+
+
+
+                    async function productosEntradasTable() {
+
+                        $('#tableProductosEntradas').DataTable({
+                            "bDestroy": true,
+                            "processing": true,
+                            "serverSide": true,
+                            "order": [],
+                            "ajax": { url: `/tableProductosEntradas`, type: "GET" },
+                            "columns": [
+                                { "data": [0] },
+                                { "data": [1] },
+                                { "data": [2] },
+                                { "data": [3] },
+                                { "data": [4] },
+                                { "data": [5] },
+                                { "data": [6] },
+
+
+
+                            ],
+                            "pageLength": 5
+
+
+
+
+                        });
+
+
+                    }
 
                     function format(d) {
 
 
                         let body = ``;
 
-                        for (let { ID, Codigo, EAN, Descripcion, Colada, Fecha,Cantidad, Certificado } of d) {
+                        for (let { ID, Codigo, EAN, Descripcion, Colada, Fecha, Cantidad, Certificado } of d) {
 
                             body += `
 
@@ -217,9 +251,9 @@
 
                         }
 
-                      
+
                         let template2 = `
-                            <table class="table table-primary table-striped table-hover "  cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">
+                            <table id="example" class="table table-primary table-striped table-hover  "  cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">
                                 <thead>
                                     <tr>
                                         <th>ID</th>
@@ -238,10 +272,13 @@
                                 </tbody>
 
                             </table>
+
                             `
 
                         return template2;
                     }
+
+
 
 
                     function verPdf() {
@@ -277,6 +314,8 @@
 
                     }
 
+
+
                     function tablaCertificadosTuvansa() {
 
                         dataTable = $('#sample_data').DataTable({
@@ -292,24 +331,56 @@
                                 { "data": [3] },
                                 { "data": [4] },
                                 { "data": [5] },
-                                // {
-                                //     "data": [7],
-                                //     render: (data, type, row) =>
-                                //         `<btn class="btn btn-xs bg-success view-pdf" href='${data}' ><i class ="fa fa-file-pdf-o"></i></></btn>`
-                                // },
+                                {
+                                    "data": '',
+                                    render: (data, type, row) => {
+
+
+
+                                        return `<btn 
+                                            class="btn btn-xs bg-warning editar" 
+                                            data-target="#modalCertificados" 
+                                            data-toggle="modal"
+                                            >
+                                            <i class ="fa fa-edit"></i></></btn>`
+
+                                    }
+
+                                },
 
                             ],
                             "dom": 'Bfrtip',
-                            "buttons": [{
-                                text: 'Alta',
-                                action: (e, dt, node, config) => printTable(),
-                                attr: {
-                                    "data-target": '#windowProveedor',
-                                    "data-toggle": "modal"
+                            "buttons": {
+                                dom: {
+                                    button: {
+                                        tag: 'button',
+                                        className: ''
+                                    }
+                                },
+                                "buttons": [{
+                                    text: 'Alta',
+                                    className: 'btn btn-primary',
+                                    action: (e, dt, node, config) => printTable(),
+                                    attr: {
+                                        "data-target": '#windowProveedor',
+                                        "data-toggle": "modal"
+                                    },
+
+                                },
+                                {
+                                    text: 'Codigos',
+                                    className: 'btn btn-success ',
+                                    action: (e, dt, node, config) => productosEntradasTable(),
+                                    attr: {
+                                        "data-target": '#modalProductosEntradas',
+                                        "data-toggle": "modal"
+                                    },
+
                                 }
-                            }
-                            ],
-                            "order": [[0, "desc"]],
+                                ]
+                            },
+
+                            "order": [[1, "desc"]],
                             "columnDefs": [{ "visible": false, "targets": [5] }]
                         });
 
@@ -329,6 +400,8 @@
                                 // This row is already open - close it
                                 row.child.hide();
                                 tr.removeClass('shown');
+
+
                             }
                             else {
                                 // Open this row
@@ -338,7 +411,234 @@
                             }
                         });
 
+
+                        $('#sample_data tbody').on('click', '.editar', async function () {
+
+                            const entrada = dataTable.row($(this).closest('tr')).data()[2];
+
+                            const { data } = await getData('coladas', entrada);
+
+
+                            const tablaCertificadosEdit = $("#TablaCertificados").DataTable({
+                                "bDestroy": true,
+                                "data": data,
+                                "columns": [
+
+                                    { "data": "ID" },
+                                    { "data": "Codigo" },
+                                    { "data": "EAN" },
+                                    { "data": "Descripcion" },
+                                    { "data": "Cantidad" },
+                                    {
+                                        "data": 'Colada',
+                                        render: (data, type, row) => {
+
+
+                                            return `
+
+                                        <form class="coladas-archivo-edit" name="coladas-archivo" method="POST" enctype="multipart/form-data" >
+                                        
+                                          
+                                                <div class="form-horizontal form-material ">
+                                                <div class="form-group ">
+                                                
+                                                    <div class="col-12">
+                                                        
+                                                        <input type="text" class="form-control form-control-line" style="width:100%" name="coladas" required value="${data}"  onkeyup="javascript:this.value=this.value.toUpperCase();">
+                                                    </div>
+                                                </div>
+                                                </div>
+
+
+                                           
+                                        
+                                    
+                                            
+                                            
+                                        </form>
+                                        `
+
+                                        },
+
+
+                                    },
+                                    {
+                                        "data": 'Certificado',
+                                        render: (certificado) => {
+
+                                            return `<btn class="btn btn-xs bg-warning edit-file" > Cambiar Archivo </btn>`
+                                        }
+                                    }
+
+                                ],
+
+                            })
+
+                            $('#TablaCertificados tbody').on('submit', '.coladas-archivo-edit', async function (e) {
+                                e.preventDefault();
+
+                                const { ID } = tablaCertificadosEdit.row($(this).parents('tr')).data();
+
+                                let formData = new FormData($(this)[0]);
+
+                                formData.append('id', ID);
+
+                                $.ajax({
+                                    url: '/certificadosEdit',
+                                    type: 'POST',
+                                    data: formData,
+                                    cache: false,
+                                    contentType: false,
+                                    processData: false,
+                                    success: function (resp) {
+
+                                        cierraSpinner()
+
+                                        Swal.fire({
+                                            position: 'top-end',
+                                            icon: 'success',
+                                            title: `${resp.message} `,
+                                            showConfirmButton: false,
+                                            timer: 1500
+                                        })
+
+
+                                        btn.classList.remove('bg-danger');
+                                        btn.classList.add('bg-success');
+                                        btn.textContent = 'Actualizado'
+                                        btn.disabled = true;
+
+
+                                        divPadre.removeChild(divPadre.children[1])
+
+                                    },
+                                    error: function (xhr, status, error) {
+                                        console.log(xhr, status, error)
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Oops...',
+                                            text: `Hubo en error, revisar con el administrador`
+                                        })
+                                    }
+
+                                })
+
+
+
+                            })
+
+                            $('#TablaCertificados tbody').on('click', '.edit-file', async function (e) {
+
+                                const { ID, Colada, Certificado } = tablaCertificadosEdit.row($(this).parents('tr')).data();
+
+                                let btn = $(this)[0];
+                                let divPadre = $(this)[0].parentElement;
+
+
+
+
+                                let formArchivo = document.createElement('form')
+
+                                formArchivo.setAttribute('method', 'POST')
+                                formArchivo.setAttribute('enctype', 'multipart/form-data')
+                                formArchivo.classList.add('archivo', 'my-2');
+                                formArchivo.innerHTML = `
+                                    <form class="archivo" name="archivo" method="POST" enctype="multipart/form-data" >
+                                        <div class="col-sm-12 mb-2">
+                                            <input type="file" class="certificado form-control-line "  name="certificados" placeholder="Certificado" required>
+                                        </div>
+                                    </form>
+                                `;
+
+
+
+
+                                if (btn.classList.contains('bg-warning')) {
+                                    console.log('si tiene warning')
+                                    btn.classList.remove('bg-warning');
+                                    btn.classList.add('bg-danger');
+                                    btn.textContent = ' Cancelar '
+
+                                } else if
+                                    (btn.classList.contains('bg-danger')) {
+
+                                    btn.classList.remove('bg-danger');
+                                    btn.classList.add('bg-warning');
+                                    btn.textContent = 'Cambiar Archivo'
+
+
+                                    divPadre.removeChild(divPadre.children[1])
+
+                                    return
+                                }
+
+                                $(this)[0].parentElement.append(formArchivo)
+
+                                formArchivo.onchange = (e) => {
+
+
+                                    cargaSpinner()
+
+                                    let formArchivo = e.target.parentElement.parentElement;
+                                    let formData = new FormData(formArchivo)
+
+                                    formData.append('id', ID)
+
+                                    $.ajax({
+                                        url: '/certificadosEdit',
+                                        type: 'POST',
+                                        data: formData,
+                                        cache: false,
+                                        contentType: false,
+                                        processData: false,
+                                        success: function (resp) {
+
+                                            cierraSpinner()
+
+                                            Swal.fire({
+                                                position: 'top-end',
+                                                icon: 'success',
+                                                title: `${resp.message} `,
+                                                showConfirmButton: false,
+                                                timer: 1500
+                                            })
+
+
+                                            btn.classList.remove('bg-danger');
+                                            btn.classList.add('bg-success');
+                                            btn.textContent = 'Actualizado'
+                                            btn.disabled = true;
+
+
+                                            divPadre.removeChild(divPadre.children[1])
+
+                                        },
+                                        error: function (xhr, status, error) {
+                                            console.log(xhr, status, error)
+                                            Swal.fire({
+                                                icon: 'error',
+                                                title: 'Oops...',
+                                                text: `Hubo en error, revisar con el administrador`
+                                            })
+
+                                        }
+
+                                    })
+
+                                }
+
+
+
+                            })
+
+
+                            $('#modalCertificados').on('hide.bs.modal', () => tablaCertificadosEdit.clear().draw())
+
+
+                        })
+
                     }
+
 
 
                     async function printTable() {
@@ -360,7 +660,8 @@
 
 
                             ],
-                            "order": [[6, "desc"]]
+                            "order": [[6, "desc"]],
+                            "pageLength": 5
                         })
 
 
@@ -475,7 +776,7 @@
                     }
 
                     //Agrega mas coladas
-                    $('#TablaProductos tbody').on('click', '.add_button', function ({ target }) {
+                    $(document).on('click', '.add_button', function ({ target }) {
 
                         let fieldHTML = `
                             <div class="form-group row">
@@ -502,7 +803,7 @@
                     });
 
                     //Quita coladas
-                    $('#TablaProductos tbody').on('click', '.remove_button', function () {
+                    $(document).on('click', '.remove_button', function () {
 
                         $(this).parent('div').parent('div').parent('div').remove()
 
