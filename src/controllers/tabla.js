@@ -61,7 +61,7 @@ controller.productosEntradas = async  (req , res) =>{
         let sTable = 'FAXINV';
 
         let aColumns = [
-            'ICOD', 'IEAN', 'I2DESCR', 'AICANT as AICANTF','DNUM', 'if(PRVNOM is NULL,"TRASPASO", PRVNOM) AS PRVNOM', 'DREFER'
+            'ICOD', 'IEAN', 'I2DESCR', 'AICANT as AICANTF','DNUM', 'if(PRVNOM is NULL,"TRASPASO", PRVNOM) AS PRVNOM', 'DREFER', 'DATE_FORMAT(DFECHA,"%Y-%m-%d") as DFECHA'
         ];
     
         let sjoin = `
