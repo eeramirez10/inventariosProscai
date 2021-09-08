@@ -12,7 +12,7 @@ const app = express();
 
 
 // Procesos de inserccion 
-// require('./procesos/procesos.js');
+require('./procesos/procesos.js');
 
 //Settings
 
