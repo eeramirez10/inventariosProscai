@@ -7,15 +7,20 @@ let { table } = require('../helpers/tableServerPro')
 
 controller.actualizar = async (req, res) => {
 
-    let user = req.body;
     
-
     try {
 
+        const usuario = {}
+        let { action, id, ...data } = req.body;
 
-        let { action, id, ...data } = user;
+        for ( d in data){
+            let propiedad = d.trim();
+            let valor = data[d].trim();
 
+            usuario[propiedad] = valor;
+        } 
 
+        
 
         if (action === 'delete'){
 
@@ -28,9 +33,9 @@ controller.actualizar = async (req, res) => {
 
         }
 
+        
 
-
-        let usuarios = await query('UPDATE usuario set ? where id = ?', [data, id])
+       await query('UPDATE usuario set ? where id = ?', [usuario, id])
 
 
         return res.json({
@@ -47,12 +52,6 @@ controller.actualizar = async (req, res) => {
             message: 'Hubo un error, revisar logs'
         })
     }
-
-
-
-
-
-
 
 
 }
@@ -90,9 +89,9 @@ controller.usuarios = async (req, res) => {
 
 controller.usuarioNuevo = async (req, res) => {
 
-    let { ...usuario } = req.body;
+    let usuario = req.body;
 
-    
+   
 
     try {
 
@@ -107,6 +106,8 @@ controller.usuarioNuevo = async (req, res) => {
                 message:'Ese usuario ya esta registrado'
             })
         }
+
+        
 
         let usuarioDB = await query('Insert into usuario set ?', usuario)
             

@@ -334,23 +334,24 @@
 
                                     })
 
-                                    usuarios.on('draw.dt', function () {
+                                    $('#usuarios').on('draw.dt', function () {
 
-                                        $(this).Tabledit({
+
+                                        $('#usuarios').Tabledit({
                                             url: `/usuarios`,
                                             eventType: 'dblclick',
                                             deleteButton: true,
                                             editButton: true,
 
-                                            //dataType: 'json',
+                                           
                                             columns: {
                                                 identifier: [0, 'id'],
                                                 editable: [
-                                                    [1, 'nombre'],
-                                                    [2, 'apellido'],
-                                                    [3, 'user'],
-                                                    [4, 'password'],
-                                                    [5, 'upload', `{
+                                                    [1, "nombre"],
+                                                    [2, "apellido"],
+                                                    [3, "user"],
+                                                    [4, "password"],
+                                                    [5, "upload", `{
                                                             "0":"no",
                                                             "1":"si"
                                                         }`],
@@ -421,6 +422,8 @@
                                                 $('#nuevoUsuario').modal('hide');
 
                                                 usuarios.draw();
+
+                                                $("#userForm").trigger('reset');
 
                                                 Swal.fire({
                                                     position: 'top-end',
