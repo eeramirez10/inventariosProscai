@@ -301,13 +301,13 @@ async function asyncTables(tabla, body) {
 
 
 
-            if (productosDBTuvansa.length > 0) {
+            // if (productosDBTuvansa.length > 0) {
 
-                productosDBTuvansa.forEach(({ codigo }) =>
-                    productos = productos.filter(({ ICOD }) => ICOD !== codigo)
-                )
+            //     productosDBTuvansa.forEach(({ codigo }) =>
+            //         productos = productos.filter(({ ICOD }) => ICOD !== codigo)
+            //     )
 
-            }
+            // }
 
 
             return ({

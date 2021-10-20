@@ -56,6 +56,9 @@
                                         <th>Asignado</th>
                                         <th>Disponible</th>
                                         <th>Inv/Real</th>
+                                        <th>Dif</th>
+                                        <th>Entrada</th>
+                                        <th>Salida</th>
                                         <th>Usuario</th>
                                         <th>Comentarios</th>
                                     </tr>
@@ -102,15 +105,43 @@
                     url: `/server`,
                     type: "GET"
                 },
+                "columns":[ 
+                    { "data":[0]},
+                    { "data":[1]},
+                    { "data":[2]},
+                    { "data":[3]},
+                    { "data":[4]},
+                    { "data":[5]},
+                    { "data":[6]},
+                    { "data":[7]},
+                    { "data":[8]},
+                    { "data":[9]},
+                    { "data":[10]},
+                    { "data":[11]},
+                    { "data":[16]},
+                    { "data":[14]},
+                    { "data":[15]},
+                    { "data":[12]},
+                    { "data":[13]},
+                ],
                 "columnDefs": [
                     {
-                        "targets": targets ,
+                        "targets": [7,8] ,
                         "visible": false
                     }
                 ],
                 "dom": 'Bfrtip',
-                "buttons": [
-                    'excel'
+                // "buttons": [
+                //     'excel'
+                // ],
+                "buttons":[
+                    {
+                        "extend":'excel',
+                        "exportOptions":{ 
+                            "columns":':visible'
+                        }
+                       
+                    }
                 ],
                 "dom": 'Blfrtip',
                 "lengthMenu": [
@@ -136,9 +167,14 @@
                     //data: { usuario : 'Erick'},
                     columns: {
                         identifier: [0, 'ISEQ'],
-                        editable: [[11, 'ALMCANTREAL'], [13, "COMENTARIOS"] /* , [2, 'last_name'], [3, 'gender', '{"1":"Male","2":"Female"}'] */]
+                        editable: [[9, 'ALMCANTREAL'], [11, "ENTRADA"],[12, 'SALIDA'], [14, "COMENTARIOS"]]
                     },
                     restoreButton: false,
+
+                    onAjax: function(action,serialize){
+                        console.log(action, serialize);
+                    },
+                    
                     onSuccess: function (data, textStatus, jqXHR) {
                         console.log(data);
                         $('#sample_data').DataTable().ajax.reload();

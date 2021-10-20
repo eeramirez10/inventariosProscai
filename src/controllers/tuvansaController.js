@@ -3,6 +3,7 @@ const controller = {};
 const moment = require('moment-timezone');
 
 const query = require('../connection/tuvansaConnection');
+const { deleteEspacesObject } = require('../helpers/deleteEspacesObject');
 
 let { table } = require('../helpers/tableServerPro')
 
@@ -13,8 +14,24 @@ let { table } = require('../helpers/tableServerPro')
 let sjoin = " left join usuario as u on finv.usuario = u.id ";
 let sTable = 'FINV';
 let aColumns = [
-    'ISEQ', 'ICOD', 'IEAN', 'I2DESCR', 'DATE_FORMAT(IALTA,"%Y-%m-%d") as IALTA', 'ALMCANT', 'IUM', 'ALMCANTMTY', 'ALMCANTVER', 'ALMASIGNADO', '(ALMCANT-ALMASIGNADO) as DIF', 'ALMCANTREAL',
-    'U.user', 'COMENTARIOS'];
+    'ISEQ',
+    'ICOD',
+    'IEAN',
+    'I2DESCR',
+    'DATE_FORMAT(IALTA,"%Y-%m-%d") as IALTA',
+    'ALMCANT',
+    'IUM',
+    'ALMCANTMTY',
+    'ALMCANTVER',
+    'ALMASIGNADO',
+    '(ALMCANT-ALMASIGNADO) as DISPONIBLE',
+    'ALMCANTREAL',
+    'U.user',
+    'COMENTARIOS',
+    "ENTRADA",
+    "SALIDA",
+    '(ALMCANT-ALMASIGNADO) - ALMCANTREAL'
+];
 
 
 // Se corre una sola vez por que inserta la base de datos en proscai a la base de tuvansa en el server 192.168.1.205
@@ -45,16 +62,16 @@ controller.insertaABdTuvansa = async (inventarios) => {
 
 
 
-const indexedByKey = (arr, key) => 
-    new Promise( resolve => resolve( arr.reduce((acc, el) => ({ ...acc, [el[key]]: el }), {}) ) )
+const indexedByKey = (arr, key) =>
+    new Promise(resolve => resolve(arr.reduce((acc, el) => ({ ...acc, [el[key]]: el }), {})))
 
 
 
 const nuevosInventarios = (indexed, inventarios) =>
-    new Promise(resolve => resolve( inventarios.filter(({ ISEQ }) => !indexed[ISEQ])));
+    new Promise(resolve => resolve(inventarios.filter(({ ISEQ }) => !indexed[ISEQ])));
 
 const registrosActualizados = (indexed, array, key, value) =>
-    new Promise(resolve => resolve( array.filter(  item  => indexed[item[key]][value] !== item[value]) ) );
+    new Promise(resolve => resolve(array.filter(item => indexed[item[key]][value] !== item[value])));
 
 
 
@@ -93,19 +110,19 @@ controller.insertaActualiza = async (inventariosProscai, [almMty, almVer]) => {
         }
 
 
-        const AlmMtyResult = await registrosActualizados(indexedInvMexico, almMty,'ISEQ','ALMCANTMTY');
+        const AlmMtyResult = await registrosActualizados(indexedInvMexico, almMty, 'ISEQ', 'ALMCANTMTY');
 
         console.log(AlmMtyResult)
 
-        const AlmVerResult = await registrosActualizados(indexedInvMexico, almVer,'ISEQ','ALMCANTVER');
+        const AlmVerResult = await registrosActualizados(indexedInvMexico, almVer, 'ISEQ', 'ALMCANTVER');
 
-        const almasignadoResutl = await registrosActualizados(indexedInvMexico, inventariosProscai,'ISEQ','ALMASIGNADO');
+        const almasignadoResutl = await registrosActualizados(indexedInvMexico, inventariosProscai, 'ISEQ', 'ALMASIGNADO');
 
-        const almcantResult = await await registrosActualizados(indexedInvMexico, inventariosProscai,'ISEQ','ALMCANT')
+        const almcantResult = await await registrosActualizados(indexedInvMexico, inventariosProscai, 'ISEQ', 'ALMCANT')
 
-        const nuevoIum = await registrosActualizados(indexedInvMexico, inventariosProscai,'ISEQ','IUM')
+        const nuevoIum = await registrosActualizados(indexedInvMexico, inventariosProscai, 'ISEQ', 'IUM')
 
-        const nuevoDescr = await await registrosActualizados(indexedInvMexico, inventariosProscai,'ISEQ','I2DESCR')
+        const nuevoDescr = await await registrosActualizados(indexedInvMexico, inventariosProscai, 'ISEQ', 'I2DESCR')
 
 
         if (nuevoDescr.length > 0) {
@@ -210,33 +227,37 @@ controller.inserta = async (req, res) => {
 
     try {
 
-        let datos = { ...req.body, ...req.user };
-
         if (req.user === undefined) {
 
             return res.status(400).json({ ok: false, message: 'No hay usuario' })
 
         }
 
+        const { idUsuario } = req.user 
 
-        if (datos.action !== 'edit') {
+        const  {  action, ISEQ, ...rest } = deleteEspacesObject(req.body)
+
+        let data = { 
+            ...rest,
+            USUARIO: idUsuario,
+            IALTAREAL:fechaActual
+        }
+
+
+        if ( action !== 'edit') {
             return;
         }
 
 
-        if (isNaN(datos.ALMCANTREAL) || datos.ALMCANTREAL === '') {
-            return res.status(400).json({ ok: false, message: 'Solo datos numericos' })
+        // if (isNaN(datos.ALMCANTREAL) || datos.ALMCANTREAL === '') {
+        //     return res.status(400).json({ ok: false, message: 'Solo datos numericos' })
 
-        }
-
-
-
-        console.log(datos);
+        // }
 
 
-        await query(`UPDATE FINV SET USUARIO= ?, IALTAREAL = ?, ALMCANTREAL = ?, COMENTARIOS = ? WHERE ISEQ = ? `, [datos.idUsuario, fechaActual, datos.ALMCANTREAL, datos.COMENTARIOS, datos.ISEQ])
+        await query(`UPDATE FINV SET ? WHERE ISEQ = ? `, [ data, ISEQ])
 
-        await query(`insert into usuariofinv set idFinv = (select id from finv where iseq = ${datos.ISEQ}), idUsuario = ${datos.idUsuario}`);
+        await query(`insert into usuariofinv set idFinv = (select id from finv where iseq = ${ISEQ}), idUsuario = ${idUsuario}`);
 
 
         return res.json({
