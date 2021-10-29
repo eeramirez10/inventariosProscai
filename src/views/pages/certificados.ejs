@@ -188,11 +188,14 @@
 
                     let dataTable;
 
-                    
+                    let altaProveedor;
+
+
 
                     tablaCertificadosTuvansa()
 
-                    verPdf();
+                    verPdf()
+                        
 
 
 
@@ -284,7 +287,7 @@
 
                     function verPdf() {
 
-                        $(document).on('click', '.view-pdf', async function () {
+                        $(document).on('click', '.view-pdf', async function (){
 
                             var pdf_link = $(this).attr('href');
 
@@ -295,11 +298,10 @@
                                 type: 'GET'
                             })
 
+                            console.log(resp)
 
+                            cierraSpinner()
 
-                            if (resp.ok) {
-                                cierraSpinner()
-                            }
                             let uri = `uploads/${pdf_link}`;
                             var iframe = `<object type="application/pdf" data="${uri}" width="100%" height="600">No Support</object>`
                             $.createModal({
@@ -308,7 +310,9 @@
                                 closeButton: true,
                                 scrollable: false
                             });
-                            return true;
+
+                            return true
+
 
                         })
 
@@ -334,18 +338,15 @@
                                 { "data": [5] },
                                 {
                                     "data": '',
-                                    render: (data, type, row) => {
-
-
-
-                                        return `<btn 
-                                            class="btn btn-xs bg-warning editar" 
-                                            data-target="#modalCertificados" 
-                                            data-toggle="modal"
-                                            >
-                                            <i class ="fa fa-edit"></i></></btn>`
-
-                                    }
+                                    render: (data, type, row) => (
+                                        `<btn 
+                                        class="btn btn-xs bg-warning editar" 
+                                        data-target="#modalCertificados" 
+                                        data-toggle="modal"
+                                        >
+                                        <i class ="fa fa-edit"></i></></btn>
+                                        `
+                                    )
 
                                 },
 
@@ -396,20 +397,17 @@
 
                             let { data } = await getData('coladas', entrada);
 
-
                             if (row.child.isShown()) {
-                                // This row is already open - close it
+
                                 row.child.hide();
                                 tr.removeClass('shown');
-
-
+                                return
                             }
-                            else {
-                                // Open this row
-                                row.child(format(data)).show();
-                                tr.addClass('shown');
 
-                            }
+
+                            row.child(format(data)).show();
+                            tr.addClass('shown');
+
                         });
 
 
@@ -659,8 +657,8 @@
                                 { "data": [5] },
                                 { "data": [6] },
 
-
                             ],
+                            "columnDefs": [{ "visible": false, "targets": [0] }],
                             "order": [[6, "desc"]],
                             "pageLength": 5
                         })
@@ -672,6 +670,7 @@
 
                             cargaSpinner();
 
+                            altaProveedor = proveedores.row(this).data()[7]
                             codigo = proveedores.row(this).data()[3];
                             proveedor = proveedores.row(this).data()[1];
                             entrada = proveedores.row(this).data()[3];
@@ -821,6 +820,8 @@
                         let tr = $(this)[0].closest('tr');
                         let formData = new FormData($(this)[0]);
 
+
+
                         let string = JSON.stringify(tablaProductosRow)
 
                         formData.append('data', string)
@@ -846,7 +847,7 @@
                             processData: false,
                             success: function (resp) {
 
-                                console.log(resp)
+
 
                                 tr.remove()
 

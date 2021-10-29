@@ -137,7 +137,7 @@ controller.uploadData = async (req, res) => {
 
 async function asincrinos(certiCol, data) {
 
-    const { PRVCOD } = data;
+    const { PRVCOD , PRVNOM, PRVRFC, PRVALTA } = data;
 
 
     try {
@@ -146,8 +146,14 @@ async function asincrinos(certiCol, data) {
 
 
 
-        const idProveedor = await getIdProveedor(PRVCOD);
+        let  { idProveedor } = await getIdProveedor(PRVCOD);
 
+
+        if(!idProveedor) {
+
+           idProveedor = await query('Insert into proveedores set codigo = ?, nombre = ?, rfc = ?, fecha_alta = ?', [PRVCOD, PRVNOM, PRVRFC, PRVALTA])
+            .then( resp => resp.insertId)
+        }
 
         const idDocumento = await getIdDocumento(idProveedor, data);
 
@@ -282,7 +288,7 @@ async function asyncTables(tabla, body) {
             let { codigo } = body;
 
             let productos = await queryProscai(`
-            SELECT  DMULTICIA,PRVCOD,PRVNOM,PRVRFC,DNUM,DATE_FORMAT(DFECHA,"%Y-%m-%d") as DFECHA,DREFERELLOS,DREFER, ICOD,IUM,IEAN,I2DESCR,AICANT as AICANTF FROM FAXINV
+            SELECT  DMULTICIA,PRVCOD,PRVNOM,PRVRFC,DATE_FORMAT(DFECHA,"%Y-%m-%d") as PRVALTA,DNUM,DATE_FORMAT(DFECHA,"%Y-%m-%d") as DFECHA,DREFERELLOS,DREFER, ICOD,IUM,IEAN,I2DESCR,AICANT as AICANTF FROM FAXINV
             LEFT JOIN FDOC ON FDOC.DSEQ=FAXINV.DSEQ
             LEFT JOIN FINV ON FINV.ISEQ=FAXINV.ISEQ
             LEFT JOIN FINV2 ON FINV2.I2KEY=FINV.ISEQ
@@ -346,7 +352,7 @@ controller.edit = async (req, res) => {
         await upload(req, res);
 
 
-        const { id } = req.body
+        const { id:idProductoColadas } = req.body
 
 
 
@@ -354,24 +360,93 @@ controller.edit = async (req, res) => {
 
             const { originalname, path } = req.files[0];
 
-            const updateCertificados = await query(`
-            update certificados 
-            inner join producto_coladas on certificados.idCertificado = producto_coladas.idCertificado
-            set certificados.descripcion = '${originalname}', ruta = '${path}' 
-            where producto_coladas.idProductoColadas = ${id}
-        `)
 
-            if (updateCertificados.affectedRows === 0) {
-                return res.status(400).json({
-                    ok: false,
-                    msg: 'Error al Actualizar'
+
+            const { idCertificado } = await query(`select idCertificado from producto_coladas where idProductoColadas = ?`, [idProductoColadas]).then( resp => resp[0])
+
+
+            const { count } = await query(`select count(*) as count from producto_coladas where idCertificado = ?`, [idCertificado]).then( resp => resp[0])
+           
+            
+            if ( count > 1){
+
+                let { idCertificado }  = await query(`select idCertificado from certificados where descripcion = ?`, [originalname]).then( ([resp]) => resp ? resp : { idColada:''});
+
+                if(idCertificado){
+
+                    await query(`update producto_coladas SET idCertificado = ? where idProductoColadas = ?`,[idCertificado, idProductoColadas]);
+
+                    return res.json({
+                        ok: true,
+                        message: 'Actualizado correctamente'
+                    })
+                }
+
+
+
+                idCertificado = await query(` INSERT INTO certificados SET descripcion = ?, ruta = ? `,[originalname, path]).then( resp => resp.insertId)
+
+
+                await query(`update producto_coladas SET idColada = ? where idProductoColadas = ?`,[idCertificado, idProductoColadas]);
+
+                return res.json({
+                    ok: true,
+                    message: 'Actualizado correctamente'
                 })
+
+
             }
+
+            const updateCertificados = await query(`
+                update certificados 
+                inner join producto_coladas on certificados.idCertificado = producto_coladas.idCertificado
+                set certificados.descripcion = '${originalname}', ruta = '${path}' 
+                where producto_coladas.idProductoColadas = ${idProductoColadas}
+            `);
+
+
         }
 
         if (req.body.coladas) {
 
             const { coladas } = req.body;
+
+      
+
+            const { idColada } = await query(`select idColada from producto_coladas where idProductoColadas = ?`, [idProductoColadas]).then( resp => resp[0])
+
+
+            const { count } = await query(`select count(*) as count from producto_coladas where idColada = ?`, [idColada]).then( resp => resp[0])
+           
+            
+            if ( count > 1){
+
+                let { idColada }  = await query(`select idColada from coladas where colada = ?`, [coladas]).then( ([resp]) => resp ? resp : { idColada:''});
+
+                if(idColada){
+
+                    await query(`update producto_coladas SET idColada = ? where idProductoColadas = ?`,[idColada, idProductoColadas]);
+
+                    return res.json({
+                        ok: true,
+                        message: 'Actualizado correctamente'
+                    })
+                }
+
+
+
+                idColada = await query(` INSERT INTO coladas SET colada = '${coladas}'`).then( resp => resp.insertId)
+
+
+                await query(`update producto_coladas SET idColada = ? where idProductoColadas = ?`,[idColada, idProductoColadas]);
+
+                return res.json({
+                    ok: true,
+                    message: 'Actualizado correctamente'
+                })
+
+
+            }
 
             const updateColada = await query(` 
                 update coladas
@@ -379,14 +454,6 @@ controller.edit = async (req, res) => {
                 set colada = '${coladas}' 
                 where producto_coladas.idProductoColadas = ${id}`
             )
-
-            if (updateColada.affectedRows === 0) {
-                return res.status(400).json({
-                    ok: false,
-                    msg: 'Error al Actualizar'
-                })
-            }
-
 
 
         }

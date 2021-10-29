@@ -26,7 +26,7 @@ if (typeof jQuery === 'undefined') {
 
         var defaults = {
             url: window.location.href,
-            inputClass: 'form-material ',
+            inputClass: 'form-material',
             toolbarClass: 'btn-toolbar',
             groupClass: 'btn-group btn-group-sm',
             dangerClass: 'danger',

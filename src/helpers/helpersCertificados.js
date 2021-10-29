@@ -4,11 +4,23 @@ const query = require('../connection/tuvansaConnection');
 
 
 helper.getIdProveedor = async (PRVCOD) => {
+
+    // if(!PRVCOD){
+    //     return 4499;
+    // }
+    
+    // let proveedor = await query('SELECT idProveedor From proveedores where codigo = ?', [PRVCOD]);
+
+    // console.log(proveedor);
+
+    // return ''
     
     return ( !PRVCOD )
     ? 4499
     : await query('SELECT idProveedor From proveedores where codigo = ?', [PRVCOD])
-    .then(([resp]) => resp.idProveedor)
+        .then(([resp]) => resp ? resp : { idProveedor: undefined })
+        
+    
 }
 
 

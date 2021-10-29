@@ -126,7 +126,8 @@
                 ],
                 "columnDefs": [
                     {
-                        "targets": [7,8] ,
+                        // 7 = ResMTY, 8 = ResVER, 12 = usuario, 13 = comentarios, 15 = salidA 16 = DIF
+                        "targets": [4,7,8,15,16] ,
                         "visible": false
                     }
                 ],
@@ -138,7 +139,8 @@
                     {
                         "extend":'excel',
                         "exportOptions":{ 
-                            "columns":':visible'
+                            "columns":[0,1,2,3,5,8,9,10,11,12,13]
+                            // "columns":':visible'
                         }
                        
                     }
@@ -167,7 +169,7 @@
                     //data: { usuario : 'Erick'},
                     columns: {
                         identifier: [0, 'ISEQ'],
-                        editable: [[9, 'ALMCANTREAL'], [11, "ENTRADA"],[12, 'SALIDA'], [14, "COMENTARIOS"]]
+                        editable: [[8, 'ALMCANTREAL'], [10, "ENTRADA"],[11, 'SALIDA'] ]
                     },
                     restoreButton: false,
 
