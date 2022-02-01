@@ -46,10 +46,7 @@ passport.use(new passportLocal( async  (username, password, done) =>  {
 
         console.log(error);
 
-        return res.status(500).json({
-            ok:false,
-            message:'Hubo un error recisar con el desarrollador'
-        })
+    
         
     }
 
