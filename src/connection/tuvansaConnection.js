@@ -23,6 +23,8 @@ connection.connect( err => {
     }
 })
 
+console.log(process.env.DATABASE_URL)
+
 let query = util.promisify(connection.query).bind(connection);
 
 module.exports = query;
