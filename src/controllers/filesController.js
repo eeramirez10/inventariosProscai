@@ -92,7 +92,12 @@ controller.getFiles = (req, res) => {
     c.on('ready', function () {
         c.list(path, function (err, list) {
 
-            if (err) throw err;
+            if (err){
+
+                console.log(err)
+
+                return 
+            };
 
             res.json({ data: list })
 

@@ -1,5 +1,6 @@
 const mysql = require('mysql');
 const util = require('util');
+
 const dotenv = require('dotenv').config()
 
 let connection = mysql.createConnection({
@@ -23,7 +24,7 @@ connection.connect( err => {
     }
 })
 
-console.log(process.env.DATABASE_URL)
+
 
 let query = util.promisify(connection.query).bind(connection);
 

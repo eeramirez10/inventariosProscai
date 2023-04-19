@@ -35,10 +35,12 @@ controller.dataTableOrdenes = async (req, res) => {
                 mid(DNUM,1,2)='1F')  AND  
                 (DCANCELADA=0 AND mid(DREFER,1,5)<>'CANCE'
             ) 
+
+          
             `;
     
     
-        let resp = await table(sTable, aColumns, sjoin,sWhere,'Proscai', req)
+        let resp = await table(sTable, aColumns, sjoin,sWhere,'Proscai', req, false)
 
         
     

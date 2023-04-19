@@ -8,6 +8,15 @@ const connection = mysql.createConnection({
     database: 'tuvansa'
 });
 
+connection.connect( err => {
+
+    if( err){
+        console.log(err.stack)
+
+        return;
+    }
+})
+
 const query = util.promisify(connection.query).bind(connection);
 
 
