@@ -32,9 +32,10 @@ controller.dataTableOrdenes = async (req, res) => {
                 mid(DNUM,1,2)='1C' OR 
                 mid(DNUM,1,2)='1D' OR 
                 mid(DNUM,1,2)='1E'  OR 
-                mid(DNUM,1,2)='1F')  AND  
-                (DCANCELADA=0 AND mid(DREFER,1,5)<>'CANCE'
-            ) 
+                mid(DNUM,1,2)='1F'
+                
+            )  AND  
+                (DCANCELADA=0 AND mid(DREFER,1,5)<>'CANCE') 
 
           
             `;
@@ -91,7 +92,7 @@ controller.productosEntradas = async  (req , res) =>{
             DCANCELADA=0 AND mid(DREFER,1,5)<>'CANCE'`;
     
     
-        let resp = await table(sTable, aColumns, sjoin,sWhere,'Proscai', req)
+        let resp = await table(sTable, aColumns, sjoin,sWhere,'Proscai', req, false)
     
         res.status(200).send(resp);
         

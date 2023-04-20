@@ -4,11 +4,13 @@
 
 
 
-const table = async (sTable, aColumns, sjoin, sWhere, DB,  req) => {
+const table = async (sTable, aColumns, sjoin, sWhere, DB,  req, buttons = true) => {
 
     const request = req.query;
 
     let query = DB === 'Tuvansa' ? require('../connection/tuvansaConnection') : require('../connection/proscaiConnection');
+
+   
 
 
     //Paging
@@ -25,19 +27,26 @@ const table = async (sTable, aColumns, sjoin, sWhere, DB,  req) => {
     }
     //Filtering
 
+  
 
 
-    if (request['search']['value'] && request['search']['value']) {
+    if (request['search']['value'].length > 3) {
+
+        
 
         sWhere += sWhere ? ` AND (` : `HAVING (`;
 
         let busqueda = request['search']['value'].toUpperCase();
+
+        let busquedaSinEspacios = busqueda.trim()
+
+
         
         for (var i = 0; i < aColumns.length; i++) {
             
             let columnas = aColumns[i].split(" ");
             
-            sWhere += `${columnas[columnas.length - 1]} LIKE '%${busqueda}%' OR `;
+            sWhere += `${columnas[columnas.length - 1]} LIKE '%${busquedaSinEspacios}%' OR `;
 
         }
 
@@ -47,7 +56,63 @@ const table = async (sTable, aColumns, sjoin, sWhere, DB,  req) => {
 
     }
 
+
+
     let sQuery = ` SELECT SQL_CALC_FOUND_ROWS  ${aColumns.join(',')} FROM ${sTable} ${sjoin} ${sWhere}  ${sOrder}  ${sLimit} `;
+
+    if (!buttons){
+
+        sQuery = ` SELECT  ${aColumns.join(',')} FROM ${sTable} ${sjoin} ${sWhere}  ${sOrder}  LIMIT 0 , 5  `;
+
+        let iFilteredTotal = {};
+        let iTotal = {};
+    
+     
+        let results = await query(sQuery)
+    
+        
+    
+        if (!results){
+
+            return {
+                aaData: [],
+                iTotalDisplayRecords:0,
+                iTotalRecords:0
+            }
+        }
+        
+
+
+        iFilteredTotal = 1
+    
+        iTotal =1
+    
+        //Output
+        let output = {};
+        let temp = [];
+    
+    
+        output.aaData = [];
+        output.iTotalDisplayRecords = 1
+        output.iTotalRecords = 1
+    
+        let aRow = results;
+    
+        for (let i in aRow) {
+            for (Field in aRow[i]) {
+                if (!aRow[i].hasOwnProperty(Field)) continue;
+                temp.push(aRow[i][Field]);
+            }
+            output.aaData.push(temp);
+            temp = [];
+        }
+    
+    
+    
+        return JSON.stringify(output);
+
+    }
+
 
     
 
