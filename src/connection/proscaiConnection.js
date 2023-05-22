@@ -1,11 +1,11 @@
-const mysql = require('mysql');
+const mysql = require('mysql2');
 const util = require('util');
 
 const connection = mysql.createConnection({
-    host: 'tuvansa.dyndns.org',
-    user: 'consultas',
-    password: 'consultas',
-    database: 'tuvansa'
+    host: process.env.DATABASE_URL2,
+    user: process.env.USER2,
+    password: process.env.PASSWORD2,
+    database: process.env.DB2,
 });
 
 connection.connect( err => {
