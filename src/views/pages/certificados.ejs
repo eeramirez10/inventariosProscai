@@ -18,6 +18,8 @@
     <link href="css/style.css" rel="stylesheet">
     <!-- You can change the theme colors from here -->
     <link href="css/colors/default-dark.css" id="theme" rel="stylesheet">
+
+
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -194,6 +196,7 @@
 
                     tablaCertificadosTuvansa()
 
+
                     verPdf()
 
 
@@ -201,7 +204,7 @@
 
                     async function productosEntradasTable() {
 
-                        $('#tableProductosEntradas').DataTable({
+                        const table = $('#tableProductosEntradas').DataTable({
                             "bDestroy": true,
                             "processing": true,
                             "serverSide": true,
@@ -225,6 +228,26 @@
 
 
 
+                        });
+
+                        table.on('xhr', function (e, settings, json) {
+
+
+
+
+                            if (json) {
+                                cierraSpinner()
+                            }
+                        });
+
+                        $('#tableProductosEntradas_filter input').unbind();
+
+                        $('#tableProductosEntradas_filter input').bind('keyup', function (e) {
+
+                            if (e.keyCode == 13) {
+                                cargaSpinner();
+                                table.search($(this).val()).draw();
+                            }
                         });
 
 
@@ -324,7 +347,7 @@
                     function tablaCertificadosTuvansa() {
 
                         dataTable = $('#sample_data').DataTable({
-                            "bDestroy": true,
+                            "bDestroy": false,
                             "processing": true,
                             "serverSide": true,
                             "order": [],
@@ -386,6 +409,15 @@
                             "columnDefs": [{ "visible": false, "targets": [5] }]
                         });
 
+
+                        $('#sample_data_filter input').unbind();
+
+                        $('#sample_data_filter input').bind('keyup', function (e) {
+                            console.log($(this).val())
+                            if (e.keyCode == 13) {
+                                dataTable.search($(this).val()).draw();
+                            }
+                        });
 
                         // Add event listener for opening and closing details
                         $('#sample_data tbody').on('click', 'td.details-control', async function () {
@@ -647,6 +679,7 @@
                         cargaSpinner();
 
                         let proveedores = $('#TablaProveedores').DataTable({
+
                             "bDestroy": true,
                             "processing": true,
                             "serverSide": true,
@@ -668,9 +701,21 @@
                             "paging": false
                         })
 
+
+
+                        $('#TablaProveedores_filter input').unbind();
+
+                        $('#TablaProveedores_filter input').bind('keyup', function (e) {
+
+                            if (e.keyCode == 13) {
+                                cargaSpinner();
+                                proveedores.search($(this).val()).draw();
+                            }
+                        });
+
                         proveedores.on('xhr', function (e, settings, json) {
 
-                            
+
 
 
                             if (json) {
