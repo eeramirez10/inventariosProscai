@@ -85,6 +85,10 @@ a.link {
   a.link:hover, a.link:focus {
     color: #398bf7; }
 
+.fade{
+  overflow-y: auto;
+}
+
 .img-responsive {
   width: 100%;
   height: auto;
