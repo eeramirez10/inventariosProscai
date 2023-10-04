@@ -354,7 +354,7 @@ controller.edit = async (req, res) => {
 
         const { id:idProductoColadas } = req.body
 
-
+      
 
         if (req.files[0]) {
 
@@ -452,7 +452,7 @@ controller.edit = async (req, res) => {
                 update coladas
                 inner join producto_coladas on producto_coladas.idColada = coladas.idColada
                 set colada = '${coladas}' 
-                where producto_coladas.idProductoColadas = ${id}`
+                where producto_coladas.idProductoColadas = ${idProductoColadas}`
             )
 
 
